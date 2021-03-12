@@ -18,6 +18,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "format": "npx prettier --write .",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
