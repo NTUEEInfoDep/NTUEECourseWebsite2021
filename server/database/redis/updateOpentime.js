@@ -2,8 +2,17 @@
 
 const redis = require("redis");
 
-const constants = require("../../constants.json");
 const openTime = require("../data/openTime.json");
+
+// ========================================
+
+if (process.env.NODE_ENV === "development") {
+  console.log("NODE_ENV = development");
+  require("dotenv").config();
+}
+
+const { REDIS_HOST, REDIS_PORT } = process.env;
+const OPEN_TIME_KEY = "ntuee-course-opentime";
 
 // ========================================
 
@@ -14,14 +23,13 @@ function createDateString(spec) {
 }
 
 module.exports = () => {
-  const client = redis.createClient(6379, constants.redisHost);
+  const client = redis.createClient(REDIS_PORT, REDIS_HOST);
   client.on("error", console.error);
 
-  const { openTimeKey } = constants;
   const startTime = createDateString(openTime.start);
   const endTime = createDateString(openTime.end);
 
-  client.hmset([openTimeKey, "start", startTime, "end", endTime], () => {
+  client.hmset([OPEN_TIME_KEY, "start", startTime, "end", endTime], () => {
     console.log("openTime updated!");
   });
 

@@ -3,7 +3,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-const constants = require("../../constants");
 const model = require("./model");
 const courses = require("../data/courses");
 
@@ -13,7 +12,15 @@ const studentsRaw = require("../private-data/students.json");
 // ========================================
 
 module.exports = () => {
-  mongoose.connect(`mongodb://${constants.mongoHost}/${constants.dbName}`, {
+  if (process.env.NODE_ENV === "development") {
+    console.log("NODE_ENV = development");
+    require("dotenv").config();
+  }
+
+  const SALT_ROUNDS = 10;
+  const { MONGO_HOST, MONGO_DBNAME } = process.env;
+
+  mongoose.connect(`mongodb://${MONGO_HOST}/${MONGO_DBNAME}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
@@ -22,7 +29,7 @@ module.exports = () => {
   db.on("error", console.error.bind(console, "connection error:"));
   db.once("open", async () => {
     console.log("Successfully connect to MongoDB!");
-    console.log(`dbName = "${constants.dbName}"`);
+    console.log(`dbName = "${MONGO_DBNAME}"`);
 
     // Drop the db
     await db.dropDatabase();
@@ -42,7 +49,7 @@ module.exports = () => {
     const students = [];
     await Promise.all(
       studentsRaw.map(async (studentRaw) => {
-        const salt = await bcrypt.genSalt(constants.saltRounds);
+        const salt = await bcrypt.genSalt(SALT_ROUNDS);
         const hash = await bcrypt.hash(studentRaw.password, salt);
         const student = { ...studentRaw };
         student.password = hash;
