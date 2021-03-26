@@ -8,7 +8,7 @@ const openTime = require("../data/openTime.json");
 
 if (process.env.NODE_ENV === "development") {
   console.log("NODE_ENV = development");
-  require("dotenv").config();
+  require("dotenv").config(); // eslint-disable-line
 }
 
 const { REDIS_HOST, REDIS_PORT } = process.env;

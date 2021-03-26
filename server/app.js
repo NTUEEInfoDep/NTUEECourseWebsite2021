@@ -11,7 +11,7 @@ const port = process.env.PORT || 8000;
 
 if (process.env.NODE_ENV === "development") {
   console.log("NODE_ENV = development");
-  require("dotenv").config();
+  require("dotenv").config(); // eslint-disable-line
 }
 
 const { MONGO_HOST, MONGO_DBNAME } = process.env;
@@ -37,8 +37,7 @@ db.once("open", () => {
   }
 
   app.use(logger("dev"));
-  app.use(express.static("assets"));
-  app.use(express.static("bundle")); // frontend static file
+  app.use(express.static("build"));
 
   app.use("/api", apiRouter);
 

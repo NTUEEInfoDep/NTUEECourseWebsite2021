@@ -17,7 +17,7 @@ const model = require("./database/mongo/model");
 
 if (process.env.NODE_ENV === "development") {
   console.log("NODE_ENV = development");
-  require("dotenv").config();
+  require("dotenv").config(); // eslint-disable-line
 }
 
 const { REDIS_HOST, REDIS_PORT } = process.env;
@@ -51,7 +51,6 @@ router.use(
 // Session middleware
 
 const secret = uuid.v4();
-console.log("Secret:", secret);
 
 const RedisStore = connectRedis(session);
 
