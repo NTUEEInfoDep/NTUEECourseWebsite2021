@@ -15,6 +15,13 @@ const model = require("./database/mongo/model");
 
 // ========================================
 
+function createDateString(spec) {
+  const { year, month, day, hour, minutes } = spec;
+  return new Date(year, month - 1, day, hour, minutes).toISOString();
+}
+
+// ========================================
+
 if (process.env.NODE_ENV === "development") {
   console.log("NODE_ENV = development");
   require("dotenv").config(); // eslint-disable-line
@@ -36,10 +43,13 @@ const hgetallAsync = promisify(redisClient.hgetall).bind(redisClient);
 
 router.use(
   asyncHandler(async (req, res, next) => {
-    const openTime = await hgetallAsync(constants.openTimeKey);
+    const startTime = await model.StartTime.findOne().exec();
+    const start = createDateString(startTime);
+    const endTime = await model.EndTime.findOne().exec();
+    const end = createDateString(endTime);
     const now = new Date().toISOString();
 
-    if (now < openTime.start || now > openTime.end) {
+    if (now < start || now > end) {
       res.status(503).send(openTime);
       return;
     }
