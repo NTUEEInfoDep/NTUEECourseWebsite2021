@@ -4,14 +4,15 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 
-const constants = require("../../constants");
 const model = require("./model");
 
 // ========================================
 
+const { MONGO_HOST, MONGO_DBNAME } = process.env;
+
 module.exports = (outputFile) => {
   const outputPath = path.resolve(__dirname, "../private-data", outputFile);
-  mongoose.connect(`mongodb://${constants.mongoHost}/${constants.dbName}`, {
+  mongoose.connect(`mongodb://${MONGO_HOST}/${MONGO_DBNAME}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
@@ -20,7 +21,7 @@ module.exports = (outputFile) => {
   db.on("error", console.error.bind(console, "connection error:"));
   db.once("open", async () => {
     console.log("Successfully connect to MongoDB!");
-    console.log(`dbName = "${constants.dbName}"`);
+    console.log(`dbName = "${MONGO_DBNAME}"`);
 
     // Export
     const students = await model.Student.find(
