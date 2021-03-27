@@ -59,7 +59,42 @@ const Student = mongoose.model("Student", userSchema);
 
 // ========================================
 
+const openTimeSchema = new mongoose.Schema({
+  year: {
+    type: String,
+    required: true,
+    immutable: false,
+  },
+  month: {
+    type: String,
+    required: true,
+    immutable: false,
+  },
+  day: {
+    type: String,
+    required: true,
+    immutable: false,
+  },
+  hour: {
+    type: String,
+    required: true,
+    immutable: false,
+  },
+  minutes: {
+    type: String,
+    required: true,
+    immutable: false,
+  },
+});
+
+const StartTime = mongoose.model("StartTime", openTimeSchema);
+const EndTime = mongoose.model("EndTime", openTimeSchema);
+
+// ========================================
+
 module.exports = {
   Course,
   Student,
+  StartTime,
+  EndTime,
 };
