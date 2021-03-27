@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const logger = require("morgan");
-const constants = require("./constants.json");
 
 const apiRouter = require("./api");
 

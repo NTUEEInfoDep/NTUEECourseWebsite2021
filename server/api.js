@@ -9,8 +9,6 @@ const connectRedis = require("connect-redis");
 const bcrypt = require("bcrypt");
 const debug = require("debug")("ntuee-course:api");
 const deprecate = require("depd")("ntuee-course:api");
-
-const constants = require("./constants.json");
 const model = require("./database/mongo/model");
 
 // ========================================
@@ -27,7 +25,7 @@ if (process.env.NODE_ENV === "development") {
   require("dotenv").config(); // eslint-disable-line
 }
 
-const { REDIS_HOST, REDIS_PORT } = process.env;
+const { REDIS_HOST, REDIS_PORT, OPENTIMEKEY } = process.env;
 
 // ========================================
 

@@ -1,7 +1,0 @@
-{
-  "mongoHost": "mongodb",
-  "dbName": "ntuee-course",
-  "redisHost": "redisdb",
-  "saltRounds": 10,
-  "openTimeKey": "ntuee-course-opentime"
-}
