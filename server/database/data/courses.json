@@ -21,41 +21,41 @@
     "name": "電路學",
     "type": "1",
     "description": "",
-    "options": ["吳忠幟", "金藝璘", "陳耀銘", "陳信樹", "毛明華"]
+    "options": ["老師A", "老師B", "老師C", "老師D", "老師E"]
   },
   {
     "id": "Electronics-two",
     "name": "電子學（二）",
     "type": "2",
     "description": "",
-    "options": ["劉深淵", "李致毅", "鍾孝文", "呂良鴻"]
+    "options": ["老師F", "老師G", "老師H", "老師I"]
   },
   {
     "id": "Electormagnetics-two",
     "name": "電磁學二",
     "type": "2",
     "description": "",
-    "options": ["吳瑞北", "吳宗霖", "李翔傑", "毛紹綱", "江簡富"]
+    "options": ["老師J", "老師K", "老師L", "老師M", "老師N"]
   },
   {
     "id": "Signals-Systems",
     "name": "信號與系統",
     "type": "2",
     "description": "",
-    "options": ["李琳山", "李枝宏", "陳宏銘", "王鈺強"]
+    "options": ["老師O", "老師P", "老師Q", "老師R"]
   },
   {
     "id": "Probability-Statistics",
     "name": "機率與統計",
     "type": "2",
     "description": "",
-    "options": ["謝宏昀", "王奕翔", "葉丙成"]
+    "options": ["老師S", "老師T", "老師U"]
   },
   {
     "id": "Algorithm",
     "name": "演算法",
     "type": "3",
     "description": "",
-    "options": ["江蕙如"]
+    "options": ["老師V"]
   }
 ]
