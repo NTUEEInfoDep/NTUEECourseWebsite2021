@@ -34,9 +34,9 @@
     "format": "npx prettier --write .",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev-server": "set NODE_ENV=development nodemon ./server/app.js",
+    "dev-server": "NODE_ENV=development nodemon ./server/app.js",
     "server": "node ./server/app.js",
-    "database": "set NODE_ENV=development node ./server/database/database.js"
+    "database": "NODE_ENV=development node ./server/database/database.js"
   },
   "eslintConfig": {
     "extends": "react-app"
