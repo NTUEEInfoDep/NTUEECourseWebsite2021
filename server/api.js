@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === "development") {
   require("dotenv").config(); // eslint-disable-line
 }
 
-const { REDIS_HOST, REDIS_PORT, OPENTIMEKEY } = process.env;
+const { REDIS_HOST, REDIS_PORT } = process.env;
 
 // ========================================
 
@@ -33,8 +33,6 @@ const router = express.Router();
 
 const redisClient = redis.createClient(REDIS_PORT, REDIS_HOST);
 redisClient.on("error", console.error);
-
-const hgetallAsync = promisify(redisClient.hgetall).bind(redisClient);
 
 // ========================================
 // Date verification middleware
