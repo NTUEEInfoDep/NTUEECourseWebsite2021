@@ -8,7 +8,6 @@ const courses = require("../data/courses");
 
 // Students with raw passwords, must be hashed later
 const studentsRaw = require("../data/students.json");
-const openTimeAll = require("../data/openTime.json");
 
 // ========================================
 
@@ -70,12 +69,18 @@ module.exports = () => {
     console.log("All students are saved.");
 
     // Save Start Time
-    const startTimeDocument = new model.StartTime(openTimeAll["start"]);
+    const startTimeDocument = new model.OpenTime({
+      type: "start",
+      time: new Date(2021, 0, 1, 0, 0).toISOString(),
+    });
     await startTimeDocument.save();
     console.log("Start time is saved.");
 
     // Save End Time
-    const endTimeDocument = new model.EndTime(openTimeAll["end"]);
+    const endTimeDocument = new model.OpenTime({
+      type: "end",
+      time: new Date(2026, 0, 1, 0, 0).toISOString(),
+    });
     await endTimeDocument.save();
     console.log("End time is saved.");
 
