@@ -92,7 +92,11 @@ router
         res.status(403).end();
         return;
       }
-      res.send({ userID: req.session.userID });
+      res.send({
+        userID: req.session.userID,
+        name: req.session.name,
+        authority: req.session.authority,
+      });
     })
   )
   .post(
@@ -107,12 +111,14 @@ router
       }
       userID = userID.toUpperCase();
 
-      const user = await model.Student.findOne({ userID }, "password").exec();
+      const user = await model.Student.findOne({ userID }).exec();
       if (!user) {
         res.status(400).end();
         return;
       }
       const passwordHash = user.password;
+      const name = user.name;
+      const authority = user.authority;
 
       // Check password with the passwordHash
       const match = await bcrypt.compare(password, passwordHash);
@@ -122,7 +128,9 @@ router
       }
 
       req.session.userID = userID;
-      res.status(201).send({ userID });
+      req.session.name = name;
+      req.session.authority = authority;
+      res.status(201).send({ userID, authority });
     })
   )
   .delete(

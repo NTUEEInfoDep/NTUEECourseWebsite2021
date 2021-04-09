@@ -52,6 +52,16 @@ const userSchema = new mongoose.Schema({
     required: true,
     immutable: true,
   },
+  name: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+  authority: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
   selections,
 });
 
