@@ -1,52 +1,52 @@
 [
   {
     "userID": "b00000000",
-    "grade": 3,
+    "grade": 2,
     "password": "1111"
   },
   {
     "userID": "b11111111",
-    "grade": 8,
+    "grade": 3,
     "password": "1111"
   },
   {
     "userID": "b22222222",
-    "grade": 8,
+    "grade": 1,
     "password": "1111"
   },
   {
     "userID": "b33333333",
-    "grade": 8,
+    "grade": 1,
     "password": "1111"
   },
   {
     "userID": "b44444444",
-    "grade": 8,
+    "grade": 4,
     "password": "1111"
   },
   {
     "userID": "b55555555",
-    "grade": 8,
+    "grade": 2,
     "password": "1111"
   },
   {
     "userID": "b66666666",
-    "grade": 8,
+    "grade": 5,
     "password": "1111"
   },
   {
     "userID": "b77777777",
-    "grade": 8,
+    "grade": 2,
     "password": "1111"
   },
   {
     "userID": "b88888888",
-    "grade": 8,
+    "grade": 4,
     "password": "1111"
   },
   {
     "userID": "b99999999",
-    "grade": 8,
+    "grade": 1,
     "password": "1111"
   }
 ]
