@@ -66,7 +66,7 @@ const openTimeSchema = new mongoose.Schema({
     immutable: true,
   },
   time: {
-    type: String,
+    type: Number,
     required: true,
     immutable: false,
   },

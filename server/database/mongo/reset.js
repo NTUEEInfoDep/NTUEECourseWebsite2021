@@ -71,7 +71,7 @@ module.exports = () => {
     // Save Start Time
     const startTimeDocument = new model.OpenTime({
       type: "start",
-      time: new Date(2021, 0, 1, 0, 0).toISOString(),
+      time: Math.floor(new Date(2021, 0, 1, 0, 0) / 1000),
     });
     await startTimeDocument.save();
     console.log("Start time is saved.");
@@ -79,7 +79,7 @@ module.exports = () => {
     // Save End Time
     const endTimeDocument = new model.OpenTime({
       type: "end",
-      time: new Date(2026, 0, 1, 0, 0).toISOString(),
+      time: Math.floor(new Date(2026, 0, 1, 0, 0) / 1000),
     });
     await endTimeDocument.save();
     console.log("End time is saved.");

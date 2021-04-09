@@ -34,7 +34,7 @@ router.use(
   asyncHandler(async (req, res, next) => {
     const startTime = await model.OpenTime.findOne({ type: "start" }).exec();
     const endTime = await model.OpenTime.findOne({ type: "end" }).exec();
-    const now = new Date().toISOString();
+    const now = Math.floor(new Date() / 1000);
 
     if (now < startTime["time"] || now > endTime["time"]) {
       res.status(503).send(openTime);
