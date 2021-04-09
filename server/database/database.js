@@ -2,7 +2,6 @@
 
 const resetMongo = require("./mongo/reset");
 const exportSelections = require("./mongo/export");
-const updateOpentime = require("./redis/updateOpentime");
 
 // ========================================
 
@@ -14,7 +13,6 @@ require("yargs") // eslint-disable-line
     () => {},
     (argv) => {
       resetMongo();
-      updateOpentime();
     }
   )
   .command(

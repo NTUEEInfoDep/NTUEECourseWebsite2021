@@ -7,7 +7,8 @@ const model = require("./model");
 const courses = require("../data/courses");
 
 // Students with raw passwords, must be hashed later
-const studentsRaw = require("../private-data/students.json");
+const studentsRaw = require("../data/students.json");
+const openTimeAll = require("../data/openTime.json");
 
 // ========================================
 
@@ -67,6 +68,16 @@ module.exports = () => {
       })
     );
     console.log("All students are saved.");
+
+    // Save Start Time
+    const startTimeDocument = new model.StartTime(openTimeAll["start"]);
+    await startTimeDocument.save();
+    console.log("Start time is saved.");
+
+    // Save End Time
+    const endTimeDocument = new model.EndTime(openTimeAll["end"]);
+    await endTimeDocument.save();
+    console.log("End time is saved.");
 
     // Disconnect
     await mongoose.disconnect();
