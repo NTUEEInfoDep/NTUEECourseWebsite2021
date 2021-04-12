@@ -36,7 +36,7 @@ router.use(
     const endTime = await model.OpenTime.findOne({ type: "end" }).exec();
     const now = Math.floor(new Date() / 1000);
 
-    if (now < startTime["time"] || now > endTime["time"]) {
+    if (now < startTime.time || now > endTime.time) {
       res.status(503).send(openTime);
       return;
     }
@@ -117,8 +117,8 @@ router
         return;
       }
       const passwordHash = user.password;
-      const name = user.name;
-      const authority = user.authority;
+      const { name } = user;
+      const { authority } = user;
 
       // Check password with the passwordHash
       const match = await bcrypt.compare(password, passwordHash);
@@ -139,6 +139,31 @@ router
       res.status(204).end();
     })
   );
+
+router.route("/opentime").put(
+  express.urlencoded({ extended: false }),
+  asyncHandler(async (req, res, next) => {
+    if (!req.session.userID || req.session.authority !== "Admin") {
+      res.status(403).end();
+    }
+    const { start } = req.body;
+    const { end } = req.body;
+    if (parseInt(start) != start || parseInt(end) != end) {
+      res.status(400).end();
+      return;
+    }
+
+    const startResult = await model.OpenTime.updateOne(
+      { type: "start" },
+      { time: parseInt(start) }
+    );
+    const endResult = await model.OpenTime.updateOne(
+      { type: "end" },
+      { time: parseInt(end) }
+    );
+    res.status(204).end();
+  })
+);
 
 router.get(
   "/courses",
