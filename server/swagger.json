@@ -41,9 +41,6 @@
           },
           "401": {
             "description": "Wrong password"
-          },
-          "503": {
-            "description": "Service close"
           }
         }
       },
@@ -57,10 +54,12 @@
                 "type": "object",
                 "properties": {
                   "userID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "B00000000"
                   },
                   "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "1111"
                   }
                 }
               }
@@ -109,10 +108,12 @@
                 "type": "object",
                 "properties": {
                   "start": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 1600000000
                   },
                   "end": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 1700000000
                   }
                 }
               }
@@ -128,6 +129,224 @@
           },
           "400": {
             "description": "Format error"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    },
+    "/courses": {
+      "get": {
+        "description": "Get all courses",
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "B12345678"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "description": "Get all users",
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "B12345678"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      },
+      "post": {
+        "description": "Add a user struct",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "string",
+                    "example": "B12345678"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Nobody"
+                  },
+                  "grade": {
+                    "type": "number",
+                    "example": "1"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "XXXX"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete particular users",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    },
+    "/password": {
+      "put": {
+        "description": "Change password",
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/course": {
+      "post": {
+        "description": "Change the content of the course",
+        "requestBody": {
+          "required": true,
+          "content": {}
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete course",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      },
+      "put": {
+        "description": "Add new course",
+        "requestBody": {
+          "required": true,
+          "content": {}
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    },
+    "/distribute": {
+      "post": {
+        "description": "Run distribution",
+        "responses": {
+          "201": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/authority": {
+      "put": {
+        "description": "Change someone's authority",
+        "requestBody": {
+          "required": true,
+          "content": {}
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "503": {
+        "description": "Service close",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "number",
+                  "example": 1600000000
+                },
+                "end": {
+                  "type": "number",
+                  "example": 1700000000
+                }
+              }
+            }
           }
         }
       }
