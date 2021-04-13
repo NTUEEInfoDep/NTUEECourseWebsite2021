@@ -30,19 +30,20 @@ redisClient.on("error", console.error);
 // ========================================
 // Date verification middleware
 
-router.use(
-  asyncHandler(async (req, res, next) => {
-    const startTime = await model.OpenTime.findOne({ type: "start" }).exec();
-    const endTime = await model.OpenTime.findOne({ type: "end" }).exec();
-    const now = Math.floor(new Date() / 1000);
-
-    if (now < startTime.time || now > endTime.time) {
-      res.status(503).send(openTime);
-      return;
-    }
-    next();
-  })
-);
+const openTimeMiddleware = asyncHandler(async (req, res, next) => {
+  const startTime = await model.OpenTime.findOne({ type: "start" }).exec();
+  const endTime = await model.OpenTime.findOne({ type: "end" }).exec();
+  const now = Math.floor(new Date() / 1000);
+  if (
+    (now < startTime.time || now > endTime.time) &&
+    req.session.authority != "Admin" &&
+    req.session.authority != "Maintainer"
+  ) {
+    res.status(503).send({ start: startTime.time, end: endTime.time });
+    return;
+  }
+  next();
+});
 
 // ========================================
 // Session middleware
@@ -94,7 +95,6 @@ router
       }
       res.send({
         userID: req.session.userID,
-        name: req.session.name,
         authority: req.session.authority,
       });
     })
@@ -140,32 +140,35 @@ router
     })
   );
 
-router.route("/opentime").put(
-  express.urlencoded({ extended: false }),
-  asyncHandler(async (req, res, next) => {
-    if (!req.session.userID || req.session.authority !== "Admin") {
-      res.status(403).end();
-    }
-    const { start } = req.body;
-    const { end } = req.body;
-    if (parseInt(start) != start || parseInt(end) != end) {
-      res.status(400).end();
-      return;
-    }
+router
+  .route("/opentime")
+  .all(openTimeMiddleware)
+  .put(
+    express.urlencoded({ extended: false }),
+    asyncHandler(async (req, res, next) => {
+      if (!req.session.userID || req.session.authority !== "Admin") {
+        res.status(403).end();
+      }
+      const { start } = req.body;
+      const { end } = req.body;
+      if (parseInt(start) != start || parseInt(end) != end) {
+        res.status(400).end();
+        return;
+      }
 
-    const startResult = await model.OpenTime.updateOne(
-      { type: "start" },
-      { time: parseInt(start) }
-    );
-    const endResult = await model.OpenTime.updateOne(
-      { type: "end" },
-      { time: parseInt(end) }
-    );
-    res.status(204).end();
-  })
-);
+      const startResult = await model.OpenTime.updateOne(
+        { type: "start" },
+        { time: parseInt(start) }
+      );
+      const endResult = await model.OpenTime.updateOne(
+        { type: "end" },
+        { time: parseInt(end) }
+      );
+      res.status(204).end();
+    })
+  );
 
-router.get(
+router.use(openTimeMiddleware).get(
   "/courses",
   asyncHandler(async (req, res, next) => {
     if (!req.session.userID) {
@@ -194,6 +197,7 @@ router.get(
 
 router
   .route("/selections/:courseID")
+  .all(openTimeMiddleware)
   .all(
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
