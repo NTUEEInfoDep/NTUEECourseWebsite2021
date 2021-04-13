@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 const express = require("express");
 const logger = require("morgan");
 
+const swaggerUi = require("swagger-ui-express");
 const apiRouter = require("./api");
+const swaggerDocs = require("./swagger.json");
+// ========================================
 
 // ========================================
 
@@ -39,6 +42,7 @@ db.once("open", () => {
   app.use(express.static("build"));
 
   app.use("/api", apiRouter);
+  app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
   app.listen(port, () =>
     console.log(`App listening at http://localhost:${port}`)

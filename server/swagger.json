@@ -1,0 +1,136 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "NTUEE course website",
+    "version": "1.0.0",
+    "description": "NTUEE course website api"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api",
+      "description": "local environment"
+    }
+  ],
+  "paths": {
+    "/session": {
+      "get": {
+        "description": "Login",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string",
+                      "example": "B12345678"
+                    },
+                    "authority": {
+                      "type": "string",
+                      "example": "User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Format error"
+          },
+          "401": {
+            "description": "Wrong password"
+          },
+          "503": {
+            "description": "Service close"
+          }
+        }
+      },
+      "post": {
+        "description": "Login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Failed"
+          },
+          "401": {
+            "description": "Wrong password"
+          },
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string",
+                      "example": "B12345678"
+                    },
+                    "authority": {
+                      "type": "string",
+                      "example": "User"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/opentime": {
+      "put": {
+        "description": "Change open time",
+        "requestBody": {
+          "description": "Enter Unix timestamp",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "start": {
+                    "type": "number"
+                  },
+                  "end": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Format error"
+          }
+        }
+      }
+    }
+  }
+}
