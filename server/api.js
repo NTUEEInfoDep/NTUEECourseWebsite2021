@@ -175,7 +175,29 @@ router.use(openTimeMiddleware).get(
       res.status(403).end();
       return;
     }
+    const coursesGroup = await model.Course.find({}).exec();
+    const filted = [];
+    let items;
+    // deal with query no query and one query key(foreach only for array)
+    if (!req.query.keys) {
+      items = [];
+    } else if (typeof req.query.keys === "string") {
+      items = [];
+      items.push(req.query.keys);
+    } else {
+      items = req.query.keys;
+    }
 
+    coursesGroup.forEach((course) => {
+      console.log(course);
+      const filtedcourse = {};
+      filtedcourse.id = course.id;
+      items.forEach((item) => {
+        filtedcourse[item] = course[item];
+      });
+      filted.push(filtedcourse);
+    });
+    /*
     const coursesGroup = await model.Course.aggregate([
       {
         $group: {
@@ -185,16 +207,56 @@ router.use(openTimeMiddleware).get(
       },
     ]);
 
-    const data = {};
+    const data = [];
     coursesGroup.forEach((group) => {
-      /* eslint-disable-next-line no-underscore-dangle */
-      data[group._id] = group.courses;
+      /* eslint-disable-next-line no-underscore-dangle 
+      data.push(group.courses);
     });
-
-    res.send(data);
+    */
+    res.send(filted);
   })
 );
-
+router
+  .route("/users")
+  .all(openTimeMiddleware)
+  .get(
+    asyncHandler(async (req, res, next) => {
+      if (!req.session.userID) {
+        res.status(403).end();
+        return;
+      }
+      if (
+        req.session.authority !== "Admin" &&
+        req.session.authority !== "Maintainer"
+      ) {
+        res.status(403).end();
+        return;
+      }
+      const studentGroup = await model.Student.find({}).exec();
+      const filted = [];
+      let items;
+      // deal with query no query and one query key(foreach only for array)
+      if (!req.query.keys) {
+        items = [];
+      } else if (typeof req.query.keys === "string") {
+        items = [];
+        items.push(req.query.keys);
+      } else {
+        items = req.query.keys;
+      }
+      studentGroup.forEach((student) => {
+        console.log(student);
+        const filtedstudent = {};
+        filtedstudent.id = student.userID;
+        items.forEach((item) => {
+          filtedstudent[item] = student[item];
+        });
+        filted.push(filtedstudent);
+      });
+      res.send(filted);
+    })
+  )
+  .post();
 router
   .route("/selections/:courseID")
   .all(openTimeMiddleware)
