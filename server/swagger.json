@@ -73,7 +73,7 @@
           "401": {
             "description": "Wrong password"
           },
-          "201": {
+          "200": {
             "description": "Success",
             "content": {
               "application/json": {
@@ -262,14 +262,51 @@
     },
     "/course": {
       "post": {
-        "description": "Change the content of the course",
+        "description": "Add new course",
         "requestBody": {
           "required": true,
-          "content": {}
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "test"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "course_name"
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "0"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "this is a tested course"
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "example": ["Teacher A", "Teacher B"]
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
-          "204": {
+          "201": {
             "description": "Success"
+          },
+          "400": {
+            "description": "The course has already existed"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "503": {
             "$ref": "#/components/responses/503"
@@ -278,9 +315,31 @@
       },
       "delete": {
         "description": "Delete course",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "test"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
           },
           "503": {
             "$ref": "#/components/responses/503"
@@ -288,14 +347,51 @@
         }
       },
       "put": {
-        "description": "Add new course",
+        "description": "Change th content of the course",
         "requestBody": {
           "required": true,
-          "content": {}
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "test"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "course_name_update"
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "1"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "this is another tested course"
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "example": ["Teacher A", "Teacher B", "Teacher C"]
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
           },
           "503": {
             "$ref": "#/components/responses/503"

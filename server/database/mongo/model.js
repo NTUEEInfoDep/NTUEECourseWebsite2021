@@ -12,16 +12,16 @@ const courseSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   type: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   description: {
     type: String,
-    immutable: true,
+    immutable: false,
   },
   options: [String],
 });

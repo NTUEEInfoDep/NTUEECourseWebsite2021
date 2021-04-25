@@ -93,7 +93,7 @@ router
         res.status(403).end();
         return;
       }
-      res.send({
+      res.status(200).send({
         userID: req.session.userID,
         authority: req.session.authority,
       });
@@ -130,7 +130,7 @@ router
       req.session.userID = userID;
       req.session.name = name;
       req.session.authority = authority;
-      res.status(201).send({ userID, authority });
+      res.status(200).send({ userID, authority });
     })
   )
   .delete(
@@ -209,7 +209,7 @@ router.use(openTimeMiddleware).get(
 
     const data = [];
     coursesGroup.forEach((group) => {
-      /* eslint-disable-next-line no-underscore-dangle 
+      /* eslint-disable-next-line no-underscore-dangle
       data.push(group.courses);
     });
     */
@@ -311,6 +311,106 @@ router
       const update = {};
       update[`selections.${courseID}`] = req.body;
       const result = await model.Student.updateOne({ userID }, update);
+      res.status(204).end();
+    })
+  );
+router
+  .route("/course")
+  .all(openTimeMiddleware)
+  .post(
+    express.urlencoded({ extended: false }),
+    asyncHandler(async (req, res, next) => {
+      if (!req.session.userID) {
+        res.status(403).end();
+        return;
+      }
+      if (
+        req.session.authority !== "Admin" &&
+        req.session.authority !== "Maintainer"
+      ) {
+        res.status(403).end();
+        return;
+      }
+      const { id } = req.body;
+      const { name } = req.body;
+      const { type } = req.body;
+      const { description } = req.body;
+      const options = req.body.options.split(",");
+      const course = await model.Course.findOne({ id }).exec();
+      if (course) {
+        res.status(400).end();
+        return;
+      }
+      const courseDocument = new model.Course({
+        id,
+        name,
+        type,
+        description,
+        options,
+      });
+      await courseDocument.save();
+      res.status(201).send({ id, name, type, description, options });
+    })
+  )
+  .delete(
+    express.urlencoded({ extended: false }),
+    asyncHandler(async (req, res, next) => {
+      if (!req.session.userID) {
+        res.status(403).end();
+        return;
+      }
+      if (
+        req.session.authority !== "Admin" &&
+        req.session.authority !== "Maintainer"
+      ) {
+        res.status(403).end();
+        return;
+      }
+      const { id } = req.body;
+      const course = await model.Course.findOne({ id }).exec();
+      if (!course) {
+        res.status(404).end();
+        return;
+      }
+      await model.Course.deleteOne({ id });
+      res.status(204).end();
+    })
+  )
+  .put(
+    express.urlencoded({ extended: false }),
+    asyncHandler(async (req, res, next) => {
+      if (!req.session.userID) {
+        res.status(403).end();
+        return;
+      }
+      if (
+        req.session.authority !== "Admin" &&
+        req.session.authority !== "Maintainer"
+      ) {
+        res.status(403).end();
+        return;
+      }
+      const { id } = req.body;
+      const { name } = req.body;
+      const { type } = req.body;
+      const { description } = req.body;
+      const options = req.body.options.split(",");
+      const course = await model.Course.findOne({ id }).exec();
+      if (!course) {
+        res.status(404).end();
+        return;
+      }
+      await model.Course.updateOne(
+        {
+          id,
+        },
+        {
+          name,
+          type,
+          description,
+          options,
+        }
+      );
       res.status(204).end();
     })
   );
