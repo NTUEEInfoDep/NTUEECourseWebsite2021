@@ -335,7 +335,7 @@ router
       const { name } = req.body;
       const { type } = req.body;
       const { description } = req.body;
-      const options = req.body.options.split(",");
+      const { options } = req.body;
       const course = await model.Course.findOne({ id }).exec();
       if (course) {
         res.status(400).end();
@@ -394,7 +394,7 @@ router
       const { name } = req.body;
       const { type } = req.body;
       const { description } = req.body;
-      const options = req.body.options.split(",");
+      const { options } = req.body;
       const course = await model.Course.findOne({ id }).exec();
       if (!course) {
         res.status(404).end();

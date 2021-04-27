@@ -289,7 +289,7 @@
                   "options": {
                     "type": "array",
                     "items": {
-                      "type": "object"
+                      "type": "string"
                     },
                     "example": ["Teacher A", "Teacher B"]
                   }
@@ -374,7 +374,7 @@
                   "options": {
                     "type": "array",
                     "items": {
-                      "type": "object"
+                      "type": "string"
                     },
                     "example": ["Teacher A", "Teacher B", "Teacher C"]
                   }
