@@ -294,6 +294,12 @@
                     "example": ["Teacher A", "Teacher B"]
                   }
                 }
+              },
+              "encoding": {
+                "options": {
+                  "style": "form",
+                  "explode": true
+                }
               }
             }
           }
@@ -378,6 +384,12 @@
                     },
                     "example": ["Teacher A", "Teacher B", "Teacher C"]
                   }
+                }
+              },
+              "encoding": {
+                "options": {
+                  "style": "form",
+                  "explode": true
                 }
               }
             }
