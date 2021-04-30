@@ -45,22 +45,22 @@ const userSchema = new mongoose.Schema({
   grade: {
     type: Number,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   password: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   name: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   authority: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   selections,
 });

@@ -36,11 +36,8 @@
               }
             }
           },
-          "400": {
-            "description": "Format error"
-          },
-          "401": {
-            "description": "Wrong password"
+          "403": {
+            "description": "Haven't login"
           }
         }
       },
@@ -94,6 +91,14 @@
             }
           }
         }
+      },
+      "delete": {
+        "description": "Log out",
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/opentime": {
@@ -140,7 +145,7 @@
       "get": {
         "description": "Get all courses",
         "responses": {
-          "201": {
+          "200": {
             "description": "Success",
             "content": {
               "application/json": {
@@ -150,11 +155,11 @@
                     "type": "object",
                     "properties": {
                       "id": {
-                        "type": "string",
-                        "example": "B12345678"
+                        "type": "string"
                       }
                     }
-                  }
+                  },
+                  "example": [{ "id": "course1" }, { "id": "course2" }]
                 }
               }
             }
@@ -172,7 +177,7 @@
       "get": {
         "description": "Get all users",
         "responses": {
-          "201": {
+          "200": {
             "description": "Success",
             "content": {
               "application/json": {
@@ -182,11 +187,11 @@
                     "type": "object",
                     "properties": {
                       "id": {
-                        "type": "string",
-                        "example": "B12345678"
+                        "type": "string"
                       }
                     }
-                  }
+                  },
+                  "example": [{ "id": "B12345678" }, { "id": "B87654321" }]
                 }
               }
             }
@@ -200,7 +205,7 @@
         }
       },
       "post": {
-        "description": "Add a user struct",
+        "description": "Add a user struct(X)",
         "requestBody": {
           "required": true,
           "content": {
@@ -233,16 +238,22 @@
           "204": {
             "description": "Success"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "503": {
             "$ref": "#/components/responses/503"
           }
         }
       },
       "delete": {
-        "description": "Delete particular users",
+        "description": "Delete particular users(X)",
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "503": {
             "$ref": "#/components/responses/503"
@@ -413,7 +424,7 @@
     },
     "/distribute": {
       "post": {
-        "description": "Run distribution",
+        "description": "Run distribution(X)",
         "responses": {
           "201": {
             "description": "Success"
@@ -426,11 +437,36 @@
         "description": "Change someone's authority",
         "requestBody": {
           "required": true,
-          "content": {}
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "string",
+                    "example": "B33333333"
+                  },
+                  "authority": {
+                    "type": "string",
+                    "example": "Maintainer"
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
           }
         }
       }
