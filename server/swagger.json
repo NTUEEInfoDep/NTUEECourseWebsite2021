@@ -289,10 +289,16 @@
                   "options": {
                     "type": "array",
                     "items": {
-                      "type": "object"
+                      "type": "string"
                     },
                     "example": ["Teacher A", "Teacher B"]
                   }
+                }
+              },
+              "encoding": {
+                "options": {
+                  "style": "form",
+                  "explode": true
                 }
               }
             }
@@ -374,10 +380,16 @@
                   "options": {
                     "type": "array",
                     "items": {
-                      "type": "object"
+                      "type": "string"
                     },
                     "example": ["Teacher A", "Teacher B", "Teacher C"]
                   }
+                }
+              },
+              "encoding": {
+                "options": {
+                  "style": "form",
+                  "explode": true
                 }
               }
             }
