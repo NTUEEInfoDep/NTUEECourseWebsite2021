@@ -1,45 +1,27 @@
 import React from "react";
-// react router
-import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
 // containers
+import Drawer from "./containers/drawer";
 import Main from "./containers/main";
 import Courses from "./containers/courses";
 import Login from "./containers/login";
 
-function App() {
-  return (
-    <div className="App">
-      <BrowserRouter>
-        <div>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Main</Link>
-              </li>
-              <li>
-                <Link to="/courses">Courses</Link>
-              </li>
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-            </ul>
-          </nav>
+const Routes = () => (
+  <Switch>
+    <Route exact from="/" render={(props) => <Main {...props} />} />
+    <Route exact path="/courses" render={(props) => <Courses {...props} />} />
+    <Route exact path="/login" render={(props) => <Login {...props} />} />
+  </Switch>
+);
 
-          <Switch>
-            <Route path="/courses">
-              <Courses />
-            </Route>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <Route path="/">
-              <Main />
-            </Route>
-          </Switch>
-        </div>
-      </BrowserRouter>
+export default function App() {
+  return (
+    <div>
+      <Router>
+        <Drawer>
+          <Routes />
+        </Drawer>
+      </Router>
     </div>
   );
 }
-
-export default App;
