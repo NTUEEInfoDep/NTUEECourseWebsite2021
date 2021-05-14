@@ -1,0 +1,499 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "NTUEE course website",
+    "version": "1.0.0",
+    "description": "NTUEE course website api"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api",
+      "description": "local environment"
+    }
+  ],
+  "paths": {
+    "/session": {
+      "get": {
+        "description": "Login",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string",
+                      "example": "B12345678"
+                    },
+                    "authority": {
+                      "type": "string",
+                      "example": "User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Haven't login"
+          }
+        }
+      },
+      "post": {
+        "description": "Login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "string",
+                    "example": "B00000000"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "1111"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Failed"
+          },
+          "401": {
+            "description": "Wrong password"
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string",
+                      "example": "B12345678"
+                    },
+                    "authority": {
+                      "type": "string",
+                      "example": "User"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Log out",
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/opentime": {
+      "put": {
+        "description": "Change open time",
+        "requestBody": {
+          "description": "Enter Unix timestamp",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "start": {
+                    "type": "number",
+                    "example": 1600000000
+                  },
+                  "end": {
+                    "type": "number",
+                    "example": 1700000000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Format error"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    },
+    "/courses": {
+      "get": {
+        "description": "Get all courses",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": [{ "id": "course1" }, { "id": "course2" }]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "description": "Get all users",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": [{ "id": "B12345678" }, { "id": "B87654321" }]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      },
+      "post": {
+        "description": "Add a user struct(X)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "string",
+                    "example": "B12345678"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Nobody"
+                  },
+                  "grade": {
+                    "type": "number",
+                    "example": "1"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "XXXX"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete particular users(X)",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    },
+    "/password": {
+      "put": {
+        "description": "Change password",
+        "responses": {
+          "204": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/course": {
+      "post": {
+        "description": "Add new course",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "test"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "course_name"
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "0"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "this is a tested course"
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["Teacher A", "Teacher B"]
+                  }
+                }
+              },
+              "encoding": {
+                "options": {
+                  "style": "form",
+                  "explode": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "The course has already existed"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete course",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "test"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      },
+      "put": {
+        "description": "Change th content of the course",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "test"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "course_name_update"
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "1"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "this is another tested course"
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["Teacher A", "Teacher B", "Teacher C"]
+                  }
+                }
+              },
+              "encoding": {
+                "options": {
+                  "style": "form",
+                  "explode": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    },
+    "/distribute": {
+      "post": {
+        "description": "Run distribution(X)",
+        "responses": {
+          "201": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/authority": {
+      "put": {
+        "description": "Change someone's authority",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "string",
+                    "example": "B33333333"
+                  },
+                  "authority": {
+                    "type": "string",
+                    "example": "Maintainer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "503": {
+        "description": "Service close",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "number",
+                  "example": 1600000000
+                },
+                "end": {
+                  "type": "number",
+                  "example": 1700000000
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

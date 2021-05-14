@@ -12,16 +12,16 @@ const courseSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   type: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   description: {
     type: String,
-    immutable: true,
+    immutable: false,
   },
   options: [String],
 });
@@ -45,12 +45,22 @@ const userSchema = new mongoose.Schema({
   grade: {
     type: Number,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   password: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
+  },
+  name: {
+    type: String,
+    required: true,
+    immutable: false,
+  },
+  authority: {
+    type: String,
+    required: true,
+    immutable: false,
   },
   selections,
 });
@@ -60,41 +70,24 @@ const Student = mongoose.model("Student", userSchema);
 // ========================================
 
 const openTimeSchema = new mongoose.Schema({
-  year: {
+  type: {
     type: String,
     required: true,
-    immutable: false,
+    immutable: true,
   },
-  month: {
-    type: String,
-    required: true,
-    immutable: false,
-  },
-  day: {
-    type: String,
-    required: true,
-    immutable: false,
-  },
-  hour: {
-    type: String,
-    required: true,
-    immutable: false,
-  },
-  minutes: {
-    type: String,
+  time: {
+    type: Number,
     required: true,
     immutable: false,
   },
 });
 
-const StartTime = mongoose.model("StartTime", openTimeSchema);
-const EndTime = mongoose.model("EndTime", openTimeSchema);
+const OpenTime = mongoose.model("OpenTime", openTimeSchema);
 
 // ========================================
 
 module.exports = {
   Course,
   Student,
-  StartTime,
-  EndTime,
+  OpenTime,
 };

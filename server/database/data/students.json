@@ -2,51 +2,71 @@
   {
     "userID": "b00000000",
     "grade": 2,
-    "password": "1111"
+    "password": "1111",
+    "name": "A",
+    "authority": "Admin"
   },
   {
     "userID": "b11111111",
     "grade": 3,
-    "password": "1111"
+    "password": "1111",
+    "name": "B",
+    "authority": "Maintainer"
   },
   {
     "userID": "b22222222",
     "grade": 1,
-    "password": "1111"
+    "password": "1111",
+    "name": "C",
+    "authority": "Maintainer"
   },
   {
     "userID": "b33333333",
     "grade": 1,
-    "password": "1111"
+    "password": "1111",
+    "name": "E",
+    "authority": "User"
   },
   {
     "userID": "b44444444",
     "grade": 4,
-    "password": "1111"
+    "password": "1111",
+    "name": "F",
+    "authority": "User"
   },
   {
     "userID": "b55555555",
     "grade": 2,
-    "password": "1111"
+    "password": "1111",
+    "name": "G",
+    "authority": "User"
   },
   {
     "userID": "b66666666",
     "grade": 5,
-    "password": "1111"
+    "password": "1111",
+    "name": "H",
+    "authority": "User"
   },
   {
     "userID": "b77777777",
     "grade": 2,
-    "password": "1111"
+    "password": "1111",
+    "name": "I",
+    "authority": "User"
   },
   {
     "userID": "b88888888",
     "grade": 4,
-    "password": "1111"
+    "password": "1111",
+    "name": "J",
+    "authority": "User"
   },
   {
     "userID": "b99999999",
     "grade": 1,
-    "password": "1111"
+    "password": "1111",
+    "name": "K",
+    "authority": "User"
   }
 ]
