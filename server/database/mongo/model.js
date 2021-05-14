@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
   grade: {
     type: Number,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   password: {
     type: String,
@@ -55,12 +55,12 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   authority: {
     type: String,
     required: true,
-    immutable: true,
+    immutable: false,
   },
   selections,
 });

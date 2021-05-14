@@ -37,8 +37,8 @@ const openTimeMiddleware = asyncHandler(async (req, res, next) => {
   const now = Math.floor(new Date() / 1000);
   if (
     (now < startTime.time || now > endTime.time) &&
-    req.session.authority != "Admin" &&
-    req.session.authority != "Maintainer"
+    req.session.authority !== "Admin" &&
+    req.session.authority !== "Maintainer"
   ) {
     res.status(503).send({ start: startTime.time, end: endTime.time });
     return;
@@ -152,7 +152,7 @@ router
       }
       const { start } = req.body;
       const { end } = req.body;
-      if (parseInt(start) != start || parseInt(end) != end) {
+      if (parseInt(start) !== start || parseInt(end) !== end) {
         res.status(400).end();
         return;
       }
@@ -436,6 +436,33 @@ router
           type,
           description,
           options,
+        }
+      );
+      res.status(204).end();
+    })
+  );
+router
+  .route("/authority")
+  .all(openTimeMiddleware)
+  .put(
+    express.urlencoded({ extended: false }),
+    asyncHandler(async (req, res, next) => {
+      if (req.session.authority !== "Admin") {
+        res.status(403).end();
+        return;
+      }
+      let { userID } = req.body;
+      const { authority } = req.body;
+      userID = userID.toUpperCase();
+      const user = await model.Student.findOne({ userID }).exec();
+      if (!user) {
+        res.status(404).end();
+        return;
+      }
+      await model.Student.updateOne(
+        { userID },
+        {
+          authority,
         }
       );
       res.status(204).end();
