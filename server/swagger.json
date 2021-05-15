@@ -264,9 +264,46 @@
     "/password": {
       "put": {
         "description": "Change password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string"
+                    },
+                    "new_password": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": [
+                  { "userID": "b33333333", "new_password": "2222" },
+                  { "userID": "b44444444", "new_password": "2222" }
+                ]
+              },
+              "encoding": {
+                "options": {
+                  "style": "form",
+                  "explode": true
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "401": {
+            "description": "Failed"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
           }
         }
       }
