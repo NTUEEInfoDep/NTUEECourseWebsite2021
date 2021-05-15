@@ -9,8 +9,9 @@ const connectRedis = require("connect-redis");
 const bcrypt = require("bcrypt");
 const debug = require("debug")("ntuee-course:api");
 const deprecate = require("depd")("ntuee-course:api");
-const model = require("./database/mongo/model");
 const mongoose = require("mongoose");
+
+const model = require("./database/mongo/model");
 
 // ========================================
 
@@ -222,9 +223,9 @@ router.route("/password").put(
   asyncHandler(async (req, res, next) => {
     const modified_data = req.body;
     const { authority } = req.session;
-    mongoose.set('useFindAndModify', false);
-    
-    if(authority != "Admin"){
+    mongoose.set("useFindAndModify", false);
+
+    if (authority !== "Admin") {
       res.status(401).end();
       return;
     }

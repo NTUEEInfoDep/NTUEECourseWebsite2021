@@ -69,6 +69,33 @@ const Student = mongoose.model("Student", userSchema);
 
 // ========================================
 
+const selectionSchema = new mongoose.Schema({
+  courseID: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+  userID: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+  name: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+  ranking: {
+    type: Number,
+    required: true,
+    immutable: true,
+  },
+});
+
+const Selection = mongoose.model("Selection", selectionSchema);
+
+// ========================================
+
 const openTimeSchema = new mongoose.Schema({
   type: {
     type: String,
@@ -89,5 +116,6 @@ const OpenTime = mongoose.model("OpenTime", openTimeSchema);
 module.exports = {
   Course,
   Student,
+  Selection,
   OpenTime,
 };
