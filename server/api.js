@@ -9,6 +9,8 @@ const connectRedis = require("connect-redis");
 const bcrypt = require("bcrypt");
 const debug = require("debug")("ntuee-course:api");
 const deprecate = require("depd")("ntuee-course:api");
+const mongoose = require("mongoose");
+
 const model = require("./database/mongo/model");
 
 // ========================================
@@ -214,6 +216,32 @@ router.use(openTimeMiddleware).get(
     });
     */
     res.send(filted);
+  })
+);
+router.route("/password").put(
+  express.json({ strict: false }),
+  asyncHandler(async (req, res, next) => {
+    const modified_data = req.body;
+    const { authority } = req.session;
+    mongoose.set("useFindAndModify", false);
+
+    if (authority !== "Admin") {
+      res.status(401).end();
+      return;
+    }
+
+    await Promise.all(
+      modified_data.map(async (data) => {
+        const SALT_ROUNDS = 10;
+        const salt = await bcrypt.genSalt(SALT_ROUNDS);
+        const hash = await bcrypt.hash(data.new_password, salt);
+        const filter = { userID: data.userID };
+        const update = { password: hash };
+        const result = await model.Student.findOneAndUpdate(filter, update);
+      })
+    );
+
+    res.status(204).end();
   })
 );
 router
