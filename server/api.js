@@ -12,6 +12,7 @@ const deprecate = require("depd")("ntuee-course:api");
 const mongoose = require("mongoose");
 
 const model = require("./database/mongo/model");
+const constants = require("./constants");
 
 // ========================================
 
@@ -46,6 +47,15 @@ const openTimeMiddleware = asyncHandler(async (req, res, next) => {
   }
   next();
 });
+
+const permissionRequired = (permission) =>
+  asyncHandler(async (req, res, next) => {
+    if (req.session.authority < permission) {
+      res.status(403).end();
+      return;
+    }
+    next();
+  });
 
 // ========================================
 // Session middleware
@@ -142,33 +152,30 @@ router
     })
   );
 
-router
-  .route("/opentime")
-  .all(openTimeMiddleware)
-  .put(
-    express.urlencoded({ extended: false }),
-    asyncHandler(async (req, res, next) => {
-      if (!req.session.userID || req.session.authority !== "Admin") {
-        res.status(403).end();
-      }
-      const { start } = req.body;
-      const { end } = req.body;
-      if (parseInt(start) !== start || parseInt(end) !== end) {
-        res.status(400).end();
-        return;
-      }
+router.route("/opentime").put(
+  express.urlencoded({ extended: false }),
+  asyncHandler(async (req, res, next) => {
+    if (!req.session.userID || req.session.authority !== "Admin") {
+      res.status(403).end();
+    }
+    const { start } = req.body;
+    const { end } = req.body;
+    if (parseInt(start) !== start || parseInt(end) !== end) {
+      res.status(400).end();
+      return;
+    }
 
-      const startResult = await model.OpenTime.updateOne(
-        { type: "start" },
-        { time: parseInt(start) }
-      );
-      const endResult = await model.OpenTime.updateOne(
-        { type: "end" },
-        { time: parseInt(end) }
-      );
-      res.status(204).end();
-    })
-  );
+    const startResult = await model.OpenTime.updateOne(
+      { type: "start" },
+      { time: parseInt(start) }
+    );
+    const endResult = await model.OpenTime.updateOne(
+      { type: "end" },
+      { time: parseInt(end) }
+    );
+    res.status(204).end();
+  })
+);
 
 router.use(openTimeMiddleware).get(
   "/courses",
@@ -178,26 +185,24 @@ router.use(openTimeMiddleware).get(
       return;
     }
     const coursesGroup = await model.Course.find({}).exec();
-    const filted = [];
+    const filtered = [];
     let items;
     // deal with query no query and one query key(foreach only for array)
     if (!req.query.keys) {
       items = [];
     } else if (typeof req.query.keys === "string") {
-      items = [];
-      items.push(req.query.keys);
+      items = [req.query.keys];
     } else {
       items = req.query.keys;
     }
 
     coursesGroup.forEach((course) => {
-      console.log(course);
-      const filtedcourse = {};
-      filtedcourse.id = course.id;
+      const filteredcourse = {};
+      filteredcourse.id = course.id;
       items.forEach((item) => {
-        filtedcourse[item] = course[item];
+        filteredcourse[item] = course[item];
       });
-      filted.push(filtedcourse);
+      filtered.push(filteredcourse);
     });
     /*
     const coursesGroup = await model.Course.aggregate([
@@ -215,13 +220,14 @@ router.use(openTimeMiddleware).get(
       data.push(group.courses);
     });
     */
-    res.send(filted);
+    res.send(filtered);
   })
 );
+
 router.route("/password").put(
   express.json({ strict: false }),
   asyncHandler(async (req, res, next) => {
-    const modified_data = req.body;
+    const modifiedData = req.body;
     const { authority } = req.session;
     mongoose.set("useFindAndModify", false);
 
@@ -231,7 +237,7 @@ router.route("/password").put(
     }
 
     await Promise.all(
-      modified_data.map(async (data) => {
+      modifiedData.map(async (data) => {
         const SALT_ROUNDS = 10;
         const salt = await bcrypt.genSalt(SALT_ROUNDS);
         const hash = await bcrypt.hash(data.new_password, salt);
@@ -244,6 +250,7 @@ router.route("/password").put(
     res.status(204).end();
   })
 );
+
 router
   .route("/users")
   .all(openTimeMiddleware)
@@ -273,18 +280,18 @@ router
         items = req.query.keys;
       }
       studentGroup.forEach((student) => {
-        console.log(student);
-        const filtedstudent = {};
-        filtedstudent.id = student.userID;
+        const filteredstudent = {};
+        filteredstudent.id = student.userID;
         items.forEach((item) => {
-          filtedstudent[item] = student[item];
+          filteredstudent[item] = student[item];
         });
-        filted.push(filtedstudent);
+        filted.push(filteredstudent);
       });
       res.send(filted);
     })
   )
   .post();
+
 router
   .route("/selections/:courseID")
   .all(openTimeMiddleware)
@@ -442,32 +449,25 @@ router
       res.status(204).end();
     })
   );
-router
-  .route("/authority")
-  .all(openTimeMiddleware)
-  .put(
-    express.urlencoded({ extended: false }),
-    asyncHandler(async (req, res, next) => {
-      if (req.session.authority !== "Admin") {
-        res.status(403).end();
-        return;
-      }
-      let { userID } = req.body;
-      const { authority } = req.body;
-      userID = userID.toUpperCase();
-      const user = await model.Student.findOne({ userID }).exec();
-      if (!user) {
-        res.status(404).end();
-        return;
-      }
-      await model.Student.updateOne(
-        { userID },
-        {
-          authority,
-        }
-      );
-      res.status(204).end();
-    })
-  );
+
+router.route("/authority").put(
+  express.urlencoded({ extended: false }),
+  asyncHandler(async (req, res, next) => {
+    if (req.session.authority !== "Admin") {
+      res.status(403).end();
+      return;
+    }
+    let { userID } = req.body;
+    const { authority } = req.body;
+    userID = userID.toUpperCase();
+    const user = await model.Student.findOne({ userID }).exec();
+    if (!user) {
+      res.status(404).end();
+      return;
+    }
+    await model.Student.updateOne({ userID }, { authority });
+    res.status(204).end();
+  })
+);
 
 module.exports = router;
