@@ -507,6 +507,113 @@
           }
         }
       }
+    },
+    "/selections/{courseID}": {
+      "get": {
+        "description": "Show the status of a course's selection",
+        "parameters": [
+          {
+            "name": "courseID",
+            "in": "path",
+            "description": "ID of a course",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Ten-Select-Two"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "十選二實驗"
+                    },
+                    "type": {
+                      "type": "string",
+                      "example": "0"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "description of a course"
+                    },
+                    "selected": {
+                      "type": "array",
+                      "example": ["course1", "course2"]
+                    },
+                    "unselected": {
+                      "type": "array",
+                      "example": ["course3", "course4"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Fail"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      },
+      "put": {
+        "description": "Show the status of a course's selection",
+        "parameters": [
+          {
+            "name": "courseID",
+            "in": "path",
+            "description": "ID of a course",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Ten-Select-Two"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Update the selection of a course",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": ["電力電子", "半導體", "嵌入式系統"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Format error"
+          },
+          "403": {
+            "description": "Fail"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
     }
   },
   "components": {
