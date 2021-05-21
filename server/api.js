@@ -158,7 +158,7 @@ router.route("/opentime").put(
   asyncHandler(async (req, res, next) => {
     const { start } = req.body;
     const { end } = req.body;
-    if (parseInt(start) !== start || parseInt(end) !== end) {
+    if (parseInt(start) != start || parseInt(end) != end) {
       res.status(400).end();
       return;
     }
