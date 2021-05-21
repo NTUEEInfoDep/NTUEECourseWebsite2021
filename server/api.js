@@ -39,8 +39,7 @@ const openTimeMiddleware = asyncHandler(async (req, res, next) => {
   const now = Math.floor(new Date() / 1000);
   if (
     (now < startTime.time || now > endTime.time) &&
-    req.session.authority !== "Admin" &&
-    req.session.authority !== "Maintainer"
+    req.session.authority < 1
   ) {
     res.status(503).send({ start: startTime.time, end: endTime.time });
     return;
@@ -50,6 +49,9 @@ const openTimeMiddleware = asyncHandler(async (req, res, next) => {
 
 const permissionRequired = (permission) =>
   asyncHandler(async (req, res, next) => {
+    console.log(req.session.authority);
+    console.log(permission);
+    console.log(constants.AUTHORITY_ADMIN);
     if (req.session.authority < permission) {
       res.status(403).end();
       return;
@@ -221,12 +223,11 @@ router.use(openTimeMiddleware).get(
 
 router.route("/password").put(
   express.json({ strict: false }),
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const modifiedData = req.body;
     const { authority } = req.session;
     mongoose.set("useFindAndModify", false);
-
-    permissionRequired(constants.AUTHORITY_ADMIN);
 
     await Promise.all(
       modifiedData.map(async (data) => {
@@ -247,12 +248,12 @@ router
   .route("/users")
   .all(openTimeMiddleware)
   .get(
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const studentGroup = await model.Student.find({}).exec();
       const filted = [];
       let items;
@@ -340,12 +341,12 @@ router
   .all(openTimeMiddleware)
   .post(
     express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const addData = req.body;
 
       await Promise.all(
@@ -374,12 +375,12 @@ router
   )
   .delete(
     express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const deleteData = req.body;
       await Promise.all(
         deleteData.map(async (id) => {
@@ -394,12 +395,12 @@ router
   )
   .put(
     express.urlencoded({ extended: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const { id } = req.body;
       const { name } = req.body;
       const { type } = req.body;
@@ -427,8 +428,8 @@ router
 
 router.route("/authority").put(
   express.urlencoded({ extended: false }),
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
-    permissionRequired(constants.AUTHORITY_ADMIN);
     let { userID } = req.body;
     const { authority } = req.body;
     userID = userID.toUpperCase();

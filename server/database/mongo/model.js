@@ -58,7 +58,7 @@ const userSchema = new mongoose.Schema({
     immutable: false,
   },
   authority: {
-    type: String,
+    type: Number,
     required: true,
     immutable: false,
   },
