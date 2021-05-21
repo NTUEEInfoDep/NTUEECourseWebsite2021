@@ -5,12 +5,18 @@ import Drawer from "./containers/drawer";
 import Main from "./containers/main";
 import Courses from "./containers/courses";
 import Login from "./containers/login";
+import StudentData from "./containers/studentData";
 
 const Routes = () => (
   <Switch>
     <Route exact from="/" render={(props) => <Main {...props} />} />
     <Route exact path="/courses" render={(props) => <Courses {...props} />} />
     <Route exact path="/login" render={(props) => <Login {...props} />} />
+    <Route
+      exact
+      path="/studentdata"
+      render={(props) => <StudentData {...props} />}
+    />
   </Switch>
 );
 
