@@ -3,6 +3,16 @@
 version: "3.4"
 
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: ./dev-support/frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+
   mongodb:
     image: mongo
     ports:
