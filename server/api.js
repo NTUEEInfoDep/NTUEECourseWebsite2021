@@ -159,8 +159,8 @@ router.route("/opentime").put(
   express.json({ strict: false }),
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
-    const start = req.body.start;
-    const end = req.body.end;
+    const { start } = req.body;
+    const { end } = req.body;
     if (parseInt(start) != start || parseInt(end) != end) {
       res.status(400).end();
       return;
@@ -355,11 +355,11 @@ router
 
       await Promise.all(
         addData.map(async (data) => {
-          const id = data.id;
-          const name = data.name;
-          const type = data.type;
-          const description = data.description;
-          const options = data.options;
+          const { id } = data;
+          const { name } = data;
+          const { type } = data;
+          const { description } = data;
+          const { options } = data;
           const course = await model.Course.findOne({ id }).exec();
           if (course) {
             await model.Course.deleteOne({ id }).exec();
@@ -398,51 +398,57 @@ router
     })
   )
   .put(
-    express.urlencoded({ extended: false }),
+    express.json({ strict: false }),
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      const { id } = req.body;
-      const { name } = req.body;
-      const { type } = req.body;
-      const { description } = req.body;
-      const { options } = req.body;
-      const course = await model.Course.findOne({ id }).exec();
-      if (!course) {
-        res.status(404).end();
-        return;
-      }
-      await model.Course.updateOne(
-        {
-          id,
-        },
-        {
-          name,
-          type,
-          description,
-          options,
-        }
+      const modifiedData = req.body;
+      await Promise.all(
+        modifiedData.map(async (data) => {
+          const { id } = data;
+          const { name } = data;
+          const { type } = data;
+          const { description } = data;
+          const { options } = data;
+          const course = await model.Course.findOne({ id }).exec();
+          if (course) {
+            await model.Course.updateOne(
+              {
+                id,
+              },
+              {
+                name,
+                type,
+                description,
+                options,
+              }
+            );
+          }
+        })
       );
       res.status(204).end();
     })
   );
 
 router.route("/authority").put(
-  express.urlencoded({ extended: false }),
+  express.json({ strict: false }),
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
-    let { userID } = req.body;
-    const { authority } = req.body;
-    userID = userID.toUpperCase();
-    const user = await model.Student.findOne({ userID }).exec();
-    if (!user) {
-      res.status(404).end();
-      return;
-    }
-    await model.Student.updateOne({ userID }, { authority });
+    const modifiedData = req.body;
+    await Promise.all(
+      modifiedData.map(async (data) => {
+        let { userID } = data;
+        const { authority } = data;
+        userID = userID.toUpperCase();
+        const user = await model.Student.findOne({ userID }).exec();
+        if (user) {
+          await model.Student.updateOne({ userID }, { authority });
+        }
+      })
+    );
     res.status(204).end();
   })
 );
