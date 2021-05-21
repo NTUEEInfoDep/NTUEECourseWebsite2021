@@ -154,10 +154,8 @@ router
 
 router.route("/opentime").put(
   express.urlencoded({ extended: false }),
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
-    if (!req.session.userID || req.session.authority !== "Admin") {
-      res.status(403).end();
-    }
     const { start } = req.body;
     const { end } = req.body;
     if (parseInt(start) !== start || parseInt(end) !== end) {
@@ -231,10 +229,7 @@ router.route("/password").put(
     const { authority } = req.session;
     mongoose.set("useFindAndModify", false);
 
-    if (authority !== "Admin") {
-      res.status(401).end();
-      return;
-    }
+    permissionRequired(constants.AUTHORITY_ADMIN);
 
     await Promise.all(
       modifiedData.map(async (data) => {
@@ -260,13 +255,7 @@ router
         res.status(403).end();
         return;
       }
-      if (
-        req.session.authority !== "Admin" &&
-        req.session.authority !== "Maintainer"
-      ) {
-        res.status(403).end();
-        return;
-      }
+      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const studentGroup = await model.Student.find({}).exec();
       const filted = [];
       let items;
@@ -359,13 +348,7 @@ router
         res.status(403).end();
         return;
       }
-      if (
-        req.session.authority !== "Admin" &&
-        req.session.authority !== "Maintainer"
-      ) {
-        res.status(403).end();
-        return;
-      }
+      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const { id } = req.body;
       const { name } = req.body;
       const { type } = req.body;
@@ -394,13 +377,7 @@ router
         res.status(403).end();
         return;
       }
-      if (
-        req.session.authority !== "Admin" &&
-        req.session.authority !== "Maintainer"
-      ) {
-        res.status(403).end();
-        return;
-      }
+      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const { id } = req.body;
       const course = await model.Course.findOne({ id }).exec();
       if (!course) {
@@ -418,13 +395,7 @@ router
         res.status(403).end();
         return;
       }
-      if (
-        req.session.authority !== "Admin" &&
-        req.session.authority !== "Maintainer"
-      ) {
-        res.status(403).end();
-        return;
-      }
+      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const { id } = req.body;
       const { name } = req.body;
       const { type } = req.body;
@@ -453,10 +424,7 @@ router
 router.route("/authority").put(
   express.urlencoded({ extended: false }),
   asyncHandler(async (req, res, next) => {
-    if (req.session.authority !== "Admin") {
-      res.status(403).end();
-      return;
-    }
+    permissionRequired(constants.AUTHORITY_ADMIN);
     let { userID } = req.body;
     const { authority } = req.body;
     userID = userID.toUpperCase();
