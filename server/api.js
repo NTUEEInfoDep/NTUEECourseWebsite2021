@@ -153,24 +153,21 @@ router
   );
 
 router.route("/opentime").put(
-  express.urlencoded({ extended: false }),
+  express.json({ strict: false }),
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
-    const { start } = req.body;
-    const { end } = req.body;
+    const start = req.body.start;
+    const end = req.body.end;
     if (parseInt(start) != start || parseInt(end) != end) {
       res.status(400).end();
       return;
     }
 
-    const startResult = await model.OpenTime.updateOne(
+    await model.OpenTime.updateOne(
       { type: "start" },
       { time: parseInt(start) }
     );
-    const endResult = await model.OpenTime.updateOne(
-      { type: "end" },
-      { time: parseInt(end) }
-    );
+    await model.OpenTime.updateOne({ type: "end" }, { time: parseInt(end) });
     res.status(204).end();
   })
 );
@@ -342,49 +339,56 @@ router
   .route("/course")
   .all(openTimeMiddleware)
   .post(
-    express.urlencoded({ extended: false }),
+    express.json({ strict: false }),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
       permissionRequired(constants.AUTHORITY_MAINTAINER);
-      const { id } = req.body;
-      const { name } = req.body;
-      const { type } = req.body;
-      const { description } = req.body;
-      const { options } = req.body;
-      const course = await model.Course.findOne({ id }).exec();
-      if (course) {
-        res.status(400).end();
-        return;
-      }
-      const courseDocument = new model.Course({
-        id,
-        name,
-        type,
-        description,
-        options,
-      });
-      await courseDocument.save();
-      res.status(201).send({ id, name, type, description, options });
+      const addData = req.body;
+
+      await Promise.all(
+        addData.map(async (data) => {
+          const id = data.id;
+          const name = data.name;
+          const type = data.type;
+          const description = data.description;
+          const options = data.options;
+          const course = await model.Course.findOne({ id }).exec();
+          if (course) {
+            await model.Course.deleteOne({ id }).exec();
+          }
+          const courseDocument = new model.Course({
+            id,
+            name,
+            type,
+            description,
+            options,
+          });
+          await courseDocument.save();
+        })
+      );
+      res.status(201).end();
     })
   )
   .delete(
-    express.urlencoded({ extended: false }),
+    express.json({ strict: false }),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
       permissionRequired(constants.AUTHORITY_MAINTAINER);
-      const { id } = req.body;
-      const course = await model.Course.findOne({ id }).exec();
-      if (!course) {
-        res.status(404).end();
-        return;
-      }
-      await model.Course.deleteOne({ id });
+      const deleteData = req.body;
+      await Promise.all(
+        deleteData.map(async (id) => {
+          const course = await model.Course.findOne({ id }).exec();
+          if (course) {
+            await model.Course.deleteOne({ id });
+          }
+        })
+      );
       res.status(204).end();
     })
   )
