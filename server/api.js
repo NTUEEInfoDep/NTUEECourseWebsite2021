@@ -254,7 +254,7 @@ router
       }
       permissionRequired(constants.AUTHORITY_MAINTAINER);
       const studentGroup = await model.Student.find({}).exec();
-      const filted = [];
+      const filtered = [];
       let items;
       // deal with query no query and one query key(foreach only for array)
       if (!req.query.keys) {
@@ -271,9 +271,9 @@ router
         items.forEach((item) => {
           filteredstudent[item] = student[item];
         });
-        filted.push(filteredstudent);
+        filtered.push(filteredstudent);
       });
-      res.send(filted);
+      res.send(filtered);
     })
   )
   .post();
