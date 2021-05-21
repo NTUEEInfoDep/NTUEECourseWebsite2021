@@ -34,8 +34,12 @@ redisClient.on("error", console.error);
 // Date verification middleware
 
 const openTimeMiddleware = asyncHandler(async (req, res, next) => {
-  const startTime = await model.OpenTime.findOne({ type: "start" }).exec();
-  const endTime = await model.OpenTime.findOne({ type: "end" }).exec();
+  const startTime = await model.OpenTime.findOne({
+    type: constants.START_TIME_KEY,
+  }).exec();
+  const endTime = await model.OpenTime.findOne({
+    type: constants.END_TIME_KEY,
+  }).exec();
   const now = Math.floor(new Date() / 1000);
   if (
     (now < startTime.time || now > endTime.time) &&
@@ -49,9 +53,6 @@ const openTimeMiddleware = asyncHandler(async (req, res, next) => {
 
 const permissionRequired = (permission) =>
   asyncHandler(async (req, res, next) => {
-    console.log(req.session.authority);
-    console.log(permission);
-    console.log(constants.AUTHORITY_ADMIN);
     if (req.session.authority < permission) {
       res.status(403).end();
       return;
@@ -166,10 +167,13 @@ router.route("/opentime").put(
     }
 
     await model.OpenTime.updateOne(
-      { type: "start" },
+      { type: constants.START_TIME_KEY },
       { time: parseInt(start) }
     );
-    await model.OpenTime.updateOne({ type: "end" }, { time: parseInt(end) });
+    await model.OpenTime.updateOne(
+      { type: constants.END_TIME_KEY },
+      { time: parseInt(end) }
+    );
     res.status(204).end();
   })
 );
