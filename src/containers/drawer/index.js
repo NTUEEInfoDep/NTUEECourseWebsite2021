@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "nowrap",
   },
   root: {
-    // display: "flex",
+  //   display: "flex",
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -79,6 +79,18 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: 0,
+  },
+  contentShift: {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: drawerWidth,
   },
   offset: theme.mixins.toolbar,
 }));
@@ -156,14 +168,21 @@ const Drawer = ({ children }) => {
           {itemList.map(({ text, to }) => {
             return (
               <ListItem button key={text} component={Link} to={to}>
-                <ListItemText primary={text} />
+                <ListItemText primary={text}/>
               </ListItem>
             );
           })}
         </List>
       </MUIDrawer>
-      <div className={classes.offset} />
-      {children}
+      <div className={classes.offset}/>
+      <div 
+        className={classes.content} 
+        className={clsx(classes.content, {
+              [classes.contentShift]: open,
+            })}
+        >
+        {children}
+      </div>
     </div>
   );
 };
