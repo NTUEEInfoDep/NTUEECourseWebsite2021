@@ -108,7 +108,7 @@
           "description": "Enter Unix timestamp",
           "required": true,
           "content": {
-            "application/x-www-form-urlencoded": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -282,8 +282,8 @@
                   }
                 },
                 "example": [
-                  { "userID": "b33333333", "new_password": "2222" },
-                  { "userID": "b44444444", "new_password": "2222" }
+                  { "userID": "B33333333", "new_password": "2222" },
+                  { "userID": "B44444444", "new_password": "2222" }
                 ]
               },
               "encoding": {
@@ -314,40 +314,48 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/x-www-form-urlencoded": {
+            "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "example": "test"
-                  },
-                  "name": {
-                    "type": "string",
-                    "example": "course_name"
-                  },
-                  "type": {
-                    "type": "string",
-                    "example": "0"
-                  },
-                  "description": {
-                    "type": "string",
-                    "example": "this is a tested course"
-                  },
-                  "options": {
-                    "type": "array",
-                    "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
                       "type": "string"
                     },
-                    "example": ["Teacher A", "Teacher B"]
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
                   }
-                }
-              },
-              "encoding": {
-                "options": {
-                  "style": "form",
-                  "explode": true
-                }
+                },
+                "example": [
+                  {
+                    "id": "test",
+                    "name": "course_name",
+                    "type": "0",
+                    "description": "this is a tested course",
+                    "options": ["Teacher A", "Teacher B"]
+                  },
+                  {
+                    "id": "test_course",
+                    "name": "course",
+                    "type": "2",
+                    "description": "this is another tested course",
+                    "options": ["Teacher B", "Teacher C"]
+                  }
+                ]
               }
             }
           }
@@ -372,15 +380,13 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/x-www-form-urlencoded": {
+            "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "example": "test"
-                  }
-                }
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": ["test", "test_course"]
               }
             }
           }
@@ -405,40 +411,48 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/x-www-form-urlencoded": {
+            "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "example": "test"
-                  },
-                  "name": {
-                    "type": "string",
-                    "example": "course_name_update"
-                  },
-                  "type": {
-                    "type": "string",
-                    "example": "1"
-                  },
-                  "description": {
-                    "type": "string",
-                    "example": "this is another tested course"
-                  },
-                  "options": {
-                    "type": "array",
-                    "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
                       "type": "string"
                     },
-                    "example": ["Teacher A", "Teacher B", "Teacher C"]
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
                   }
-                }
-              },
-              "encoding": {
-                "options": {
-                  "style": "form",
-                  "explode": true
-                }
+                },
+                "example": [
+                  {
+                    "id": "test",
+                    "name": "new_course_name",
+                    "type": "4",
+                    "description": "this is a modified tested course",
+                    "options": ["Teacher A", "Teacher B", "Teacher E"]
+                  },
+                  {
+                    "id": "test_course",
+                    "name": "course",
+                    "type": "2",
+                    "description": "this is another modified tested course",
+                    "options": ["Teacher B", "Teacher C"]
+                  }
+                ]
               }
             }
           }
@@ -475,19 +489,32 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/x-www-form-urlencoded": {
+            "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "userID": {
-                    "type": "string",
-                    "example": "B33333333"
-                  },
-                  "authority": {
-                    "type": "string",
-                    "example": "Maintainer"
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string",
+                      "example": "B33333333"
+                    },
+                    "authority": {
+                      "type": "number",
+                      "example": 1
+                    }
                   }
-                }
+                },
+                "example": [
+                  {
+                    "userID": "B33333333",
+                    "authority": 1
+                  },
+                  {
+                    "userID": "B22222222",
+                    "authority": 0
+                  }
+                ]
               }
             }
           }
