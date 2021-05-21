@@ -34,13 +34,16 @@ redisClient.on("error", console.error);
 // Date verification middleware
 
 const openTimeMiddleware = asyncHandler(async (req, res, next) => {
-  const startTime = await model.OpenTime.findOne({ type: "start" }).exec();
-  const endTime = await model.OpenTime.findOne({ type: "end" }).exec();
+  const startTime = await model.OpenTime.findOne({
+    type: constants.START_TIME_KEY,
+  }).exec();
+  const endTime = await model.OpenTime.findOne({
+    type: constants.END_TIME_KEY,
+  }).exec();
   const now = Math.floor(new Date() / 1000);
   if (
     (now < startTime.time || now > endTime.time) &&
-    req.session.authority !== "Admin" &&
-    req.session.authority !== "Maintainer"
+    req.session.authority < 1
   ) {
     res.status(503).send({ start: startTime.time, end: endTime.time });
     return;
@@ -164,10 +167,13 @@ router.route("/opentime").put(
     }
 
     await model.OpenTime.updateOne(
-      { type: "start" },
+      { type: constants.START_TIME_KEY },
       { time: parseInt(start) }
     );
-    await model.OpenTime.updateOne({ type: "end" }, { time: parseInt(end) });
+    await model.OpenTime.updateOne(
+      { type: constants.END_TIME_KEY },
+      { time: parseInt(end) }
+    );
     res.status(204).end();
   })
 );
@@ -221,12 +227,11 @@ router.use(openTimeMiddleware).get(
 
 router.route("/password").put(
   express.json({ strict: false }),
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const modifiedData = req.body;
     const { authority } = req.session;
     mongoose.set("useFindAndModify", false);
-
-    permissionRequired(constants.AUTHORITY_ADMIN);
 
     await Promise.all(
       modifiedData.map(async (data) => {
@@ -247,14 +252,14 @@ router
   .route("/users")
   .all(openTimeMiddleware)
   .get(
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const studentGroup = await model.Student.find({}).exec();
-      const filted = [];
+      const filtered = [];
       let items;
       // deal with query no query and one query key(foreach only for array)
       if (!req.query.keys) {
@@ -271,9 +276,9 @@ router
         items.forEach((item) => {
           filteredstudent[item] = student[item];
         });
-        filted.push(filteredstudent);
+        filtered.push(filteredstudent);
       });
-      res.send(filted);
+      res.send(filtered);
     })
   )
   .post();
@@ -340,12 +345,12 @@ router
   .all(openTimeMiddleware)
   .post(
     express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const addData = req.body;
 
       await Promise.all(
@@ -374,12 +379,12 @@ router
   )
   .delete(
     express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const deleteData = req.body;
       await Promise.all(
         deleteData.map(async (id) => {
@@ -394,12 +399,12 @@ router
   )
   .put(
     express.urlencoded({ extended: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const { id } = req.body;
       const { name } = req.body;
       const { type } = req.body;
@@ -427,8 +432,8 @@ router
 
 router.route("/authority").put(
   express.urlencoded({ extended: false }),
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
-    permissionRequired(constants.AUTHORITY_ADMIN);
     let { userID } = req.body;
     const { authority } = req.body;
     userID = userID.toUpperCase();
