@@ -175,7 +175,7 @@
     },
     "/users": {
       "get": {
-        "description": "Get all users",
+        "description": "Get all users with query parameters",
         "responses": {
           "200": {
             "description": "Success",
@@ -186,12 +186,21 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "id": {
+                      "id(default)": {
                         "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "grade": {
+                        "type": "number"
+                      },
+                      "authority": {
+                        "type": "number"
                       }
                     }
                   },
-                  "example": [{ "id": "B12345678" }, { "id": "B87654321" }]
+                  "example": "api/users/id?name?grade?authority"
                 }
               }
             }
@@ -205,11 +214,11 @@
         }
       },
       "post": {
-        "description": "Add a user struct(X)",
+        "description": "Add new users",
         "requestBody": {
           "required": true,
           "content": {
-            "application/x-www-form-urlencoded": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -217,17 +226,21 @@
                     "type": "string",
                     "example": "B12345678"
                   },
-                  "name": {
-                    "type": "string",
-                    "example": "Nobody"
-                  },
                   "grade": {
                     "type": "number",
                     "example": "1"
                   },
+                  "name": {
+                    "type": "string",
+                    "example": "Nobody"
+                  },
                   "password": {
                     "type": "string",
-                    "example": "XXXX"
+                    "example": "1111"
+                  },
+                  "authority": {
+                    "type": "number",
+                    "example": "2"
                   }
                 }
               }
@@ -247,7 +260,23 @@
         }
       },
       "delete": {
-        "description": "Delete particular users(X)",
+        "description": "Delete particular users",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "properties": {
+                  "userID": {
+                    "type": "string"
+                  }
+                },
+                "example": ["b9213849", "b1432797"]
+              }
+            }
+          }
+        },
         "responses": {
           "204": {
             "description": "Success"

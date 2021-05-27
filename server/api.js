@@ -274,6 +274,10 @@ router
         const filteredstudent = {};
         filteredstudent.id = student.userID;
         items.forEach((item) => {
+          if (item === "password") {
+            res.status(403).end();
+            return;
+          }
           filteredstudent[item] = student[item];
         });
         filtered.push(filteredstudent);
@@ -281,7 +285,82 @@ router
       res.send(filtered);
     })
   )
-  .post();
+  .post(
+    express.json({ extended: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
+    asyncHandler(async (req, res, next) => {
+      if (!req.session.userID) {
+        res.status(403).end();
+        return;
+      }
+      const studentsRaw = req.body;
+      const students = [];
+      let cnt = 0;
+      await Promise.all(
+        studentsRaw.map(async (studentRaw) => {
+          if (
+            !studentRaw.userID ||
+            !studentRaw.grade ||
+            !studentRaw.password ||
+            !studentRaw.name ||
+            !studentRaw.authority
+          ) {
+            res.status(400).end();
+            return;
+          }
+          if (
+            typeof studentRaw.authority !== "number" &&
+            typeof grade !== "number"
+          ) {
+            res.status(400).end();
+            return;
+          }
+          const salt = await bcrypt.genSalt(10);
+          const hash = await bcrypt.hash(studentRaw.password, salt);
+          const student = { ...studentRaw };
+          student.password = hash;
+          student.userID = student.userID.toUpperCase();
+          const match = await model.Student.findOne({
+            userID: student.userID,
+          }).exec();
+          if (!match) {
+            cnt += 1;
+            students.push(student);
+          }
+        })
+      );
+      console.log("All passwords are hashed!");
+      // Save all students
+      await Promise.all(
+        students.map(async (student) => {
+          const studentDocument = new model.Student(student);
+          await studentDocument.save();
+        })
+      );
+      console.log(`Successfully update ${cnt} students`);
+      res.status(204).end();
+    })
+  )
+  .delete(
+    express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
+    asyncHandler(async (req, res, next) => {
+      if (!req.session.userID) {
+        res.status(403).end();
+        return;
+      }
+      const deleteData = req.body;
+      await Promise.all(
+        deleteData.map(async (userID) => {
+          const student = await model.Student.findOne({ userID }).exec();
+          if (student) {
+            await model.Student.deleteOne({ userID });
+          }
+        })
+      );
+      res.status(204).end();
+    })
+  );
 
 router
   .route("/selections/:courseID")
