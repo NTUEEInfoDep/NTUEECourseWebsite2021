@@ -7,6 +7,7 @@ import Main from "./containers/main";
 import Courses from "./containers/courses";
 import Login from "./containers/login";
 import StudentData from "./containers/studentData";
+import CourseManage from "./containers/courseManage";
 
 // slices
 import { selectSession } from "./slices/sessionSlice";
@@ -23,6 +24,11 @@ const Routes = () => {
         exact
         path="/studentdata"
         render={(props) => <StudentData {...props} />}
+      />
+      <Route
+        exact
+        path="/course-manage"
+        render={(props) => <CourseManage {...props} />}
       />
     </Switch>
   );

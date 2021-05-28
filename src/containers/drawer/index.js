@@ -114,6 +114,7 @@ const Drawer = ({ children }) => {
     { text: "Courses", to: "/courses" },
     { text: "Login", to: "/login" },
     { text: "Student Data", to: "/studentdata" },
+    { text: "Course Data", to: "/course-manage" },
   ];
   return (
     <div className={classes.root}>
