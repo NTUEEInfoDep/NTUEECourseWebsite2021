@@ -12,3 +12,19 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+  backend:
+    build:
+      context: .
+      dockerfile: ./dev-support/backend/Dockerfile
+    ports:
+      - "8000:8000"
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  redisdb:
+    image: redis
+    ports:
+      - "6379:6379"
+

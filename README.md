@@ -30,16 +30,31 @@ $ npm start
 
 Goto `http://localhost:3000` to see the website.
 
-## Frontend Develop
+## Frontend Develop (With Docker)
 
 ```bash
-# start frontend: create-react-app
+# start frontend, backend, database
 $ docker-compose up -d
-# start database: mongo and redis
-$ docker-compose -f ./server/docker-compose.yml up -d
-# start backend: api server
-$ npm run dev-server
+```
 
-# to see frontend logs
+To see frontend logs
+
+```
 $ docker logs -f ntueecoursewebsite2021_frontend_1
+```
+
+To reset database
+
+```bash
+$ docker exec -it ntueecoursewebsite2021_backend_1 npm run database reset
+```
+
+## Frontend Develop (Without Docker)
+
+```bash
+$ npm install
+$ npm start
+# in another terminal
+$ npm run database reset
+$ npm run dev-server
 ```
