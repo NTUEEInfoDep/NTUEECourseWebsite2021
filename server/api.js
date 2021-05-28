@@ -11,8 +11,11 @@ const debug = require("debug")("ntuee-course:api");
 const deprecate = require("depd")("ntuee-course:api");
 const mongoose = require("mongoose");
 
-const model = require("./database/mongo/model");
+const { array } = require("yargs");
+const { type } = require("os");
+const { getType } = require("@reduxjs/toolkit");
 const constants = require("./constants");
+const model = require("./database/mongo/model");
 
 // ========================================
 
@@ -233,6 +236,10 @@ router.route("/password").put(
     const { authority } = req.session;
     mongoose.set("useFindAndModify", false);
 
+    if (!modifiedData || !Array.isArray(modifiedData)) {
+      res.status(400).end();
+      return;
+    }
     await Promise.all(
       modifiedData.map(async (data) => {
         const SALT_ROUNDS = 10;
@@ -296,6 +303,11 @@ router
       const studentsRaw = req.body;
       const students = [];
       let cnt = 0;
+
+      if (!studentsRaw || !Array.isArray(studentsRaw)) {
+        res.status(400).end();
+        return;
+      }
       await Promise.all(
         studentsRaw.map(async (studentRaw) => {
           if (
@@ -350,6 +362,11 @@ router
         return;
       }
       const deleteData = req.body;
+
+      if (!deleteData || !Array.isArray(deleteData)) {
+        res.status(400).end();
+        return;
+      }
       await Promise.all(
         deleteData.map(async (userID) => {
           const student = await model.Student.findOne({ userID }).exec();
@@ -431,7 +448,10 @@ router
         return;
       }
       const addData = req.body;
-
+      if (!addData || !Array.isArray(addData)) {
+        res.status(400).end();
+        return;
+      }
       await Promise.all(
         addData.map(async (data) => {
           const { id } = data;
@@ -465,6 +485,10 @@ router
         return;
       }
       const deleteData = req.body;
+      if (!deleteData || !Array.isArray(deleteData)) {
+        res.status(400).end();
+        return;
+      }
       await Promise.all(
         deleteData.map(async (id) => {
           const course = await model.Course.findOne({ id }).exec();
@@ -485,6 +509,10 @@ router
         return;
       }
       const modifiedData = req.body;
+      if (!modifiedData || !Array.isArray(modifiedData)) {
+        res.status(400).end();
+        return;
+      }
       await Promise.all(
         modifiedData.map(async (data) => {
           const { id } = data;
@@ -517,6 +545,10 @@ router.route("/authority").put(
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const modifiedData = req.body;
+    if (!modifiedData || !Array.isArray(modifiedData)) {
+      res.status(400).end();
+      return;
+    }
     await Promise.all(
       modifiedData.map(async (data) => {
         let { userID } = data;
