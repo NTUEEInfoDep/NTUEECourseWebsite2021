@@ -55,6 +55,9 @@ $ docker exec -it ntueecoursewebsite2021_backend_1 npm run database reset
 $ npm install
 $ npm start
 # in another terminal
-$ npm run database reset
-$ npm run dev-server
+cd server
+docker-compose up -d
+cd ..
+npm run database reset
+npm run dev-server
 ```
