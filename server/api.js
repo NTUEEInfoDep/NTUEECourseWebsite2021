@@ -299,25 +299,26 @@ router
         res.status(400).end();
         return;
       }
+      studentsRaw.forEach((studentRaw) => {
+        if (
+          !studentRaw.userID ||
+          !studentRaw.grade ||
+          !studentRaw.password ||
+          !studentRaw.name ||
+          !studentRaw.authority
+        ) {
+          res.status(400).end();
+          return;
+        }
+        if (
+          typeof studentRaw.authority !== "number" &&
+          typeof grade !== "number"
+        ) {
+          res.status(400).end();
+        }
+      });
       await Promise.all(
         studentsRaw.map(async (studentRaw) => {
-          if (
-            !studentRaw.userID ||
-            !studentRaw.grade ||
-            !studentRaw.password ||
-            !studentRaw.name ||
-            !studentRaw.authority
-          ) {
-            res.status(400).end();
-            return;
-          }
-          if (
-            typeof studentRaw.authority !== "number" &&
-            typeof grade !== "number"
-          ) {
-            res.status(400).end();
-            return;
-          }
           const salt = await bcrypt.genSalt(10);
           const hash = await bcrypt.hash(studentRaw.password, salt);
           const student = { ...studentRaw };
