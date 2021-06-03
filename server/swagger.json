@@ -220,29 +220,40 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
+                "type": "array",
                 "properties": {
                   "userID": {
-                    "type": "string",
-                    "example": "B12345678"
+                    "type": "string"
                   },
                   "grade": {
-                    "type": "number",
-                    "example": "1"
+                    "type": "number"
                   },
                   "name": {
-                    "type": "string",
-                    "example": "Nobody"
+                    "type": "string"
                   },
                   "password": {
-                    "type": "string",
-                    "example": "1111"
+                    "type": "string"
                   },
                   "authority": {
-                    "type": "number",
-                    "example": "2"
+                    "type": "number"
                   }
-                }
+                },
+                "example": [
+                  {
+                    "userID": "b787",
+                    "grade": 2,
+                    "password": "1111",
+                    "name": "A",
+                    "authority": 2
+                  },
+                  {
+                    "userID": "b1338",
+                    "grade": 3,
+                    "password": "1111",
+                    "name": "B",
+                    "authority": 1
+                  }
+                ]
               }
             }
           }

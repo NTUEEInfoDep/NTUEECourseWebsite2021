@@ -1,5 +1,4 @@
 const uuid = require("node-uuid");
-const { promisify } = require("util");
 
 const express = require("express");
 const session = require("express-session");
@@ -7,13 +6,9 @@ const asyncHandler = require("express-async-handler");
 const redis = require("redis");
 const connectRedis = require("connect-redis");
 const bcrypt = require("bcrypt");
-const debug = require("debug")("ntuee-course:api");
 const deprecate = require("depd")("ntuee-course:api");
 const mongoose = require("mongoose");
 
-const { array } = require("yargs");
-const { type } = require("os");
-const { getType } = require("@reduxjs/toolkit");
 const constants = require("./constants");
 const model = require("./database/mongo/model");
 
@@ -46,7 +41,7 @@ const openTimeMiddleware = asyncHandler(async (req, res, next) => {
   const now = Math.floor(new Date() / 1000);
   if (
     (now < startTime.time || now > endTime.time) &&
-    req.session.authority < 1
+    req.session.authority < constants.AUTHORITY_MAINTAINER
   ) {
     res.status(503).send({ start: startTime.time, end: endTime.time });
     return;
@@ -54,9 +49,17 @@ const openTimeMiddleware = asyncHandler(async (req, res, next) => {
   next();
 });
 
+const loginRequired = asyncHandler(async (req, res, next) => {
+  if (!req.session.userID) {
+    res.status(403).end();
+    return;
+  }
+  next();
+});
+
 const permissionRequired = (permission) =>
   asyncHandler(async (req, res, next) => {
-    if (req.session.authority < permission) {
+    if (!req.session.authority || req.session.authority < permission) {
       res.status(403).end();
       return;
     }
@@ -106,11 +109,8 @@ router.use(session(sessionOptions));
 router
   .route("/session")
   .get(
+    loginRequired,
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       res.status(200).send({
         userID: req.session.userID,
         authority: req.session.authority,
@@ -164,18 +164,22 @@ router.route("/opentime").put(
   asyncHandler(async (req, res, next) => {
     const { start } = req.body;
     const { end } = req.body;
-    if (parseInt(start) != start || parseInt(end) != end) {
+    if (typeof start !== "number" || typeof end !== "number") {
+      res.status(400).end();
+      return;
+    }
+    if (start > 0 || end > 0) {
       res.status(400).end();
       return;
     }
 
     await model.OpenTime.updateOne(
       { type: constants.START_TIME_KEY },
-      { time: parseInt(start) }
+      { time: start }
     );
     await model.OpenTime.updateOne(
       { type: constants.END_TIME_KEY },
-      { time: parseInt(end) }
+      { time: end }
     );
     res.status(204).end();
   })
@@ -183,11 +187,8 @@ router.route("/opentime").put(
 
 router.use(openTimeMiddleware).get(
   "/courses",
+  loginRequired,
   asyncHandler(async (req, res, next) => {
-    if (!req.session.userID) {
-      res.status(403).end();
-      return;
-    }
     const coursesGroup = await model.Course.find({}).exec();
     const filtered = [];
     let items;
@@ -280,10 +281,6 @@ router
   .get(
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       const studentGroup = await model.Student.find({}).exec();
       const filtered = [];
       let items;
@@ -291,8 +288,7 @@ router
       if (!req.query.keys) {
         items = [];
       } else if (typeof req.query.keys === "string") {
-        items = [];
-        items.push(req.query.keys);
+        items = [req.query.keys];
       } else {
         items = req.query.keys;
       }
@@ -315,10 +311,6 @@ router
     express.json({ extended: false }),
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       const studentsRaw = req.body;
       const students = [];
       let cnt = 0;
@@ -327,25 +319,26 @@ router
         res.status(400).end();
         return;
       }
+      studentsRaw.forEach((studentRaw) => {
+        if (
+          !studentRaw.userID ||
+          !studentRaw.grade ||
+          !studentRaw.password ||
+          !studentRaw.name ||
+          !studentRaw.authority
+        ) {
+          res.status(400).end();
+          return;
+        }
+        if (
+          typeof studentRaw.authority !== "number" &&
+          typeof grade !== "number"
+        ) {
+          res.status(400).end();
+        }
+      });
       await Promise.all(
         studentsRaw.map(async (studentRaw) => {
-          if (
-            !studentRaw.userID ||
-            !studentRaw.grade ||
-            !studentRaw.password ||
-            !studentRaw.name ||
-            !studentRaw.authority
-          ) {
-            res.status(400).end();
-            return;
-          }
-          if (
-            typeof studentRaw.authority !== "number" &&
-            typeof grade !== "number"
-          ) {
-            res.status(400).end();
-            return;
-          }
           const salt = await bcrypt.genSalt(10);
           const hash = await bcrypt.hash(studentRaw.password, salt);
           const student = { ...studentRaw };
@@ -376,10 +369,6 @@ router
     express.json({ strict: false }),
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       const deleteData = req.body;
 
       if (!deleteData || !Array.isArray(deleteData)) {
@@ -400,13 +389,10 @@ router
 
 router
   .route("/selections/:courseID")
-  .all(openTimeMiddleware)
   .all(
+    openTimeMiddleware,
+    loginRequired,
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       const { courseID } = req.params;
       const course = await model.Course.findOne(
         { id: courseID },
@@ -462,10 +448,6 @@ router
     express.json({ strict: false }),
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       const addData = req.body;
       if (!addData || !Array.isArray(addData)) {
         res.status(400).end();
@@ -523,10 +505,6 @@ router
     express.json({ strict: false }),
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       const modifiedData = req.body;
       if (!modifiedData || !Array.isArray(modifiedData)) {
         res.status(400).end();
