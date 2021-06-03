@@ -233,20 +233,39 @@ router.route("/password").put(
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const modifiedData = req.body;
-    const { authority } = req.session;
+    let ERROR_INPUT = false;
     mongoose.set("useFindAndModify", false);
 
     if (!modifiedData || !Array.isArray(modifiedData)) {
       res.status(400).end();
       return;
     }
+
+    // check input type
+    modifiedData.map((data) => {
+      // check if attribute userID,new_password exist
+      if (!data.userID || !data.new_password) {
+        ERROR_INPUT = true;
+      }
+      // check if input is string
+      if (
+        typeof data.new_password !== "string" ||
+        typeof data.userID !== "string"
+      ) {
+        ERROR_INPUT = true;
+      }
+    });
+    if (ERROR_INPUT) {
+      res.status(403).end();
+      return;
+    }
+
     await Promise.all(
       modifiedData.map(async (data) => {
-        const SALT_ROUNDS = 10;
-        const salt = await bcrypt.genSalt(SALT_ROUNDS);
-        const hash = await bcrypt.hash(data.new_password, salt);
-        const filter = { userID: data.userID };
-        const update = { password: hash };
+        const salt = await bcrypt.genSalt(constants.SALT_ROUNDS);
+        const newpasswordHash = await bcrypt.hash(data.new_password, salt);
+        const filter = { userID: data.userID.toUpperCase() };
+        const update = { password: newpasswordHash };
         const result = await model.Student.findOneAndUpdate(filter, update);
       })
     );
