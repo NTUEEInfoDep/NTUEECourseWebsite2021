@@ -27,27 +27,22 @@ export default function StudentTable({ data, loaded }) {
         <TableHead>
           <TableRow key="title">
             <TableCell className={classes.table_cell}>index</TableCell>
-            {loaded &&
-              data[0].map((col) => (
-                <TableCell
-                  key={col}
-                  align="right"
-                  className={classes.table_cell}
-                >
-                  {col}
-                </TableCell>
-              ))}
+            {["userID", "name", "grade"].map((e) => (
+              <TableCell key={e} align="right" className={classes.table_cell}>
+                {e}
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
 
         <TableBody>
-          {loaded ? (
-            data.slice(1).map((row, index) => (
-              <TableRow key={row[0]}>
+          {data.length !== 0 ? (
+            data.map((row, index) => (
+              <TableRow key={row.userID}>
                 <TableCell align="left" className={classes.table_cell}>
                   {index + 1}
                 </TableCell>
-                {row.map((col) => (
+                {Object.values(row).map((col) => (
                   <TableCell
                     key={col}
                     align="right"

@@ -27,20 +27,17 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const handleUpdate = () => {
-  console.log("to be complete");
-};
-
-function InputGrid({ name, placeholder, newStudent, setNewStudent, idx }) {
+function InputGrid({ type, newStudent, setNewStudent }) {
   return (
     <Input
-      value={newStudent[idx]}
-      name={name}
-      placeholder={placeholder}
+      value={newStudent[type]}
+      name={type}
+      placeholder={type}
       onChange={(e) => {
-        const items = newStudent;
-        items[idx] = e.target.value;
-        setNewStudent(items);
+        setNewStudent({
+          ...newStudent,
+          [type]: e.target.value,
+        });
       }}
     />
   );
@@ -52,14 +49,16 @@ function InputGrid({ name, placeholder, newStudent, setNewStudent, idx }) {
 export default function StudentData() {
   const classes = useStyles();
 
-  const [file, setFile] = React.useState("");
-  const [data, setData] = React.useState([["", "", ""]]);
+  const [data, setData] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false);
-  const [newStudent, setNewStudent] = React.useState([]);
+  const [newStudent, setNewStudent] = React.useState({
+    userID: "",
+    name: "",
+    grade: "",
+  });
 
   const handleTest = () => {
     console.log(data);
-    console.log(newStudent);
   };
 
   const handleUpload = async (efile) => {
@@ -67,13 +66,20 @@ export default function StudentData() {
       Papa.parse(efile, {
         skipEmptyLines: true,
         complete(results) {
-          // console.log("Finished:", results.data);
-          setData(results.data);
+          const newData = results.data.reduce((obj, cur) => {
+            return obj.concat([
+              { userID: cur[0], name: cur[1], grade: cur[2] },
+            ]);
+          }, []);
+          setData(data.concat(newData));
           setLoaded(true);
         },
       });
-      setFile(efile);
     }
+  };
+
+  const handleUpdate = () => {
+    console.log("to be complete");
   };
 
   const handleDownload = () => {
@@ -81,12 +87,12 @@ export default function StudentData() {
   };
 
   const onAddStudent = () => {
-    console.log(data);
-    console.log(newStudent);
-    console.log(data.concat([newStudent]));
-    setData([...data, newStudent]);
-    // setData(data.concat([newStudent]));
-    setNewStudent([]);
+    setData(data.concat(newStudent));
+    setNewStudent({
+      userID: "",
+      name: "",
+      grade: "",
+    });
   };
 
   return (
@@ -167,33 +173,16 @@ export default function StudentData() {
             alignItems="flex-start"
             direction="row"
           >
-            <Grid item>
-              <InputGrid
-                name="add-id"
-                placeholder="userID"
-                newStudent={newStudent}
-                setNewStudent={setNewStudent}
-                idx={0}
-              />
-            </Grid>
-            <Grid item>
-              <InputGrid
-                name="add-name"
-                placeholder="name"
-                newStudent={newStudent}
-                setNewStudent={setNewStudent}
-                idx={1}
-              />
-            </Grid>
-            <Grid item>
-              <InputGrid
-                name="add-grade"
-                placeholder="grade"
-                newStudent={newStudent}
-                setNewStudent={setNewStudent}
-                idx={2}
-              />
-            </Grid>
+            {["userID", "name", "grade"].map((e) => (
+              <Grid item>
+                <InputGrid
+                  type={e}
+                  newStudent={newStudent}
+                  setNewStudent={setNewStudent}
+                />
+              </Grid>
+            ))}
+
             <Grid item>
               <Button
                 variant="contained"
