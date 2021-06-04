@@ -169,7 +169,7 @@ router.route("/opentime").put(
       res.status(400).end();
       return;
     }
-    if (start > 0 || end > 0) {
+    if (start < 0 || end < 0) {
       res.status(400).end();
       return;
     }
@@ -192,15 +192,7 @@ router.use(openTimeMiddleware).get(
   asyncHandler(async (req, res, next) => {
     const coursesGroup = await model.Course.find({}).exec();
     const filtered = [];
-    let items;
-    // deal with query no query and one query key(foreach only for array)
-    if (!req.query.keys) {
-      items = [];
-    } else if (typeof req.query.keys === "string") {
-      items = [req.query.keys];
-    } else {
-      items = req.query.keys;
-    }
+    const items = Object.keys(req.query);
 
     coursesGroup.forEach((course) => {
       const filteredcourse = {};
@@ -284,15 +276,7 @@ router
     asyncHandler(async (req, res, next) => {
       const studentGroup = await model.Student.find({}).exec();
       const filtered = [];
-      let items;
-      // deal with query no query and one query key(foreach only for array)
-      if (!req.query.keys) {
-        items = [];
-      } else if (typeof req.query.keys === "string") {
-        items = [req.query.keys];
-      } else {
-        items = req.query.keys;
-      }
+      const items = Object.keys(req.query);
       studentGroup.forEach((student) => {
         const filteredstudent = {};
         filteredstudent.id = student.userID;
@@ -334,7 +318,7 @@ router
         if (
           typeof studentRaw.authority !== "number" ||
           typeof studentRaw.grade !== "number" ||
-          typeof studentRaw.userId !== "string" ||
+          typeof studentRaw.userID !== "string" ||
           typeof studentRaw.password !== "string" ||
           typeof studentRaw.name !== "string"
         ) {
@@ -422,9 +406,10 @@ router
       const { courseID } = req.params;
       const { userID } = req.session;
       const { name, type, description, options } = req.course;
-      const selections = await model.Selection.find({ userID, courseID })
-        .sort({ ranking: 1 })
-        .select("name");
+      let selected = await model.Selection.find({ userID, courseID }).sort({
+        ranking: 1,
+      });
+      selected = selected.map((selection) => selection.name);
       const unselected = options.filter((option) => !selected.includes(option));
       res.send({ name, type, description, selected, unselected });
     })
@@ -594,11 +579,10 @@ router.route("/authority").put(
       res.status(400).end();
       return;
     }
+    console.log(modifiedData);
     modifiedData.forEach((data) => {
       if (
-        !data.userID ||
         typeof data.userID !== "string" ||
-        !data.authority ||
         typeof data.authority !== "number"
       ) {
         const indexofdata = modifiedData.indexOf(data);

@@ -144,6 +144,38 @@
     "/courses": {
       "get": {
         "description": "Get all courses",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "name",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["1"]
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["1"]
+            }
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "description": "description",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["1"]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -176,6 +208,38 @@
     "/users": {
       "get": {
         "description": "Get all users with query parameters",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "name",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["1"]
+            }
+          },
+          {
+            "name": "grade",
+            "in": "query",
+            "description": "grade",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["1"]
+            }
+          },
+          {
+            "name": "authority",
+            "in": "query",
+            "description": "authority",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["1"]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -516,6 +580,7 @@
     "/distribute": {
       "post": {
         "description": "Run distribution(X)",
+        "deprecated": true,
         "responses": {
           "201": {
             "description": "Success"
