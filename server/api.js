@@ -422,9 +422,9 @@ router
       const { courseID } = req.params;
       const { userID } = req.session;
       const { name, type, description, options } = req.course;
-      const user = await model.Student.findOne({ userID }, "selections");
-      const { selections } = user;
-      const selected = selections[courseID];
+      const selections = await model.Selection.find({ userID, courseID })
+        .sort({ ranking: 1 })
+        .select("name");
       const unselected = options.filter((option) => !selected.includes(option));
       res.send({ name, type, description, selected, unselected });
     })
@@ -446,9 +446,15 @@ router
         return;
       }
 
-      const update = {};
-      update[`selections.${courseID}`] = req.body;
-      const result = await model.Student.updateOne({ userID }, update);
+      const update = [];
+      req.body.forEach((item, index) => {
+        update.push({ courseID, userID, name: item, ranking: index + 1 });
+      });
+      const resultDelete = await model.Selection.deleteMany({
+        userID,
+        courseID,
+      });
+      const result = await model.Selection.insertMany(update);
       res.status(204).end();
     })
   );
