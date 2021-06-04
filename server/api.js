@@ -9,6 +9,7 @@ const bcrypt = require("bcrypt");
 const deprecate = require("depd")("ntuee-course:api");
 const mongoose = require("mongoose");
 
+const { string } = require("yargs");
 const constants = require("./constants");
 const model = require("./database/mongo/model");
 
@@ -243,7 +244,7 @@ router.route("/password").put(
     }
 
     // check input type
-    modifiedData.map((data) => {
+    modifiedData.forEach((data) => {
       // check if attribute userID,new_password exist
       if (!data.userID || !data.new_password) {
         ERROR_INPUT = true;
@@ -331,8 +332,11 @@ router
           return;
         }
         if (
-          typeof studentRaw.authority !== "number" &&
-          typeof grade !== "number"
+          typeof studentRaw.authority !== "number" ||
+          typeof studentRaw.grade !== "number" ||
+          typeof studentRaw.userId !== "string" ||
+          typeof studentRaw.password !== "string" ||
+          typeof studentRaw.name !== "string"
         ) {
           res.status(400).end();
         }
@@ -375,8 +379,15 @@ router
         res.status(400).end();
         return;
       }
+      deleteData.forEach((userID) => {
+        if (typeof userID !== "string") {
+          const indexofData = deleteData.indexOf(userID);
+          deleteData.splice(indexofData, 1);
+        }
+      });
       await Promise.all(
-        deleteData.map(async (userID) => {
+        deleteData.map(async (data) => {
+          const userID = data.toUpperCase();
           const student = await model.Student.findOne({ userID }).exec();
           if (student) {
             await model.Student.deleteOne({ userID });
@@ -453,6 +464,23 @@ router
         res.status(400).end();
         return;
       }
+      // if the element in addData is not a valid Course type, remove it from addData
+      addData.forEach((data) => {
+        if (
+          !data.id ||
+          typeof data.id !== "string" ||
+          !data.name ||
+          typeof data.name !== "string" ||
+          !data.type ||
+          typeof data.type !== "string" ||
+          !data.description ||
+          typeof data.description !== "string" ||
+          !data.options
+        ) {
+          const indexofdata = addData.indexOf(data);
+          addData.splice(indexofdata, 1);
+        }
+      });
       await Promise.all(
         addData.map(async (data) => {
           const { id } = data;
@@ -490,6 +518,13 @@ router
         res.status(400).end();
         return;
       }
+      // if the element in addData is not a valid Course type, remove it from addData
+      deleteData.forEach((id) => {
+        if (!id || typeof id !== "string") {
+          const indexofdata = deleteData.indexOf(id);
+          deleteData.splice(indexofdata, 1);
+        }
+      });
       await Promise.all(
         deleteData.map(async (id) => {
           const course = await model.Course.findOne({ id }).exec();
@@ -510,6 +545,13 @@ router
         res.status(400).end();
         return;
       }
+      // if the element in addData is not a valid Course type, remove it from addData
+      modifiedData.forEach((data) => {
+        if (!data.id || typeof data.id !== "string") {
+          const indexofdata = modifiedData.indexOf(data);
+          modifiedData.splice(indexofdata, 1);
+        }
+      });
       await Promise.all(
         modifiedData.map(async (data) => {
           const { id } = data;
@@ -546,6 +588,17 @@ router.route("/authority").put(
       res.status(400).end();
       return;
     }
+    modifiedData.forEach((data) => {
+      if (
+        !data.userID ||
+        typeof data.userID !== "string" ||
+        !data.authority ||
+        typeof data.authority !== "number"
+      ) {
+        const indexofdata = modifiedData.indexOf(data);
+        modifiedData.splice(indexofdata, 1);
+      }
+    });
     await Promise.all(
       modifiedData.map(async (data) => {
         let { userID } = data;
