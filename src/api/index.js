@@ -19,5 +19,24 @@ export const SessionAPI = {
 };
 
 export const CourseAPI = {
-  getCourses: () => {},
+  getCourses: () => axios.get(`/api/courses`),
+  postCourse: (course) =>
+    axios.post(`/api/course`, qs.stringify(course), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }),
+  deleteCourse: (id) =>
+    axios.delete(`/api/course`, {
+      data: qs.stringify({ id }),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }),
+  putCourse: (course) =>
+    axios.put(`/api/course`, qs.stringify(course), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }),
 };
