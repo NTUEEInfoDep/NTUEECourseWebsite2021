@@ -3,33 +3,37 @@ import React, { useState, useEffect } from "react";
 // material-ui
 import {
   Grid,
-  Paper,
   Button,
-  ButtonGroup,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
   Select,
   MenuItem,
-  TextField,
+  Chip,
 } from "@material-ui/core";
+import { Add } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import CourseTable from "./CourseTable";
 
+// api
+import { CourseAPI } from "../../api";
+
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexWrap: "wrap",
-    maxWidth: "1000px",
-    padding: "35px",
+  optionsTitle: {
+    margin: `${theme.spacing(1)}px 0 0 0`,
+  },
+  options: {
     "& > *": {
-      margin: "auto",
+      margin: theme.spacing(0.5),
     },
   },
-  input: {
-    display: "none",
+  optionsAdd: {
+    margin: `${theme.spacing(1)}px 0 0 0`,
   },
 }));
 
@@ -57,29 +61,93 @@ const typeData = [
  */
 export default function CourseManage() {
   const classes = useStyles();
-  // get courses
-  const types = typeData;
-  const [remote, setRemote] = useState([]);
+  // courses
+  const emptyCourse = {
+    id: "",
+    name: "",
+    type: "",
+    description: "",
+    options: [],
+  };
   const [courses, setCourses] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  useEffect(() => {
-    // const courseData = axios.get("/api/courses");
-    // const typeData = axios.get("/api/grades");
-    // eslint-disable-next-line no-use-before-define
-    setRemote(dummyCourses);
-    setCourses(dummyCourses);
-  }, []);
-
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [currentId, setCurrentId] = useState("");
+  const [course, setCourse] = useState(emptyCourse);
+  const [newOption, setNewOption] = useState("");
+  const [errors, setErrors] = useState({});
   const handleOpen = () => {
     setDialogOpen(true);
   };
 
   const handleClose = () => {
+    setErrors({});
     setDialogOpen(false);
   };
 
-  const handleSave = () => {
-    setRemote(courses);
+  const handleCourse = (event, key) => {
+    setCourse({ ...course, [key]: event.target.value });
+    if (event.target.value.length) setErrors({ ...errors, [key]: false });
+  };
+
+  const handleCourseAddOption = () => {
+    if (!newOption.length) return;
+    setCourse({ ...course, options: [...course.options, newOption] });
+    setNewOption("");
+  };
+
+  const handleCourseDelOption = (index) => {
+    setCourse({
+      ...course,
+      options: [
+        ...course.options.slice(0, index),
+        ...course.options.slice(index + 1),
+      ],
+    });
+  };
+
+  const handleCoursesReload = async () => {
+    try {
+      setCourses(await CourseAPI.getCourses());
+    } catch (err) {
+      //
+    }
+  };
+
+  const handleCourseApply = async () => {
+    const errs = {};
+    ["id", "name", "type", "options"].forEach((key) => {
+      errs[key] = !course[key]?.length;
+    });
+    setErrors({ ...errors, ...errs });
+    if (Object.keys(errs).some((key) => errs[key])) {
+      // console.log("Some fields are not filled.");
+      return;
+    }
+    try {
+      if (currentId === "") {
+        const response = await CourseAPI.postCourse(course);
+        setCourses([...courses, response]);
+      } else {
+        await CourseAPI.putCourse({
+          ...course,
+          id: currentId,
+        });
+      }
+    } catch (err) {
+      handleCoursesReload();
+    }
+    handleClose();
+  };
+
+  const handleCourseDelete = async () => {
+    try {
+      await CourseAPI.deleteCourse(currentId);
+      setCourses(courses.filter((c) => c.id !== currentId));
+    } catch (err) {
+      handleCoursesReload();
+    }
+    setConfirmOpen(false);
   };
 
   const reorderCourse = (index, offset) => {
@@ -92,15 +160,36 @@ export default function CourseManage() {
     ]);
   };
 
+  const addCourse = () => {
+    setCurrentId("");
+    setCourse(emptyCourse);
+    handleOpen();
+  };
+
+  const editCourse = (index) => {
+    setCurrentId(courses[index].id);
+    setCourse(courses[index]);
+    handleOpen();
+  };
+
+  const deleteCourse = (index) => {
+    setCurrentId(courses[index].id);
+    setCourse(courses[index]);
+    setConfirmOpen(true);
+  };
+
+  useEffect(() => {
+    handleCoursesReload();
+    // eslint-disable-next-line no-use-before-define
+    setCourses(dummyCourses);
+  }, []);
+
   return (
     <div>
       <Grid container spacing={3} direction="row">
         <Grid item sm={12}>
-          <Button onClick={handleOpen} variant="contained" color="primary">
+          <Button onClick={addCourse} variant="contained" color="primary">
             Add Course
-          </Button>
-          <Button onClick={handleSave} variant="contained" color="primary">
-            Save
           </Button>
         </Grid>
         <Grid item sm={12}>
@@ -108,49 +197,140 @@ export default function CourseManage() {
             courses={courses}
             typeData={typeData}
             reorderCourse={reorderCourse}
+            editCourse={editCourse}
+            deleteCourse={deleteCourse}
           />
         </Grid>
       </Grid>
-      <Dialog maxWidth="md" fullWidth open={dialogOpen} onClose={handleClose}>
-        <DialogTitle id="alert-dialog-title">Add Course</DialogTitle>
+      <Dialog
+        maxWidth="md"
+        fullWidth
+        disableBackdropClick
+        open={dialogOpen}
+        onClose={handleClose}
+      >
+        <DialogTitle>{currentId === "" ? "Add" : "Edit"} Course</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Specify ID
-          </DialogContentText>
-          <TextField id="id" label="Course ID" type="text" fullWidth />
-          <TextField id="name" label="Course Name" type="text" fullWidth />
-          <Select
-            inputProps={{
-              name: "max-width",
-              id: "max-width",
-            }}
+          <TextField
+            id="id"
+            label="Course ID"
+            type="text"
             fullWidth
-          >
-            {[{ id: "-", text: "Select Course Type..." }, ...typeData].map(
-              (type) => (
-                <MenuItem
-                  key={type.id}
-                  value={type.id}
-                  default={type.id === "-"}
-                >
+            value={course.id}
+            error={errors.id}
+            disabled={currentId !== ""}
+            onChange={(e) => handleCourse(e, "id")}
+          />
+          <TextField
+            id="name"
+            label="Course Name"
+            type="text"
+            fullWidth
+            value={course.name}
+            error={errors.name}
+            onChange={(e) => handleCourse(e, "name")}
+          />
+          <FormControl fullWidth>
+            <InputLabel>Course Type</InputLabel>
+            <Select
+              fullWidth
+              value={course.type}
+              error={errors.type}
+              onChange={(e) => handleCourse(e, "type")}
+            >
+              {typeData.map((type) => (
+                <MenuItem key={type.id} value={type.id}>
                   {type.text}
                 </MenuItem>
-              )
-            )}
-          </Select>
+              ))}
+            </Select>
+          </FormControl>
           <TextField
             id="desc"
             label="Description (HTML)"
             type="text"
             fullWidth
+            multiline
+            value={course.description}
+            onChange={(e) => handleCourse(e, "description")}
           />
+          <DialogContentText className={classes.optionsTitle}>
+            Options
+          </DialogContentText>
+          <div className={classes.options}>
+            {course.options.map((option, _index) => (
+              <Chip
+                label={option}
+                variant="outlined"
+                onDelete={() => handleCourseDelOption(_index)}
+                padding={1}
+                // color="primary"
+              />
+            ))}
+          </div>
+          <div className={classes.optionsAdd}>
+            <TextField
+              placeholder="Add Options..."
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.code === "Enter") handleCourseAddOption();
+              }}
+            />
+            <Button
+              startIcon={<Add />}
+              variant="outlined"
+              color="primary"
+              size="small"
+              onClick={handleCourseAddOption}
+            >
+              Add
+            </Button>
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleClose} variant="contained" color="primary">
+          <Button
+            onClick={handleCourseApply}
+            variant="contained"
+            color="primary"
+          >
             Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        maxWidth="md"
+        fullWidth
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+      >
+        <DialogTitle>Delete Course {course.name}?</DialogTitle>
+        <DialogContent>
+          <DialogContentText className={classes.optionsTitle}>
+            Are you sure you want to delete the course {course.name}?<br />
+            This action is IRREVOCABLE.
+            <br />
+            <br />
+            ID: {course.id}
+            <br />
+            Type: {typeData.find((type) => type.id === course.type)?.text}
+            <br />
+            Options: {course.options.join(",")}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleCourseDelete}
+            variant="contained"
+            color="secondary"
+          >
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

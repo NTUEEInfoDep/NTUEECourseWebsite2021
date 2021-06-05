@@ -1,4 +1,7 @@
 import React from "react";
+import PropTypes from "prop-types";
+
+// material-ui
 import {
   TableContainer,
   Table,
@@ -7,11 +10,23 @@ import {
   TableRow,
   TableCell,
   Paper,
-  Button,
   ButtonGroup,
+  IconButton,
 } from "@material-ui/core";
+import {
+  /* ArrowUpward, ArrowDownward, */
+  Edit,
+  Delete,
+} from "@material-ui/icons";
 
-export default function CourseTable({ courses, typeData, reorderCourse }) {
+export default function CourseTable({
+  courses,
+  typeData,
+  // eslint-disable-next-line no-unused-vars
+  reorderCourse,
+  editCourse,
+  deleteCourse,
+}) {
   return (
     <TableContainer component={Paper}>
       <Table size="small">
@@ -28,27 +43,33 @@ export default function CourseTable({ courses, typeData, reorderCourse }) {
         <TableBody>
           {courses.map(({ id, name, type, description, options }, _index) => (
             <TableRow key={id}>
-              <TableCell padding="checkbox">{id}</TableCell>
+              <TableCell>{id}</TableCell>
               <TableCell>{name}</TableCell>
               <TableCell>
-                {typeData.find(({ id }) => id === type)?.text ?? ""}
+                {typeData.find(({ id: ID }) => ID === type)?.text ?? ""}
               </TableCell>
               <TableCell>{description.length ? "✔" : ""}</TableCell>
               <TableCell>{options.length}</TableCell>
-              <TableCell spacing={1}>
+              <TableCell padding="checkbox">
                 <ButtonGroup variant="outlined">
-                  <Button
+                  {/* <IconButton
                     disabled={_index === 0}
                     onClick={() => reorderCourse(_index, -1)}
                   >
-                    U
-                  </Button>
-                  <Button
+                    <ArrowUpward />
+                  </IconButton>
+                  <IconButton
                     disabled={_index === courses.length - 1}
                     onClick={() => reorderCourse(_index, 1)}
                   >
-                    D
-                  </Button>
+                    <ArrowDownward />
+                  </IconButton> */}
+                  <IconButton onClick={() => editCourse(_index)}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton onClick={() => deleteCourse(_index)}>
+                    <Delete />
+                  </IconButton>
                 </ButtonGroup>
               </TableCell>
             </TableRow>
@@ -58,3 +79,24 @@ export default function CourseTable({ courses, typeData, reorderCourse }) {
     </TableContainer>
   );
 }
+
+CourseTable.propTypes = {
+  courses: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      options: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    })
+  ).isRequired,
+  typeData: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  reorderCourse: PropTypes.func.isRequired,
+  editCourse: PropTypes.func.isRequired,
+  deleteCourse: PropTypes.func.isRequired,
+};
