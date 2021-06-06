@@ -10,7 +10,6 @@ import {
   TableRow,
   TableCell,
   Paper,
-  ButtonGroup,
   IconButton,
 } from "@material-ui/core";
 import {
@@ -50,27 +49,25 @@ export default function CourseTable({
               </TableCell>
               <TableCell>{description.length ? "✔" : ""}</TableCell>
               <TableCell>{options.length}</TableCell>
-              <TableCell padding="checkbox">
-                <ButtonGroup variant="outlined">
-                  {/* <IconButton
-                    disabled={_index === 0}
-                    onClick={() => reorderCourse(_index, -1)}
-                  >
-                    <ArrowUpward />
-                  </IconButton>
-                  <IconButton
-                    disabled={_index === courses.length - 1}
-                    onClick={() => reorderCourse(_index, 1)}
-                  >
-                    <ArrowDownward />
-                  </IconButton> */}
-                  <IconButton onClick={() => editCourse(_index)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => deleteCourse(_index)}>
-                    <Delete />
-                  </IconButton>
-                </ButtonGroup>
+              <TableCell>
+                {/* <IconButton
+                  disabled={_index === 0}
+                  onClick={() => reorderCourse(_index, -1)}
+                >
+                  <ArrowUpward />
+                </IconButton>
+                <IconButton
+                  disabled={_index === courses.length - 1}
+                  onClick={() => reorderCourse(_index, 1)}
+                >
+                  <ArrowDownward />
+                </IconButton> */}
+                <IconButton onClick={() => editCourse(_index)}>
+                  <Edit />
+                </IconButton>
+                <IconButton onClick={() => deleteCourse(_index)}>
+                  <Delete />
+                </IconButton>
               </TableCell>
             </TableRow>
           ))}

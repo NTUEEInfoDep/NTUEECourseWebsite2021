@@ -15,9 +15,13 @@ import {
   Select,
   MenuItem,
   Chip,
+  Snackbar,
 } from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 import { Add } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
+
+// components
 import CourseTable from "./CourseTable";
 
 // api
@@ -76,13 +80,20 @@ export default function CourseManage() {
   const [course, setCourse] = useState(emptyCourse);
   const [newOption, setNewOption] = useState("");
   const [errors, setErrors] = useState({});
+  const [alert, setAlert] = useState({});
+
   const handleOpen = () => {
     setDialogOpen(true);
   };
 
   const handleClose = () => {
+    setNewOption("");
     setErrors({});
     setDialogOpen(false);
+  };
+
+  const showAlert = (severity, msg) => {
+    setAlert({ open: true, severity, msg });
   };
 
   const handleCourse = (event, key) => {
@@ -90,13 +101,32 @@ export default function CourseManage() {
     if (event.target.value.length) setErrors({ ...errors, [key]: false });
   };
 
+  const handleCourseOption = (event) => {
+    setNewOption(event.target.value);
+    setErrors({
+      ...errors,
+      newOption: !!course.options.find(
+        (option) => option === event.target.value
+      ),
+    });
+  };
+
   const handleCourseAddOption = () => {
-    if (!newOption.length) return;
+    if (!newOption.length || errors.newOption) {
+      if (errors.newOption)
+        showAlert("warning", `The option ${newOption} is repeated.`);
+      return;
+    }
     setCourse({ ...course, options: [...course.options, newOption] });
     setNewOption("");
   };
 
   const handleCourseDelOption = (index) => {
+    if (course.options[index] === newOption)
+      setErrors({
+        ...errors,
+        newOption: false,
+      });
     setCourse({
       ...course,
       options: [
@@ -110,7 +140,7 @@ export default function CourseManage() {
     try {
       setCourses(await CourseAPI.getCourses());
     } catch (err) {
-      //
+      // showAlert("error", "Failed to load courses.");
     }
   };
 
@@ -121,33 +151,44 @@ export default function CourseManage() {
     });
     setErrors({ ...errors, ...errs });
     if (Object.keys(errs).some((key) => errs[key])) {
-      // console.log("Some fields are not filled.");
+      if (errs?.id) showAlert("warning", "Course ID is required.");
+      else if (errs?.name) showAlert("warning", "Course Name is required.");
+      else if (errs?.type) showAlert("warning", "Course Type is required.");
+      else if (errs?.options)
+        showAlert("warning", "At least one option required.");
       return;
     }
     try {
       if (currentId === "") {
         const response = await CourseAPI.postCourse(course);
+        showAlert("success", `Course ${course.name} added.`);
         setCourses([...courses, response]);
+        handleClose();
       } else {
         await CourseAPI.putCourse({
           ...course,
           id: currentId,
         });
+        showAlert("success", `Course ${course.name} modified.`);
+        handleCoursesReload();
+        handleClose();
       }
     } catch (err) {
+      showAlert("error", "Operation failed.");
       handleCoursesReload();
     }
-    handleClose();
   };
 
   const handleCourseDelete = async () => {
     try {
       await CourseAPI.deleteCourse(currentId);
+      showAlert("success", `Course ${course.name} deleted.`);
       setCourses(courses.filter((c) => c.id !== currentId));
+      setConfirmOpen(false);
     } catch (err) {
+      showAlert("error", "Deletion failed.");
       handleCoursesReload();
     }
-    setConfirmOpen(false);
   };
 
   const reorderCourse = (index, offset) => {
@@ -262,6 +303,7 @@ export default function CourseManage() {
               <Chip
                 label={option}
                 variant="outlined"
+                color={option === newOption ? "secondary" : "default"}
                 onDelete={() => handleCourseDelOption(_index)}
                 padding={1}
                 // color="primary"
@@ -272,7 +314,8 @@ export default function CourseManage() {
             <TextField
               placeholder="Add Options..."
               value={newOption}
-              onChange={(e) => setNewOption(e.target.value)}
+              error={errors.newOption}
+              onChange={handleCourseOption}
               onKeyDown={(e) => {
                 if (e.code === "Enter") handleCourseAddOption();
               }}
@@ -322,7 +365,7 @@ export default function CourseManage() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={() => setConfirmOpen(false)} color="primary">
             Cancel
           </Button>
           <Button
@@ -334,6 +377,16 @@ export default function CourseManage() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={alert?.open}
+        autoHideDuration={3000}
+        onClose={() => setAlert({ ...alert, open: false })}
+      >
+        <Alert variant="filled" severity={alert?.severity}>
+          {alert?.msg}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
