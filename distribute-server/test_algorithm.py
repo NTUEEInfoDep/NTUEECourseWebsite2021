@@ -1,13 +1,13 @@
 import unittest
-from algorithm import Algorithm
+from algorithm import Algorithm, Course, Student
 
 
 class Test(unittest.TestCase):
-    def setUp(self):
-        self.algorithm = Algorithm()
-
-    def test_01_sample(self):
-        self.assertEqual(self.algorithm.add(1, 1), 2)
+    def test_01_empty(self):
+        students = []
+        courses = []
+        results = []
+        self.assertEqual(Algorithm.distribute(courses, students), results)
 
 
 if __name__ == "__main__":
