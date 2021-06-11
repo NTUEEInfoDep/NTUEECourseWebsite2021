@@ -23,7 +23,7 @@ const courseSchema = new mongoose.Schema({
     type: String,
     immutable: false,
   },
-  options: [String],
+  options: [{ name: String, limit: Number }],
 });
 
 const Course = mongoose.model("Course", courseSchema);
@@ -113,9 +113,32 @@ const OpenTime = mongoose.model("OpenTime", openTimeSchema);
 
 // ========================================
 
+const resultSchema = new mongoose.Schema({
+  studentID: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+  courseName: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+  optionName: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+});
+
+const Result = mongoose.model("Result", resultSchema);
+
+// ========================================
+
 module.exports = {
   Course,
   Student,
   Selection,
   OpenTime,
+  Result,
 };

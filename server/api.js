@@ -8,6 +8,9 @@ const connectRedis = require("connect-redis");
 const bcrypt = require("bcrypt");
 const deprecate = require("depd")("ntuee-course:api");
 const mongoose = require("mongoose");
+const fetch = require("node-fetch");
+const csvStringify = require("csv-stringify");
+const { promisify } = require("util");
 
 const { string } = require("yargs");
 const constants = require("./constants");
@@ -15,12 +18,19 @@ const model = require("./database/mongo/model");
 
 // ========================================
 
+const csvStringifyPromise = promisify(csvStringify);
+
 if (process.env.NODE_ENV === "development") {
   console.log("NODE_ENV = development");
   require("dotenv").config(); // eslint-disable-line
 }
 
-const { REDIS_HOST, REDIS_PORT } = process.env;
+const {
+  REDIS_HOST,
+  REDIS_PORT,
+  DISTRIBUTE_SERVER_HOST,
+  DISTRIBUTE_SERVER_PORT,
+} = process.env;
 
 // ========================================
 
@@ -601,6 +611,37 @@ router.route("/authority").put(
       })
     );
     res.status(204).end();
+  })
+);
+
+router.post(
+  "/distribute",
+  permissionRequired(constants.AUTHORITY_ADMIN),
+  asyncHandler(async (req, res, next) => {
+    const resp = await fetch(
+      `http://${DISTRIBUTE_SERVER_HOST}:${DISTRIBUTE_SERVER_PORT}/distribute`,
+      {
+        method: "POST",
+      }
+    );
+    if (resp.ok) {
+      res.status(204).end();
+    } else {
+      res.status(400).end();
+    }
+  })
+);
+
+router.get(
+  "/result",
+  asyncHandler(async (req, res, next) => {
+    const results = await model.Result.find({}).exec();
+    const rows = [["studentID", "courseName", "optionName"]];
+    results.forEach((result) => {
+      rows.push([result.studentID, result.courseName, result.optionName]);
+    });
+    const output = await csvStringifyPromise(rows);
+    res.status(200).send(output);
   })
 );
 
