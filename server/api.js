@@ -633,7 +633,7 @@ router.post(
 );
 
 router.get(
-  "/result",
+  "/result.csv",
   asyncHandler(async (req, res, next) => {
     const results = await model.Result.find({}).exec();
     const rows = [["studentID", "courseName", "optionName"]];
@@ -641,6 +641,7 @@ router.get(
       rows.push([result.studentID, result.courseName, result.optionName]);
     });
     const output = await csvStringifyPromise(rows);
+    res.setHeader("content-type", "application/csv");
     res.status(200).send(output);
   })
 );
