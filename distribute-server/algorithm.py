@@ -15,6 +15,7 @@ class Option:
         self._selected = list()  # the students been choose
         self._students = dict()  # all students
         self._priority_list = list()  # the students this option want
+        self._fix = 0   # the index of immutable select
 
     def add_student(self, student_id, student_data):
         '''
@@ -48,10 +49,13 @@ class Option:
             self._priority_list.extend(students)
 
     def select(self, student_id):
+        if student_id in self._selected:
+            return student_id
+
         if len(self._selected) < self._limit:
             index = self._priority_list.index(student_id)
             idx = index
-            for i in range(index):
+            for i in range(self._fix, index):
                 idx = i
                 if i >= len(self._selected):
                     break
@@ -60,7 +64,7 @@ class Option:
                     break
             self._selected.insert(idx, student_id)
             return True
-        else:
+        elif(self._fix < len(self._selected)):
             index = self._priority_list.index(student_id)
             about_to_kick = self._selected.pop()
             if index > self._priority_list.index(about_to_kick):
@@ -68,7 +72,7 @@ class Option:
                 return student_id
             else:
                 idx = index
-                for i in range(index):
+                for i in range(self._fix, index):
                     idx = i
                     if i >= len(self._selected):
                         break
@@ -77,6 +81,11 @@ class Option:
                         break
                 self._selected.insert(idx, student_id)
                 return about_to_kick
+        else:
+            return student_id
+
+    def fix_index(self):
+        self._fix = len(self._selected)
 
 
 class Course:
@@ -99,7 +108,7 @@ class Course:
         self._unselect = list()
         self._distribute_result = dict()
 
-        if self._type == "Ten-Select_Two":
+        if self._type == "Ten-Select-Two":
             self.max_select = 2
 
         for name, limit in course["options"].items():
@@ -125,7 +134,6 @@ class Course:
 
             # check if this student has select any option of a course
             if self._id in student._options:
-                self._unselect.append(student._id)
                 self._students[student._id] = student._options[self._id]
 
                 data = {"grade": student._grade, "num": 0}
@@ -136,31 +144,43 @@ class Course:
         for option in self._options:
             self._options[option].make_priority_list()
 
-        student_num = len(self._unselect)
 
-        for time in range(student_num):
-            student_id = self._unselect.pop()
-            distributed = False
-            while not distributed:
-                initial = student_id
-                result = initial
-                for option in self._students[student_id]:
-                    result = self._options[option].select(student_id)
-                    '''
-                    result return True if students was added,
-                    result return an id != student_id then loop again,
-                    result return id == student_id then keep going
-                    '''
-                    if result is True:
+        for time in range(self.max_select):
+            for student in students:
+                if self._id in student._options:
+                    self._unselect.append(student._id)
+
+            for name in self._options.keys():
+                self._options[name].fix_index()
+
+            student_num = len(self._unselect)
+
+            for iterate_through_students in range(student_num):
+                student_id = self._unselect.pop()
+                distributed = False
+                while not distributed:
+                    initial = student_id
+                    result = initial
+                    for option in self._students[student_id]:
+                        result = self._options[option].select(student_id)
+                        '''
+                        result return True if students was added,
+                        result return an id != student_id then loop again,
+                        result return id == student_id then keep going
+                        '''
+                        if result is True:
+                            distributed = True
+                            break
+                        elif result != student_id:
+                            student_id = result
+                            break
+                    if result == initial:  # poor you
                         distributed = True
-                        break
-                    elif result != student_id:
-                        student_id = result
-                        break
-                if result == initial:  # poor you
-                    distributed = True
+            for name in self._options.keys():
+                self._options[name].fix_index()
 
 
+        # deal with ten-select-two
 
 
         for name in self._options.keys():
