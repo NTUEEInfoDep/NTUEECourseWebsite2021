@@ -642,6 +642,7 @@ router.get(
     });
     const output = await csvStringifyPromise(rows);
     res.setHeader("content-type", "application/csv");
+    res.setHeader("content-disposition", "attachment; filename=result.csv");
     res.status(200).send(output);
   })
 );

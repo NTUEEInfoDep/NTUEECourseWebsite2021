@@ -746,6 +746,24 @@
           }
         }
       }
+    },
+    "/result.csv": {
+      "get": {
+        "description": "get distribution result",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/csv": {
+                "schema": {
+                  "type": "string",
+                  "example": "studentID,courseName,optionName\nB00000000,電路學,老師A\nB11111111,機率與統計,老師H"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
