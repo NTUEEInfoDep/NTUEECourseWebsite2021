@@ -116,7 +116,7 @@ export default function Login() {
           <form className={classes.form} noValidate onSubmit={handleSubmit}>
             <OutlinedInput
               error={values.error}
-              margin="normal"
+              margin="dense"
               required
               fullWidth
               id="StudentId"
@@ -130,7 +130,7 @@ export default function Login() {
             />
             <OutlinedInput
               error={values.error}
-              margin="normal"
+              margin="dense"
               required
               fullWidth
               name="password"
