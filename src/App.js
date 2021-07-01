@@ -8,28 +8,33 @@ import Courses from "./containers/courses";
 import Login from "./containers/login";
 import StudentData from "./containers/studentData";
 import CourseManage from "./containers/courseManage";
-
 // slices
 import { selectSession } from "./slices/sessionSlice";
+//Route
+import { Redirect } from "react-router";
+import PublicRoute from "./components/routes/publicRoute";
+import PrivateRoute from "./components/routes/privateRoute";
 
 const Routes = () => {
-  const { authority } = useSelector(selectSession);
+  const { authority, isLogin } = useSelector(selectSession);
   console.log(authority);
+  console.log(isLogin);
   return (
     <Switch>
-      <Route exact from="/" render={(props) => <Main {...props} />} />
-      <Route exact path="/courses" render={(props) => <Courses {...props} />} />
-      <Route exact path="/login" render={(props) => <Login {...props} />} />
-      <Route
-        exact
-        path="/studentdata"
-        render={(props) => <StudentData {...props} />}
-      />
-      <Route
-        exact
-        path="/course-manage"
-        render={(props) => <CourseManage {...props} />}
-      />
+      <PublicRoute exact path="/">
+        <Main />
+      </PublicRoute>
+      <PublicRoute exact path="/courses">
+        <Courses />
+      </PublicRoute>
+      <Route exact path="/login" render={() => <Login />} />
+      <PrivateRoute exact path="/studeentdata">
+        <StudentData />
+      </PrivateRoute>
+      <PrivateRoute exact path="/course-manage">
+        <CourseManage />
+      </PrivateRoute>
+      <Redirect to="/login" />
     </Switch>
   );
 };

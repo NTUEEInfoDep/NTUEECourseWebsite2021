@@ -7,11 +7,10 @@ export const sessionSlice = createSlice({
     isLogin: false,
     authority: null,
     userID: null,
+    initialized: false,
   },
   reducers: {
-    /**
-     * Login
-     */
+    //login
     setLogin: (state, action) => {
       state.isLogin = true;
       state.authority = action.payload.authority;

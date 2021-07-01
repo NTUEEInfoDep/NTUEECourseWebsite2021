@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 // material_ui
@@ -17,6 +18,9 @@ import MenuIcon from "@material-ui/icons/Menu";
 import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+// slices
+import { selectSession } from "../../slices/sessionSlice";
 
 const drawerWidth = 150;
 
@@ -27,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "nowrap",
   },
   root: {
-    //   display: "flex",
+    //  display: "flex",
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -37,60 +41,68 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
+    [theme.breakpoints.up("sm")]: {
+      marginLeft: drawerWidth,
+      width: `calc(100% - ${drawerWidth}px)`,
+      transition: theme.transitions.create(["width", "margin"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
   },
   hide: {
     display: "none",
   },
   drawerOpen: {
-    width: drawerWidth,
-    transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
+    [theme.breakpoints.up("sm")]: {
+      width: drawerWidth,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
   },
   menuButton: {
     marginRight: 36,
   },
   drawerClose: {
-    transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
     overflowX: "hidden",
-    width: theme.spacing(7),
+    width: theme.spacing(0),
     [theme.breakpoints.up("sm")]: {
       width: theme.spacing(0) + 1,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
     },
   },
   toolbar: {
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
-    padding: theme.spacing(0, 1),
+    padding: theme.spacing(0, 0),
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
   },
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
+    [theme.breakpoints.up("sm")]: {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
     marginLeft: 0,
   },
   contentShift: {
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: drawerWidth,
+    [theme.breakpoints.up("sm")]: {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: drawerWidth,
+    },
   },
   offset: theme.mixins.toolbar,
 }));
@@ -98,9 +110,10 @@ const useStyles = makeStyles((theme) => ({
 //
 
 const Drawer = ({ children }) => {
+  const { authority } = useSelector(selectSession);
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -109,13 +122,27 @@ const Drawer = ({ children }) => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const itemList = [
-    { text: "Main", to: "/" },
-    { text: "Courses", to: "/courses" },
-    { text: "Login", to: "/login" },
-    { text: "Student Data", to: "/studentdata" },
-    { text: "Course Data", to: "/course-manage" },
-  ];
+  const itemList =
+    authority == 0 || authority == 1
+      ? [
+          { text: "Main", to: "/" },
+          { text: "Courses", to: "/courses" },
+          { text: "Login", to: "/login" },
+          {
+            text: "Student Data",
+            to: "/studentdata",
+          },
+          {
+            text: "Course Manage",
+            to: "/course-manage",
+          },
+        ]
+      : [
+          { text: "Main", to: "/" },
+          { text: "Courses", to: "/courses" },
+          { text: "Login", to: "/login" },
+        ];
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -137,6 +164,17 @@ const Drawer = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
+          <IconButton
+            color="inherit"
+            aria-label="close drawer"
+            onClick={handleDrawerClose}
+            edge="start"
+            className={clsx(classes.menuButton, {
+              [classes.hide]: !open || innerWidth >= 600,
+            })}
+          >
+            <KeyboardArrowUpIcon />
+          </IconButton>
           <Typography variant="h6" noWrap>
             NTUEE course pre-selection
           </Typography>
@@ -144,6 +182,7 @@ const Drawer = ({ children }) => {
       </AppBar>
 
       <MUIDrawer
+        anchor={innerWidth >= 600 ? "left" : "top"}
         variant="permanent"
         className={clsx(classes.drawer, {
           [classes.drawerOpen]: open,
