@@ -28,7 +28,7 @@ const Routes = () => {
         <Courses />
       </PublicRoute>
       <Route exact path="/login" render={() => <Login />} />
-      <PrivateRoute exact path="/studeentdata">
+      <PrivateRoute exact path="/studentdata">
         <StudentData />
       </PrivateRoute>
       <PrivateRoute exact path="/course-manage">

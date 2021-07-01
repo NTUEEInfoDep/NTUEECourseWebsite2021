@@ -123,7 +123,7 @@ const Drawer = ({ children }) => {
     setOpen(false);
   };
   const itemList =
-    authority == 0 || authority == 1
+    authority == "Admin" || authority == "Maintainer"
       ? [
           { text: "Main", to: "/" },
           { text: "Courses", to: "/courses" },
