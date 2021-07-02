@@ -14,10 +14,12 @@ MONGO_PORT = os.environ.get("MONGO_PORT", 27017)
 MONGO_DBNAME = os.environ.get("MONGO_DBNAME", "ntuee-course")
 
 # ========================================
+
+
 def genCourse(raw_courses):
     courses = []
     for data in raw_courses.find():
-        courseDict = {} 
+        courseDict = {}
 
         courseDict["name"] = data["name"]
         courseDict["id"] = data["id"]
@@ -28,28 +30,34 @@ def genCourse(raw_courses):
         courses.append(Course(courseDict))
     return courses
 
+
 def getCourseid(raw_courses):
     name = []
     for data in raw_courses.find():
         name.append(data["id"])
     return name
 
+
 def genStudent(raw_student, raw_selection, course_id):
     students = []
-    for data in raw_student.find(): # iterate through all students
+    for data in raw_student.find():  # iterate through all students
         result_selection = {}
-        for name in course_id: # iterate through every course
+        for name in course_id:  # iterate through every course
             result_selection[name] = []
-            student_selections = raw_selection.find({"userID":data["userID"], "courseID" : name}) # all selections made by a student of certain course
+            # all selections made by a student of certain course
+            student_selections = raw_selection.find(
+                {"userID": data["userID"], "courseID": name})
             for i in range(len(list(student_selections))):
-                rank_i_selection = raw_selection.find({"userID":data["userID"], "courseID" : name, "ranking" : i + 1}) #the (i+1)th selection
+                rank_i_selection = raw_selection.find(
+                    {"userID": data["userID"], "courseID": name, "ranking": i + 1})  # the (i+1)th selection
                 for ith_option in rank_i_selection:
                     result_selection[name].append(ith_option["name"])
 
-        students.append(Student(data["name"], data["userID"], result_selection, data["grade"]))
+        students.append(
+            Student(data["name"], data["userID"], result_selection, data["grade"]))
     return students
 # ========================================
-@app.route("/") 
+@app.route("/")
 def index():
     return "Distribute server"
 
@@ -66,11 +74,6 @@ def distribute():
     course_names = getCourseid(raw_courses)
 
     students = genStudent(raw_students, raw_selection, course_names)
-
-
-
-    # read db
-    # student1 = Student("alice")
 
     results = Algorithm.distribute(courses, students)
     db.results.insert_many(results)
