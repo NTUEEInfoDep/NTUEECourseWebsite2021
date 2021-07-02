@@ -87,6 +87,7 @@ export default function Login() {
         dispatch(setLogin(response.data));
       } catch (err) {
         console.error(err);
+        values.error = true;
       }
     } else {
       values.error = true;
