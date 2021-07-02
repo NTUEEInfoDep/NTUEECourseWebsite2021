@@ -18,24 +18,19 @@ class Option:
         self._priority_list = list()  # the students this option want
         self._fix = 0   # the index of immutable select
 
-    def add_student(self, student_id, student_data):
+    def add_student(self, student_id, student_grade):
         '''
         student_id: string,
-        student_data:
-        {
-            "grade": int
-            "num": int
-        }
+        student_grade: int
         '''
         priority = 0
-        grade = min(student_data["grade"], 4)
+        grade = min(student_grade, 4)
         if self._priority is True:
             priority += grade
         if type(self._priority) == int and grade == self._priority:
             priority += 1
         if type(self._priority) == list and grade in self._priority:
             priority += (len(self._priority) - self._priority.index(grade))
-        priority -= 10 * student_data["num"]
         self._students[student_id] = -priority
 
     def make_priority_list(self):
@@ -56,7 +51,7 @@ class Option:
         if len(self._selected) < self._limit:
             index = self._priority_list.index(student_id)
             idx = index
-            for i in range(self._fix, index):
+            for i in range(self._fix, self._fix + index):
                 idx = i
                 if i >= len(self._selected):
                     break
@@ -87,6 +82,11 @@ class Option:
 
     def fix_index(self):
         self._fix = len(self._selected)
+
+    def preselect(self, preselect):
+        self._selected.extend(preselect)
+        self._priority_list.extend(preselect)
+        self.fix_index()
 
 
 class Course:
@@ -133,31 +133,36 @@ class Course:
     def __repr__(self):
         return self.__str__()
 
-    def distribute(self, students, preselect):
-        '''
-        preselect = dict()
-        '''
+    def distribute(self, students, preselect=None):
+        if preselect is not None:
+            self._options["數電實驗"].preselect(preselect)
+
         for student in students:
 
             # check if this student has select any option of a course
             if self._id in student._options:
                 self._students[student._id] = student._options[self._id]
 
-                data = {"grade": student._grade, "num": 0}
                 for option in student._options[self._id]:
                     if option in self._options:
-                        self._options[option].add_student(student._id, data)
+                        self._options[option].add_student(student._id,
+                                student._grade)
 
         for option in self._options:
             self._options[option].make_priority_list()
 
         for time in range(self.max_select):
-            for student in students:
-                if self._id in student._options:
-                    self._unselect.append(student._id)
-
             for name in self._options.keys():
                 self._options[name].fix_index()
+
+            if time == 0 and preselect is not None:
+                for student in students:
+                    if self._id in student._options and student._id not in preselect:
+                        self._unselect.append(student._id)
+            else:
+                for student in students:
+                    if self._id in student._options:
+                        self._unselect.append(student._id)
 
             student_num = len(self._unselect)
 
@@ -182,13 +187,12 @@ class Course:
                             break
                     if result == initial:  # poor you
                         distributed = True
-            for name in self._options.keys():
-                self._options[name].fix_index()
 
         # deal with ten-select-two
 
         for name in self._options.keys():
             self._distribute_result[name] = self._options[name]._selected
+
 
         return self._distribute_result
 
@@ -216,9 +220,15 @@ class Student:
 class Algorithm:
     @staticmethod
     def distribute(courses, students, preselect=None):
+        '''
+        preselect = [student1_id, student2_id, ...]
+        '''
         results = list()
         for course in courses:
-            course.distribute(students, None)
+            if course._type == "Ten-Select-Two":
+                course.distribute(students, preselect)
+            else:
+                course.distribute(students, None)
             for option in course._distribute_result.keys():
                 for student in course._distribute_result[option]:
                     result = {
@@ -238,16 +248,18 @@ class Algorithm:
 
 
 if __name__ == "__main__":
-    student1 = Student("a", "B00000000",
-                       {"course1": ["teacher1a", "teacher1b"]}, 2)
-    student2 = Student("b", "B11111111", {"course1": [
-                       "teacher1a", "teacher1b"]}, 1)
-    student3 = Student("c", "B22222222",
-                       {"course1": ["teacher1b", "teacher1a"]}, 8)
-    students = [student2, student1, student3]
+    student1 = Student("a", "B00000000", {"course1": ["teacher1a", "teacher1b","數電實驗"]}, 2)
+    student2 = Student("b", "B11111111", {"course1": ["teacher1a", "teacher1b","數電實驗"]}, 1)
+    student3 = Student("c", "B22222222", {"course1": ["teacher1b", "teacher1a","數電實驗"]}, 8)
+    student4 = Student("c", "B22222223", {"course1": ["teacher1b", "teacher1a","數電實驗"]}, 2)
+    student5 = Student("c", "B22222224", {"course1": ["teacher1b", "teacher1a","數電實驗"]}, 4)
+    student6 = Student("c", "B22222225", {"course1": ["teacher1b", "teacher1a","數電實驗"]}, 3)
+    students = [student2, student1, student3, student4, student5, student6]
 
     course1 = Course({"id": "course1", "name": "course1", "type": "Ten-Select-Two",
-                      "options": {"teacher1a": 2, "teacher1b": 2}})
+        "options": {"數電實驗": 5, "teacher1b": 2, "teacher1a":2}})
     courses = [course1]
 
-    print(Algorithm.distribute(courses, students))
+    preselect = ["B22222225", "B22222224", "B22222223"]
+
+    print(Algorithm.distribute(courses, students, preselect))
