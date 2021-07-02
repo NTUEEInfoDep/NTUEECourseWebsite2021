@@ -430,13 +430,14 @@ router
       const { userID } = req.session;
       const { courseID } = req.params;
       const { options } = req.course;
+      const optionNames = options.map((option) => option.name);
 
       // Validation
       if (!Array.isArray(req.body)) {
         res.status(400).end();
         return;
       }
-      if (!req.body.every((option) => options.includes(option))) {
+      if (!req.body.every((option) => optionNames.includes(option))) {
         res.status(400).end();
         return;
       }

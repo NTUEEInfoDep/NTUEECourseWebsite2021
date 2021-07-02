@@ -1,6 +1,7 @@
 import heapq
 import random
 
+
 class Option:
     def __init__(self, name, limit, priority):
         '''
@@ -89,6 +90,7 @@ class Option:
 
 
 class Course:
+    # type has three type: Ten-Select-Two, EE-Lab, Required
     def __init__(self, course):
         '''
         course:
@@ -119,12 +121,17 @@ class Course:
                 priority = False
             elif self._type == "Ten-Select-Two":
                 if name == "數電實驗":
-                    priority = [4,3]
+                    priority = [4, 3]
                 else:
-                    priority = [4,3]
+                    priority = [4, 3]
             option = Option(name, limit, priority)
             self._options[name] = option
 
+    def __str__(self):
+        return f"Course(id={self._id}, name={self._name})"
+
+    def __repr__(self):
+        return self.__str__()
 
     def distribute(self, students, preselect):
         '''
@@ -143,7 +150,6 @@ class Course:
 
         for option in self._options:
             self._options[option].make_priority_list()
-
 
         for time in range(self.max_select):
             for student in students:
@@ -179,15 +185,12 @@ class Course:
             for name in self._options.keys():
                 self._options[name].fix_index()
 
-
         # deal with ten-select-two
-
 
         for name in self._options.keys():
             self._distribute_result[name] = self._options[name]._selected
 
         return self._distribute_result
-
 
 
 class Student:
@@ -203,21 +206,26 @@ class Student:
         self._options = options
         self._grade = grade
 
+    def __str__(self):
+        return f"Student(id={self._id}, name={self._name}, options={self._options})"
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class Algorithm:
     @staticmethod
-    def distribute(courses, students):
+    def distribute(courses, students, preselect=None):
         results = list()
         for course in courses:
             course.distribute(students, None)
             for option in course._distribute_result.keys():
                 for student in course._distribute_result[option]:
                     result = {
-                            "studentID": student,
-                            "courseName": course,
-                            "optionName": option
-                            }
+                        "studentID": student,
+                        "courseName": course._name,
+                        "optionName": option
+                    }
                     results.append(result)
         '''
         result = {
@@ -227,3 +235,19 @@ class Algorithm:
         }
         '''
         return results
+
+
+if __name__ == "__main__":
+    student1 = Student("a", "B00000000",
+                       {"course1": ["teacher1a", "teacher1b"]}, 2)
+    student2 = Student("b", "B11111111", {"course1": [
+                       "teacher1a", "teacher1b"]}, 1)
+    student3 = Student("c", "B22222222",
+                       {"course1": ["teacher1b", "teacher1a"]}, 8)
+    students = [student2, student1, student3]
+
+    course1 = Course({"id": "course1", "name": "course1", "type": "Ten-Select-Two",
+                      "options": {"teacher1a": 2, "teacher1b": 2}})
+    courses = [course1]
+
+    print(Algorithm.distribute(courses, students))
