@@ -3,15 +3,18 @@ import random
 
 
 class Option:
-    def __init__(self, name, limit, priority):
+    def __init__(self, name, data):
         '''
         name: string,
-        limit: int,
-        priority: 1.int, 2.bool, 3.list
+        data: dict:
+            {
+                "limit": int,
+                "priority": 1.int, 2.bool, 3.list
+            }
         '''
         self._name = name
-        self._limit = limit
-        self._priority = priority
+        self._limit = data["limit"]
+        self._priority = data["priority"]
         self._full = False
         self._selected = list()  # the students been choose
         self._students = dict()  # all students
@@ -98,7 +101,17 @@ class Course:
             "id": string,
             "name": string,
             "type": string,
-            "options": dict
+            "options": dict:
+                {
+                "Option_name":
+                    {
+                    "limit": int,
+                    "priority":
+                        1.int
+                        2.bool
+                        3.list
+                    }
+                }
         }
         '''
         self._name = course["name"]
@@ -113,18 +126,8 @@ class Course:
         if self._type == "Ten-Select-Two":
             self.max_select = 2
 
-        for name, limit in course["options"].items():
-            priority = None
-            if self._type == "Required":
-                priority = True
-            elif self._type == "EE-Lab":
-                priority = False
-            elif self._type == "Ten-Select-Two":
-                if name == "數電實驗":
-                    priority = [4, 3]
-                else:
-                    priority = [4, 3]
-            option = Option(name, limit, priority)
+        for name, data in course["options"].items():
+            option = Option(name, data)
             self._options[name] = option
 
     def __str__(self):
@@ -257,7 +260,9 @@ if __name__ == "__main__":
     students = [student2, student1, student3, student4, student5, student6]
 
     course1 = Course({"id": "course1", "name": "course1", "type": "Ten-Select-Two",
-        "options": {"數電實驗": 5, "teacher1b": 2, "teacher1a":2}})
+        "options": {"數電實驗": {"limit":5, "priority":True}, "teacher1b":
+            {"limit":2, "priority":[4,3]}, "teacher1a":{"limit":2,
+                "priority":False}}})
     courses = [course1]
 
     preselect = ["B22222225", "B22222224", "B22222223"]
