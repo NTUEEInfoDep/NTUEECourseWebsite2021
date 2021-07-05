@@ -1,17 +1,19 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
+import { ThemeProvider } from "@material-ui/core/styles";
 // containers
+import { Redirect } from "react-router";
 import Drawer from "./containers/drawer";
 import Main from "./containers/main";
 import Courses from "./containers/courses";
 import Login from "./containers/login";
 import StudentData from "./containers/studentData";
 import CourseManage from "./containers/courseManage";
+import theme from "./theme";
 // slices
 import { selectSession } from "./slices/sessionSlice";
-//Route
-import { Redirect } from "react-router";
+// Route
 import PublicRoute from "./components/routes/publicRoute";
 import PrivateRoute from "./components/routes/privateRoute";
 
@@ -43,9 +45,11 @@ export default function App() {
   return (
     <div>
       <Router>
-        <Drawer>
-          <Routes />
-        </Drawer>
+        <ThemeProvider theme={theme}>
+          <Drawer>
+            <Routes />
+          </Drawer>
+        </ThemeProvider>
       </Router>
     </div>
   );
