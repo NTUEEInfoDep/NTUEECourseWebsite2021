@@ -420,7 +420,9 @@ router
         ranking: 1,
       });
       selected = selected.map((selection) => selection.name);
-      const unselected = options.filter((option) => !selected.includes(option));
+      const unselected = options.filter(
+        (option) => !selected.includes(option.name)
+      );
       res.send({ name, type, description, selected, unselected });
     })
   )
