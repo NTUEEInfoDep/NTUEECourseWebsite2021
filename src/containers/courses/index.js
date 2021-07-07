@@ -117,8 +117,8 @@ export default function Courses() {
       <Tabs
         value={selectedGrade}
         onChange={handleSelectGrade}
-        textColor="primary"
-        indicatorColor="primary"
+        textColor="secondary"
+        indicatorColor="secondary"
         variant="fullWidth"
       >
         {grades.map(({ grade, text }) => (

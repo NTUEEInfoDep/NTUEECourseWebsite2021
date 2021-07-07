@@ -44,13 +44,13 @@ const Routes = () => {
 export default function App() {
   return (
     <div>
-      <Router>
-        <ThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
+        <Router>        
           <Drawer>
             <Routes />
-          </Drawer>
-        </ThemeProvider>
-      </Router>
+          </Drawer>        
+        </Router>
+      </ThemeProvider>      
     </div>
   );
 }
