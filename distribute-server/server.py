@@ -56,6 +56,12 @@ def genStudent(raw_student, raw_selection, course_id):
         students.append(
             Student(data["name"], data["userID"], result_selection, data["grade"]))
     return students
+
+def genPreselect(raw_preselects):
+    preselects = []
+    for data in raw_preselects.find():
+        preselect.append(data["userID"])
+    return preselects
 # ========================================
 @app.route("/")
 def index():
@@ -69,13 +75,16 @@ def distribute():
     raw_selection = db["selections"]
     raw_students = db["students"]
     raw_courses = db["courses"]
+    raw_preselects = db["preselects"]
 
     courses = genCourse(raw_courses)
-    course_names = getCourseid(raw_courses)
 
+    course_names = getCourseid(raw_courses)
     students = genStudent(raw_students, raw_selection, course_names)
 
-    results = Algorithm.distribute(courses, students)
+    preselects = genPreselect(raw_preselects)
+
+    results = Algorithm.distribute(courses, students, preselects)
     db.results.insert_many(results)
     client.close()
     return ""

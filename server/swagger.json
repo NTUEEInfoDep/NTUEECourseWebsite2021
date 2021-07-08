@@ -747,6 +747,42 @@
         }
       }
     },
+    "/preselect": {
+      "put": {
+        "description": "update preselect",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": ["B11111111", "B44444444", "B99999999"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Format error"
+          },
+          "403": {
+            "description": "Fail"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
+      }
+    },
     "/result.csv": {
       "get": {
         "description": "get distribution result",

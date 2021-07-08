@@ -617,6 +617,25 @@ router.route("/authority").put(
   })
 );
 
+router.route("/preselect").put(
+  express.json({ strict: false }),
+  permissionRequired(constants.AUTHORITY_ADMIN),
+  asyncHandler(async (req, res, next) => {
+    // Validation
+    if (!Array.isArray(req.body)) {
+      res.status(400).end();
+      return;
+    }
+    const update = [];
+    req.body.forEach((userID) => {
+      update.push({ userID });
+    });
+    const resultDelete = await model.Preselect.deleteMany({});
+    const result = await model.Preselect.insertMany(update);
+    res.status(204).end();
+  })
+);
+
 router.post(
   "/distribute",
   permissionRequired(constants.AUTHORITY_ADMIN),
