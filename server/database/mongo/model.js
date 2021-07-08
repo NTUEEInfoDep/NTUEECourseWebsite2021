@@ -93,7 +93,17 @@ const selectionSchema = new mongoose.Schema({
 });
 
 const Selection = mongoose.model("Selection", selectionSchema);
+// ========================================
 
+const preselectSchema = new mongoose.Schema({
+  userID: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+});
+
+const Preselect = mongoose.model("Preselect", preselectSchema);
 // ========================================
 
 const openTimeSchema = new mongoose.Schema({
@@ -139,6 +149,7 @@ module.exports = {
   Course,
   Student,
   Selection,
+  Preselect,
   OpenTime,
   Result,
 };
