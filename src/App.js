@@ -45,12 +45,12 @@ export default function App() {
   return (
     <div>
       <ThemeProvider theme={theme}>
-        <Router>        
+        <Router>
           <Drawer>
             <Routes />
-          </Drawer>        
+          </Drawer>
         </Router>
-      </ThemeProvider>      
+      </ThemeProvider>
     </div>
   );
 }
