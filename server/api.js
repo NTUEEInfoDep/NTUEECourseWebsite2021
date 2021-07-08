@@ -1,5 +1,4 @@
 const uuid = require("node-uuid");
-const { promisify } = require("util");
 
 const express = require("express");
 const session = require("express-session");
@@ -7,12 +6,12 @@ const asyncHandler = require("express-async-handler");
 const redis = require("redis");
 const connectRedis = require("connect-redis");
 const bcrypt = require("bcrypt");
-const debug = require("debug")("ntuee-course:api");
 const deprecate = require("depd")("ntuee-course:api");
 const mongoose = require("mongoose");
 
-const model = require("./database/mongo/model");
+const { string } = require("yargs");
 const constants = require("./constants");
+const model = require("./database/mongo/model");
 
 // ========================================
 
@@ -34,13 +33,16 @@ redisClient.on("error", console.error);
 // Date verification middleware
 
 const openTimeMiddleware = asyncHandler(async (req, res, next) => {
-  const startTime = await model.OpenTime.findOne({ type: "start" }).exec();
-  const endTime = await model.OpenTime.findOne({ type: "end" }).exec();
+  const startTime = await model.OpenTime.findOne({
+    type: constants.START_TIME_KEY,
+  }).exec();
+  const endTime = await model.OpenTime.findOne({
+    type: constants.END_TIME_KEY,
+  }).exec();
   const now = Math.floor(new Date() / 1000);
   if (
     (now < startTime.time || now > endTime.time) &&
-    req.session.authority !== "Admin" &&
-    req.session.authority !== "Maintainer"
+    req.session.authority < constants.AUTHORITY_MAINTAINER
   ) {
     res.status(503).send({ start: startTime.time, end: endTime.time });
     return;
@@ -48,9 +50,17 @@ const openTimeMiddleware = asyncHandler(async (req, res, next) => {
   next();
 });
 
+const loginRequired = asyncHandler(async (req, res, next) => {
+  if (!req.session.userID) {
+    res.status(403).end();
+    return;
+  }
+  next();
+});
+
 const permissionRequired = (permission) =>
   asyncHandler(async (req, res, next) => {
-    if (req.session.authority < permission) {
+    if (!req.session.authority || req.session.authority < permission) {
       res.status(403).end();
       return;
     }
@@ -100,11 +110,8 @@ router.use(session(sessionOptions));
 router
   .route("/session")
   .get(
+    loginRequired,
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       res.status(200).send({
         userID: req.session.userID,
         authority: req.session.authority,
@@ -153,23 +160,27 @@ router
   );
 
 router.route("/opentime").put(
-  express.urlencoded({ extended: false }),
+  express.json({ strict: false }),
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const { start } = req.body;
     const { end } = req.body;
-    if (parseInt(start) != start || parseInt(end) != end) {
+    if (typeof start !== "number" || typeof end !== "number") {
+      res.status(400).end();
+      return;
+    }
+    if (start < 0 || end < 0) {
       res.status(400).end();
       return;
     }
 
-    const startResult = await model.OpenTime.updateOne(
-      { type: "start" },
-      { time: parseInt(start) }
+    await model.OpenTime.updateOne(
+      { type: constants.START_TIME_KEY },
+      { time: start }
     );
-    const endResult = await model.OpenTime.updateOne(
-      { type: "end" },
-      { time: parseInt(end) }
+    await model.OpenTime.updateOne(
+      { type: constants.END_TIME_KEY },
+      { time: end }
     );
     res.status(204).end();
   })
@@ -177,22 +188,11 @@ router.route("/opentime").put(
 
 router.use(openTimeMiddleware).get(
   "/courses",
+  loginRequired,
   asyncHandler(async (req, res, next) => {
-    if (!req.session.userID) {
-      res.status(403).end();
-      return;
-    }
     const coursesGroup = await model.Course.find({}).exec();
     const filtered = [];
-    let items;
-    // deal with query no query and one query key(foreach only for array)
-    if (!req.query.keys) {
-      items = [];
-    } else if (typeof req.query.keys === "string") {
-      items = [req.query.keys];
-    } else {
-      items = req.query.keys;
-    }
+    const items = Object.keys(req.query);
 
     coursesGroup.forEach((course) => {
       const filteredcourse = {};
@@ -224,20 +224,42 @@ router.use(openTimeMiddleware).get(
 
 router.route("/password").put(
   express.json({ strict: false }),
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const modifiedData = req.body;
-    const { authority } = req.session;
+    let ERROR_INPUT = false;
     mongoose.set("useFindAndModify", false);
 
-    permissionRequired(constants.AUTHORITY_ADMIN);
+    if (!modifiedData || !Array.isArray(modifiedData)) {
+      res.status(400).end();
+      return;
+    }
+
+    // check input type
+    modifiedData.forEach((data) => {
+      // check if attribute userID,new_password exist
+      if (!data.userID || !data.new_password) {
+        ERROR_INPUT = true;
+      }
+      // check if input is string
+      if (
+        typeof data.new_password !== "string" ||
+        typeof data.userID !== "string"
+      ) {
+        ERROR_INPUT = true;
+      }
+    });
+    if (ERROR_INPUT) {
+      res.status(403).end();
+      return;
+    }
 
     await Promise.all(
       modifiedData.map(async (data) => {
-        const SALT_ROUNDS = 10;
-        const salt = await bcrypt.genSalt(SALT_ROUNDS);
-        const hash = await bcrypt.hash(data.new_password, salt);
-        const filter = { userID: data.userID };
-        const update = { password: hash };
+        const salt = await bcrypt.genSalt(constants.SALT_ROUNDS);
+        const newpasswordHash = await bcrypt.hash(data.new_password, salt);
+        const filter = { userID: data.userID.toUpperCase() };
+        const update = { password: newpasswordHash };
         const result = await model.Student.findOneAndUpdate(filter, update);
       })
     );
@@ -250,46 +272,122 @@ router
   .route("/users")
   .all(openTimeMiddleware)
   .get(
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
       const studentGroup = await model.Student.find({}).exec();
-      const filted = [];
-      let items;
-      // deal with query no query and one query key(foreach only for array)
-      if (!req.query.keys) {
-        items = [];
-      } else if (typeof req.query.keys === "string") {
-        items = [];
-        items.push(req.query.keys);
-      } else {
-        items = req.query.keys;
-      }
+      const filtered = [];
+      const items = Object.keys(req.query);
       studentGroup.forEach((student) => {
         const filteredstudent = {};
         filteredstudent.id = student.userID;
         items.forEach((item) => {
+          if (item === "password") {
+            res.status(403).end();
+            return;
+          }
           filteredstudent[item] = student[item];
         });
-        filted.push(filteredstudent);
+        filtered.push(filteredstudent);
       });
-      res.send(filted);
+      res.send(filtered);
     })
   )
-  .post();
+  .post(
+    express.json({ extended: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
+    asyncHandler(async (req, res, next) => {
+      const studentsRaw = req.body;
+      const students = [];
+      let cnt = 0;
+
+      if (!studentsRaw || !Array.isArray(studentsRaw)) {
+        res.status(400).end();
+        return;
+      }
+      studentsRaw.forEach((studentRaw) => {
+        if (
+          !studentRaw.userID ||
+          !studentRaw.grade ||
+          !studentRaw.password ||
+          !studentRaw.name ||
+          !studentRaw.authority
+        ) {
+          res.status(400).end();
+          return;
+        }
+        if (
+          typeof studentRaw.authority !== "number" ||
+          typeof studentRaw.grade !== "number" ||
+          typeof studentRaw.userID !== "string" ||
+          typeof studentRaw.password !== "string" ||
+          typeof studentRaw.name !== "string"
+        ) {
+          res.status(400).end();
+        }
+      });
+      await Promise.all(
+        studentsRaw.map(async (studentRaw) => {
+          const salt = await bcrypt.genSalt(10);
+          const hash = await bcrypt.hash(studentRaw.password, salt);
+          const student = { ...studentRaw };
+          student.password = hash;
+          student.userID = student.userID.toUpperCase();
+          const match = await model.Student.findOne({
+            userID: student.userID,
+          }).exec();
+          if (!match) {
+            cnt += 1;
+            students.push(student);
+          }
+        })
+      );
+      console.log("All passwords are hashed!");
+      // Save all students
+      await Promise.all(
+        students.map(async (student) => {
+          const studentDocument = new model.Student(student);
+          await studentDocument.save();
+        })
+      );
+      console.log(`Successfully update ${cnt} students`);
+      res.status(204).end();
+    })
+  )
+  .delete(
+    express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
+    asyncHandler(async (req, res, next) => {
+      const deleteData = req.body;
+
+      if (!deleteData || !Array.isArray(deleteData)) {
+        res.status(400).end();
+        return;
+      }
+      deleteData.forEach((userID) => {
+        if (typeof userID !== "string") {
+          const indexofData = deleteData.indexOf(userID);
+          deleteData.splice(indexofData, 1);
+        }
+      });
+      await Promise.all(
+        deleteData.map(async (data) => {
+          const userID = data.toUpperCase();
+          const student = await model.Student.findOne({ userID }).exec();
+          if (student) {
+            await model.Student.deleteOne({ userID });
+          }
+        })
+      );
+      res.status(204).end();
+    })
+  );
 
 router
   .route("/selections/:courseID")
-  .all(openTimeMiddleware)
   .all(
+    openTimeMiddleware,
+    loginRequired,
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       const { courseID } = req.params;
       const course = await model.Course.findOne(
         { id: courseID },
@@ -308,9 +406,10 @@ router
       const { courseID } = req.params;
       const { userID } = req.session;
       const { name, type, description, options } = req.course;
-      const user = await model.Student.findOne({ userID }, "selections");
-      const { selections } = user;
-      const selected = selections[courseID];
+      let selected = await model.Selection.find({ userID, courseID }).sort({
+        ranking: 1,
+      });
+      selected = selected.map((selection) => selection.name);
       const unselected = options.filter((option) => !selected.includes(option));
       res.send({ name, type, description, selected, unselected });
     })
@@ -332,9 +431,15 @@ router
         return;
       }
 
-      const update = {};
-      update[`selections.${courseID}`] = req.body;
-      const result = await model.Student.updateOne({ userID }, update);
+      const update = [];
+      req.body.forEach((item, index) => {
+        update.push({ courseID, userID, name: item, ranking: index + 1 });
+      });
+      const resultDelete = await model.Selection.deleteMany({
+        userID,
+        courseID,
+      });
+      const result = await model.Selection.insertMany(update);
       res.status(204).end();
     })
   );
@@ -342,98 +447,159 @@ router
   .route("/course")
   .all(openTimeMiddleware)
   .post(
-    express.urlencoded({ extended: false }),
+    express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
-      const { id } = req.body;
-      const { name } = req.body;
-      const { type } = req.body;
-      const { description } = req.body;
-      const { options } = req.body;
-      const course = await model.Course.findOne({ id }).exec();
-      if (course) {
+      const addData = req.body;
+      if (!addData || !Array.isArray(addData)) {
         res.status(400).end();
         return;
       }
-      const courseDocument = new model.Course({
-        id,
-        name,
-        type,
-        description,
-        options,
+      // if the element in addData is not a valid Course type, remove it from addData
+      addData.forEach((data) => {
+        if (
+          !data.id ||
+          typeof data.id !== "string" ||
+          !data.name ||
+          typeof data.name !== "string" ||
+          !data.type ||
+          typeof data.type !== "string" ||
+          !data.description ||
+          typeof data.description !== "string" ||
+          !data.options
+        ) {
+          const indexofdata = addData.indexOf(data);
+          addData.splice(indexofdata, 1);
+        }
       });
-      await courseDocument.save();
-      res.status(201).send({ id, name, type, description, options });
+      await Promise.all(
+        addData.map(async (data) => {
+          const { id } = data;
+          const { name } = data;
+          const { type } = data;
+          const { description } = data;
+          const { options } = data;
+          const course = await model.Course.findOne({ id }).exec();
+          if (course) {
+            await model.Course.deleteOne({ id }).exec();
+          }
+          const courseDocument = new model.Course({
+            id,
+            name,
+            type,
+            description,
+            options,
+          });
+          await courseDocument.save();
+        })
+      );
+      res.status(201).end();
     })
   )
   .delete(
-    express.urlencoded({ extended: false }),
+    express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       if (!req.session.userID) {
         res.status(403).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
-      const { id } = req.body;
-      const course = await model.Course.findOne({ id }).exec();
-      if (!course) {
-        res.status(404).end();
+      const deleteData = req.body;
+      if (!deleteData || !Array.isArray(deleteData)) {
+        res.status(400).end();
         return;
       }
-      await model.Course.deleteOne({ id });
+      // if the element in addData is not a valid Course type, remove it from addData
+      deleteData.forEach((id) => {
+        if (!id || typeof id !== "string") {
+          const indexofdata = deleteData.indexOf(id);
+          deleteData.splice(indexofdata, 1);
+        }
+      });
+      await Promise.all(
+        deleteData.map(async (id) => {
+          const course = await model.Course.findOne({ id }).exec();
+          if (course) {
+            await model.Course.deleteOne({ id });
+          }
+        })
+      );
       res.status(204).end();
     })
   )
   .put(
-    express.urlencoded({ extended: false }),
+    express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
+      const modifiedData = req.body;
+      if (!modifiedData || !Array.isArray(modifiedData)) {
+        res.status(400).end();
         return;
       }
-      permissionRequired(constants.AUTHORITY_MAINTAINER);
-      const { id } = req.body;
-      const { name } = req.body;
-      const { type } = req.body;
-      const { description } = req.body;
-      const { options } = req.body;
-      const course = await model.Course.findOne({ id }).exec();
-      if (!course) {
-        res.status(404).end();
-        return;
-      }
-      await model.Course.updateOne(
-        {
-          id,
-        },
-        {
-          name,
-          type,
-          description,
-          options,
+      // if the element in addData is not a valid Course type, remove it from addData
+      modifiedData.forEach((data) => {
+        if (!data.id || typeof data.id !== "string") {
+          const indexofdata = modifiedData.indexOf(data);
+          modifiedData.splice(indexofdata, 1);
         }
+      });
+      await Promise.all(
+        modifiedData.map(async (data) => {
+          const { id } = data;
+          const { name } = data;
+          const { type } = data;
+          const { description } = data;
+          const { options } = data;
+          const course = await model.Course.findOne({ id }).exec();
+          if (course) {
+            await model.Course.updateOne(
+              {
+                id,
+              },
+              {
+                name,
+                type,
+                description,
+                options,
+              }
+            );
+          }
+        })
       );
       res.status(204).end();
     })
   );
 
 router.route("/authority").put(
-  express.urlencoded({ extended: false }),
+  express.json({ strict: false }),
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
-    permissionRequired(constants.AUTHORITY_ADMIN);
-    let { userID } = req.body;
-    const { authority } = req.body;
-    userID = userID.toUpperCase();
-    const user = await model.Student.findOne({ userID }).exec();
-    if (!user) {
-      res.status(404).end();
+    const modifiedData = req.body;
+    if (!modifiedData || !Array.isArray(modifiedData)) {
+      res.status(400).end();
       return;
     }
-    await model.Student.updateOne({ userID }, { authority });
+    console.log(modifiedData);
+    modifiedData.forEach((data) => {
+      if (
+        typeof data.userID !== "string" ||
+        typeof data.authority !== "number"
+      ) {
+        const indexofdata = modifiedData.indexOf(data);
+        modifiedData.splice(indexofdata, 1);
+      }
+    });
+    await Promise.all(
+      modifiedData.map(async (data) => {
+        let { userID } = data;
+        const { authority } = data;
+        userID = userID.toUpperCase();
+        const user = await model.Student.findOne({ userID }).exec();
+        if (user) {
+          await model.Student.updateOne({ userID }, { authority });
+        }
+      })
+    );
     res.status(204).end();
   })
 );
