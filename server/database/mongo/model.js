@@ -24,6 +24,10 @@ const courseSchema = new mongoose.Schema({
     immutable: false,
   },
   options: [{ name: String, limit: Number }],
+  priority: {
+    type: Number,
+    immutable: false,
+  },
 });
 
 const Course = mongoose.model("Course", courseSchema);
