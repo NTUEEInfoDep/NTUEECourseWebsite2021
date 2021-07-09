@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 
@@ -11,6 +11,8 @@ import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import Papa from "papaparse";
 import { Hidden, Typography } from "@material-ui/core";
 import StudentTable from "./StudentTable";
+
+import { StudentDataAPI } from "../../api";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -57,6 +59,15 @@ export default function StudentData() {
     grade: "",
   });
 
+  useEffect(() => {
+    // const courseData = fakeCourseData;
+    StudentDataAPI.getStudentData()
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch(() => {});
+  }, []);
+
   const handleTest = () => {
     console.log(data);
   };
@@ -67,9 +78,7 @@ export default function StudentData() {
         skipEmptyLines: true,
         complete(results) {
           const newData = results.data.reduce((obj, cur) => {
-            return obj.concat([
-              { userID: cur[0], name: cur[1], grade: cur[2] },
-            ]);
+            return obj.concat([{ id: cur[0], name: cur[1], grade: cur[2] }]);
           }, []);
           setData(data.concat(newData));
           setLoaded(true);
@@ -89,7 +98,7 @@ export default function StudentData() {
   const onAddStudent = () => {
     setData(data.concat(newStudent));
     setNewStudent({
-      userID: "",
+      id: "",
       name: "",
       grade: "",
     });
@@ -173,8 +182,8 @@ export default function StudentData() {
             alignItems="flex-start"
             direction="row"
           >
-            {["userID", "name", "grade"].map((e) => (
-              <Grid item>
+            {["id", "name", "grade"].map((e) => (
+              <Grid item key={e}>
                 <InputGrid
                   type={e}
                   newStudent={newStudent}
