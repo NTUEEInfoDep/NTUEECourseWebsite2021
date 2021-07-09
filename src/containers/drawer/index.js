@@ -111,7 +111,7 @@ const useStyles = makeStyles((theme) => ({
 //
 
 const Drawer = ({ children }) => {
-  const { authority } = useSelector(selectSession);
+  const { isLogin, authority } = useSelector(selectSession);
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -123,26 +123,30 @@ const Drawer = ({ children }) => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const itemList =
-    authority === 2 || authority === 1
-      ? [
-          { text: "Main", to: "/" },
-          { text: "Courses", to: "/courses" },
-          { text: "Login", to: "/login" },
-          {
-            text: "Student Data",
-            to: "/studentdata",
-          },
-          {
-            text: "Course Manage",
-            to: "/course-manage",
-          },
-        ]
-      : [
-          { text: "Main", to: "/" },
-          { text: "Courses", to: "/courses" },
-          { text: "Login", to: "/login" },
-        ];
+
+  const itemList = !isLogin
+    ? [
+        { text: "Main", to: "/" },
+        { text: "Courses", to: "/courses" },
+        { text: "Login", to: "/login" },
+      ]
+    : authority == "Admin" || authority == "Maintainer"
+    ? [
+        { text: "Main", to: "/" },
+        { text: "Courses", to: "/courses" },
+        {
+          text: "Student Data",
+          to: "/studentdata",
+        },
+        {
+          text: "Course Manage",
+          to: "/course-manage",
+        },
+      ]
+    : [
+        { text: "Main", to: "/" },
+        { text: "Courses", to: "/courses" },
+      ];
 
   return (
     <div className={classes.root}>

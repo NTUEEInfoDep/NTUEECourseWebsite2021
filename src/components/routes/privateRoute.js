@@ -12,7 +12,7 @@ export default function PrivateRoute({ children, path }) {
     <Route
       path={path}
       render={() => {
-        //if (!initialized) return <Loading />;
+        if (!initialized) return <Loading />;
         if (!isLogin) return <Redirect to="/login" />;
         if (authority == "User") return <Redirect to="/" />;
         return children;

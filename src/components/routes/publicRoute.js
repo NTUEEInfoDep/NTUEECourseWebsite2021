@@ -13,7 +13,7 @@ export default function PublicRoute({ children, path }) {
       exact
       path={path}
       render={() => {
-        //if (!initialized) return <Loading />;
+        if (!initialized) return <Loading />;
         return isLogin ? children : <Redirect to="/login" />;
       }}
     />
