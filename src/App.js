@@ -1,5 +1,5 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
 // containers
 import Drawer from "./containers/drawer";
@@ -8,17 +8,18 @@ import Courses from "./containers/courses";
 import Login from "./containers/login";
 import StudentData from "./containers/studentData";
 import CourseManage from "./containers/courseManage";
-// slices
-import { selectSession } from "./slices/sessionSlice";
 //Route
 import { Redirect } from "react-router";
 import PublicRoute from "./components/routes/publicRoute";
 import PrivateRoute from "./components/routes/privateRoute";
+//initialize
+import { init } from "./slices/sessionSlice";
 
 const Routes = () => {
-  const { authority, isLogin } = useSelector(selectSession);
-  console.log(authority);
-  console.log(isLogin);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(init());
+  }, []);
   return (
     <Switch>
       <PublicRoute exact path="/">
