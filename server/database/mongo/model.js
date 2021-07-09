@@ -23,11 +23,7 @@ const courseSchema = new mongoose.Schema({
     type: String,
     immutable: false,
   },
-  options: [{ name: String, limit: Number }],
-  priority: {
-    type: Number,
-    immutable: false,
-  },
+  options: [{ name: String, limit: Number, priority: Number }],
 });
 
 const Course = mongoose.model("Course", courseSchema);
