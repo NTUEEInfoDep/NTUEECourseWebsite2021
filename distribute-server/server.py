@@ -57,6 +57,7 @@ def genStudent(raw_student, raw_selection, course_id):
             Student(data["name"], data["userID"], result_selection, data["grade"]))
     return students
 
+
 def genPreselect(raw_preselects):
     preselects = []
     for data in raw_preselects.find():
