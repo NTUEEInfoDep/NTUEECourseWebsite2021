@@ -24,20 +24,24 @@ export const sessionSlice = createSlice({
       state.authority = action.payload.authority;
       state.userID = action.payload.userID;
     },
-    setInitializedNotLogin: (state) => {
+    setInitializedNotLogin: (state, action) => {
       state.initialized = true;
       state.isLogin = false;
-      authority = null;
-      userID = null;
+      state.authority = null;
+      state.userID = null;
     },
   },
 });
 
 export const init = () => async (dispatch) => {
-  const session = await SessionAPI.getSession();
-  console.log(session);
-  if (session.status == "200") dispatch(setInitializedLogin(session.data));
-  else dispatch(setInitializedNotLogin());
+  try {
+    const session = await SessionAPI.getSession();
+    if (session.status == "200") {
+      dispatch(setInitializedLogin(session.data));
+    }
+  } catch (err) {
+    dispatch(setInitializedNotLogin());
+  }
 };
 
 export const { setLogin, setInitializedLogin, setInitializedNotLogin } =

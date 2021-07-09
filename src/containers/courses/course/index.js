@@ -31,7 +31,7 @@ export default function Course({ id, name, handleSelectCourse }) {
 }
 
 Course.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   handleSelectCourse: PropTypes.func.isRequired,
 };

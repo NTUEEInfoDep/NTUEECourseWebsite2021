@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 // material_ui
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {
@@ -174,7 +175,7 @@ const Drawer = ({ children }) => {
             onClick={handleDrawerClose}
             edge="start"
             className={clsx(classes.menuButton, {
-              [classes.hide]: !open || innerWidth >= 600,
+              [classes.hide]: !open || window.innerWidth >= 600,
             })}
           >
             <KeyboardArrowUpIcon />
@@ -186,7 +187,7 @@ const Drawer = ({ children }) => {
       </AppBar>
 
       <MUIDrawer
-        anchor={innerWidth >= 600 ? "left" : "top"}
+        anchor={window.innerWidth >= 600 ? "left" : "top"}
         variant="permanent"
         className={clsx(classes.drawer, {
           [classes.drawerOpen]: open,
@@ -221,7 +222,6 @@ const Drawer = ({ children }) => {
       </MUIDrawer>
       <div className={classes.offset} />
       <div
-        className={classes.content}
         className={clsx(classes.content, {
           [classes.contentShift]: open,
         })}
@@ -230,6 +230,10 @@ const Drawer = ({ children }) => {
       </div>
     </div>
   );
+};
+
+Drawer.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default Drawer;

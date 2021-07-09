@@ -19,11 +19,8 @@ export const SessionAPI = {
 };
 
 export const CourseAPI = {
-  getCourses: () => axios.get(`/api/courses`),
-  postCourse: (course) => axios.post(`/api/course`, course),
-  deleteCourse: (id) =>
-    axios.delete(`/api/course`, {
-      data: { id },
-    }),
-  putCourse: (course) => axios.put(`/api/course`, course),
+  getCourses: () => axios.get(`/api/courses?name&type&description&options`),
+  postCourse: (course) => axios.post(`/api/course`, [course]),
+  deleteCourse: (id) => axios.delete(`/api/course`, { data: [id] }),
+  putCourse: (course) => axios.put(`/api/course`, [course]),
 };
