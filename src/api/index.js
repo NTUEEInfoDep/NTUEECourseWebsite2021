@@ -24,3 +24,13 @@ export const CourseAPI = {
   deleteCourse: (id) => axios.delete(`/api/course`, { data: [id] }),
   putCourse: (course) => axios.put(`/api/course`, [course]),
 };
+
+export const StudentDataAPI = {
+  getStudentData: () =>
+    axios.get(`/api/users`, {
+      params: {
+        name: 1,
+        grade: 1,
+      },
+    }),
+};

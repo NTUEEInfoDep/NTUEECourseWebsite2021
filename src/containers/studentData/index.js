@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 
@@ -11,6 +11,8 @@ import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import Papa from "papaparse";
 import { Hidden, Typography } from "@material-ui/core";
 import StudentTable from "./StudentTable";
+
+import { StudentDataAPI } from "../../api";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -56,6 +58,15 @@ export default function StudentData() {
     name: "",
     grade: "",
   });
+
+  useEffect(() => {
+    // const courseData = fakeCourseData;
+    StudentDataAPI.getStudentData()
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleTest = () => {
     console.log(data);
