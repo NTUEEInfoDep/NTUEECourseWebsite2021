@@ -35,9 +35,7 @@ const Routes = () => {
       <PublicRoute exact path="/courses">
         <Courses />
       </PublicRoute>
-      <PublicRoute exact path="/login">
-        <Login />
-      </PublicRoute>
+      <Route exact path="/login" render={() => <Login />} />
       <PrivateRoute exact path="/studentdata">
         <StudentData />
       </PrivateRoute>
