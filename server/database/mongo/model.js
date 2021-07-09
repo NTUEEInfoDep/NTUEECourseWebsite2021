@@ -95,6 +95,7 @@ const selectionSchema = new mongoose.Schema({
 const Selection = mongoose.model("Selection", selectionSchema);
 // ========================================
 
+// 只有數電實驗需要
 const preselectSchema = new mongoose.Schema({
   userID: {
     type: String,

@@ -150,7 +150,7 @@ class Course:
                 for option in student._options[self._id]:
                     if option in self._options:
                         self._options[option].add_student(student._id,
-                                student._grade)
+                                                          student._grade)
 
         for option in self._options:
             self._options[option].make_priority_list()
@@ -196,7 +196,6 @@ class Course:
 
         for name in self._options.keys():
             self._distribute_result[name] = self._options[name]._selected
-
 
         return self._distribute_result
 
@@ -252,18 +251,24 @@ class Algorithm:
 
 
 if __name__ == "__main__":
-    student1 = Student("a", "B00000000", {"course1": ["teacher1a", "teacher1b","數電實驗"]}, 2)
-    student2 = Student("b", "B11111111", {"course1": ["teacher1a", "teacher1b","數電實驗"]}, 1)
-    student3 = Student("c", "B22222222", {"course1": ["teacher1b", "teacher1a","數電實驗"]}, 8)
-    student4 = Student("c", "B22222223", {"course1": ["teacher1b", "teacher1a","數電實驗"]}, 2)
-    student5 = Student("c", "B22222224", {"course1": ["teacher1b", "teacher1a","數電實驗"]}, 4)
-    student6 = Student("c", "B22222225", {"course1": ["teacher1b", "teacher1a","數電實驗"]}, 3)
+    student1 = Student("a", "B00000000", {"course1": [
+                       "teacher1a", "teacher1b", "數電實驗"]}, 2)
+    student2 = Student("b", "B11111111", {"course1": [
+                       "teacher1a", "teacher1b", "數電實驗"]}, 1)
+    student3 = Student("c", "B22222222", {"course1": [
+                       "teacher1b", "teacher1a", "數電實驗"]}, 8)
+    student4 = Student("c", "B22222223", {"course1": [
+                       "teacher1b", "teacher1a", "數電實驗"]}, 2)
+    student5 = Student("c", "B22222224", {"course1": [
+                       "teacher1b", "teacher1a", "數電實驗"]}, 4)
+    student6 = Student("c", "B22222225", {"course1": [
+                       "teacher1b", "teacher1a", "數電實驗"]}, 3)
     students = [student2, student1, student3, student4, student5, student6]
 
     course1 = Course({"id": "course1", "name": "course1", "type": "Ten-Select-Two",
-        "options": {"數電實驗": {"limit":5, "priority":-1}, "teacher1b":
-            {"limit":2, "priority":3}, "teacher1a":{"limit":2,
-                "priority":0}}})
+                      "options": {"數電實驗": {"limit": 5, "priority": -1}, "teacher1b":
+                                  {"limit": 2, "priority": 3}, "teacher1a": {"limit": 2,
+                                                                             "priority": 0}}})
     courses = [course1]
 
     preselect = ["B22222225", "B22222224", "B22222223"]

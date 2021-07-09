@@ -626,12 +626,12 @@ router.route("/preselect").put(
       res.status(400).end();
       return;
     }
-    const update = [];
-    req.body.forEach((userID) => {
-      update.push({ userID });
+    const update = req.body.map((userID) => {
+      return { userID };
     });
-    const resultDelete = await model.Preselect.deleteMany({});
-    const result = await model.Preselect.insertMany(update);
+
+    await model.Preselect.deleteMany({});
+    await model.Preselect.insertMany(update);
     res.status(204).end();
   })
 );
