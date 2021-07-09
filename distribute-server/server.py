@@ -19,9 +19,6 @@ MONGO_DBNAME = os.environ.get("MONGO_DBNAME", "ntuee-course")
 def genCourse(raw_courses):
     courses = []
     for data in raw_courses.find():
-        print("=" * 40)
-        print(data)
-        print("=" * 40)
         courseDict = {}
 
         courseDict["name"] = data["name"]
@@ -29,10 +26,16 @@ def genCourse(raw_courses):
         courseDict["type"] = data["type"]
         courseDict["options"] = {}
         for op in data["options"]:
-            courseDict["options"][op["name"]] = {
+            options = {
                 "limit": op["limit"],
-                "priority": op["priority"],
             }
+            if data["type"] == "Ten-Select-Two":
+                options["priority"] = op["priority"]
+            elif data["type"] == "Required":
+                options["priority"] = -1
+            else:  # EE-Lab
+                options["priority"] = 0
+            courseDict["options"][op["name"]] = options
         courses.append(Course(courseDict))
     return courses
 
@@ -91,8 +94,8 @@ def distribute():
 
     preselects = genPreselect(raw_preselects)
 
-    # results = Algorithm.distribute(courses, students, preselects)
-    # db.results.insert_many(results)
+    results = Algorithm.distribute(courses, students, preselects)
+    db.results.insert_many(results)
     client.close()
     return ""
 
