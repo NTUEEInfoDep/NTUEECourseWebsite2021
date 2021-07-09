@@ -67,7 +67,7 @@ def genStudent(raw_student, raw_selection, course_id):
 def genPreselect(raw_preselects):
     preselects = []
     for data in raw_preselects.find():
-        preselect.append(data["userID"])
+        preselects.append(data["userID"])
     return preselects
 # ========================================
 @app.route("/")
