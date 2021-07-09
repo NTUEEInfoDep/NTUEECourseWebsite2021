@@ -9,6 +9,9 @@ import SearchIcon from "@material-ui/icons/Search";
 import Course from "./course";
 import Selection from "./selection";
 
+// api
+import { CourseAPI } from "../../api";
+
 const useStyles = makeStyles((theme) => ({
   search: {
     position: "relative",
@@ -53,19 +56,19 @@ const useStyles = makeStyles((theme) => ({
 
 const gradeData = [
   {
-    grade: 1,
+    id: "1",
     text: "大一",
   },
   {
-    grade: 2,
+    id: "2",
     text: "大二",
   },
   {
-    grade: 3,
+    id: "3",
     text: "大三",
   },
   {
-    grade: 0,
+    id: "0",
     text: "十選二實驗",
   },
 ];
@@ -79,15 +82,14 @@ export default function Courses() {
   const grades = gradeData;
   const [courses, setCourses] = useState([]);
   useEffect(() => {
-    // const courseData = axios.get("/api/courses");
-    // const gradeData = axios.get("/api/grades");
-    // eslint-disable-next-line no-use-before-define
-    const courseData = fakeCourseData;
-    setCourses(courseData);
+    // const courseData = fakeCourseData;
+    CourseAPI.getCourses()
+      .then((res) => setCourses(res.data))
+      .catch(() => {});
   }, []);
 
   // select grade
-  const [selectedGrade, setSelectedGrade] = useState(null);
+  const [selectedGrade, setSelectedGrade] = useState(false);
   const handleSelectGrade = (event, value) => {
     setSelectedGrade(value);
   };
@@ -95,7 +97,7 @@ export default function Courses() {
   // select course
   const [selectedCourse, setSelectedCourse] = useState(null);
   const handleSelectCourse = (selectedID) => {
-    setSelectedCourse(courses.find(({ courseID }) => courseID === selectedID));
+    setSelectedCourse(courses.find(({ id }) => id === selectedID));
   };
 
   return (
@@ -121,18 +123,17 @@ export default function Courses() {
         indicatorColor="secondary"
         variant="fullWidth"
       >
-        {grades.map(({ grade, text }) => (
-          <Tab key={grade} value={grade} label={text} />
+        {grades.map(({ id, text }) => (
+          <Tab key={id} value={id} label={text} />
         ))}
       </Tabs>
       <Grid container>
         {courses
-          .filter((c) => c.grade === selectedGrade)
-          .map(({ courseID, name }) => (
-            <Grid item xs={6} sm={4} md={3}>
+          .filter((c) => c.type === selectedGrade)
+          .map(({ id, name }) => (
+            <Grid item xs={6} sm={4} md={3} key={id}>
               <Course
-                key={courseID}
-                id={courseID}
+                id={id}
                 name={name}
                 handleSelectCourse={handleSelectCourse}
               />
@@ -146,27 +147,31 @@ export default function Courses() {
 
 const fakeCourseData = [
   {
-    courseID: 0,
+    id: "0",
     name: "演算法",
-    grade: 3,
+    type: "3",
+    description: "",
     options: ["老師A", "老師B"],
   },
   {
-    courseID: 1,
+    id: "1",
     name: "電子學",
-    grade: 2,
+    type: "2",
+    description: "",
     options: ["老師C", "老師D"],
   },
   {
-    courseID: 2,
+    id: "2",
     name: "網路多媒體實驗",
-    grade: 0,
+    type: "0",
+    description: "",
     options: ["老師E"],
   },
   {
-    courseID: 3,
+    id: "3",
     name: "電磁學",
-    grade: 2,
+    type: "2",
+    description: "",
     options: ["老師F", "老師G", "老師H", "老師I", "老師J"],
   },
 ];
