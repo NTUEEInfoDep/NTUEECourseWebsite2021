@@ -13,6 +13,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Toolbar from "@material-ui/core/Toolbar";
 import Paper from "@material-ui/core/Paper";
 import Checkbox from "@material-ui/core/Checkbox";
+import Input from "@material-ui/core/Input";
 import Switch from "@material-ui/core/Switch";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import PropTypes from "prop-types";
@@ -136,7 +137,11 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected } = props;
+  const { numSelected, search, setSearch } = props;
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
 
   return (
     <Toolbar
@@ -163,7 +168,14 @@ const EnhancedTableToolbar = (props) => {
           Students
         </Typography>
       )}
-
+      <Input
+        value={search}
+        name="search bar"
+        placeholder="search a name"
+        onChange={(e) => {
+          handleSearch(e);
+        }}
+      />
       {numSelected > 0 ? (
         <Tooltip title="Delete">
           <IconButton aria-label="delete">
@@ -183,6 +195,8 @@ const EnhancedTableToolbar = (props) => {
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
+  search: PropTypes.string.isRequired,
+  setSearch: PropTypes.func.isRequired,
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -217,22 +231,32 @@ export default function StudentTable({ data }) {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [search, setSearch] = React.useState("");
 
+  //
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
+  const studentFilter = (e) => {
+    return search ? e.name === search : true;
+  };
+
+  //
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = data.map((n) => n.name);
+      const newSelecteds = data
+        .filter((e) => studentFilter(e))
+        .map((n) => n.id);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
+  //
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
@@ -253,28 +277,37 @@ export default function StudentTable({ data }) {
     setSelected(newSelected);
   };
 
+  // change page
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  // change rows per page
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
+  // change rows density
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
 
+  // select
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
+  // empty row for maintain constant height
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          search={search}
+          setSearch={setSearch}
+        />
         <TableContainer>
           <Table
             className={classes.table}
@@ -293,19 +326,20 @@ export default function StudentTable({ data }) {
             />
             <TableBody>
               {stableSort(data, getComparator(order, orderBy))
+                .filter((e) => studentFilter(e))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
+                  const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.name)}
+                      onClick={(event) => handleClick(event, row.id)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
+                      key={row.id}
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
@@ -338,7 +372,7 @@ export default function StudentTable({ data }) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={data.length}
+          count={data.filter((e) => studentFilter(e)).length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}

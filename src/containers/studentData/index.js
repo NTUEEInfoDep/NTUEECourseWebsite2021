@@ -78,9 +78,7 @@ export default function StudentData() {
         skipEmptyLines: true,
         complete(results) {
           const newData = results.data.reduce((obj, cur) => {
-            return obj.concat([
-              { userID: cur[0], name: cur[1], grade: cur[2] },
-            ]);
+            return obj.concat([{ id: cur[0], name: cur[1], grade: cur[2] }]);
           }, []);
           setData(data.concat(newData));
           setLoaded(true);
@@ -100,7 +98,7 @@ export default function StudentData() {
   const onAddStudent = () => {
     setData(data.concat(newStudent));
     setNewStudent({
-      userID: "",
+      id: "",
       name: "",
       grade: "",
     });
@@ -184,8 +182,8 @@ export default function StudentData() {
             alignItems="flex-start"
             direction="row"
           >
-            {["userID", "name", "grade"].map((e) => (
-              <Grid item>
+            {["id", "name", "grade"].map((e) => (
+              <Grid item key={e}>
                 <InputGrid
                   type={e}
                   newStudent={newStudent}
