@@ -9,7 +9,10 @@ class Option:
         data: dict:
             {
                 "limit": int,
-                "priority": 1.int, 2.bool, 3.list
+                "priority": int
+                            0: no priority
+                            -1: priority from high grade to low grade
+                            1,2,3,4: this grade has higher priority
             }
         '''
         self._name = name
@@ -28,12 +31,10 @@ class Option:
         '''
         priority = 0
         grade = min(student_grade, 4)
-        if self._priority is True:
+        if self._priority == -1:
             priority += grade
-        if type(self._priority) == int and grade == self._priority:
+        elif grade == self._priority:
             priority += 1
-        if type(self._priority) == list and grade in self._priority:
-            priority += (len(self._priority) - self._priority.index(grade))
         self._students[student_id] = -priority
 
     def make_priority_list(self):
@@ -260,9 +261,9 @@ if __name__ == "__main__":
     students = [student2, student1, student3, student4, student5, student6]
 
     course1 = Course({"id": "course1", "name": "course1", "type": "Ten-Select-Two",
-        "options": {"數電實驗": {"limit":5, "priority":True}, "teacher1b":
-            {"limit":2, "priority":[4,3]}, "teacher1a":{"limit":2,
-                "priority":False}}})
+        "options": {"數電實驗": {"limit":5, "priority":-1}, "teacher1b":
+            {"limit":2, "priority":3}, "teacher1a":{"limit":2,
+                "priority":0}}})
     courses = [course1]
 
     preselect = ["B22222225", "B22222224", "B22222223"]
