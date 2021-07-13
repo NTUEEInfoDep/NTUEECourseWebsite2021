@@ -20,10 +20,17 @@ import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import HomeIcon from '@material-ui/icons/Home'; //Main
+import VpnKeyIcon from '@material-ui/icons/VpnKey'; //Login
+import SubjectIcon from '@material-ui/icons/Subject'; //Courses
+import PeopleIcon from '@material-ui/icons/People'; //Student Data
+import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered'; //Course Manage
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+
 // slices
 import { selectSession } from "../../slices/sessionSlice";
 
-const drawerWidth = 150;
+const drawerWidth = 200;
 
 const useStyles = makeStyles((theme) => ({
   drawer: {
@@ -212,8 +219,33 @@ const Drawer = ({ children }) => {
 
         <List>
           {itemList.map(({ text, to }) => {
-            return (
+            return (              
               <ListItem button key={text} component={Link} to={to}>
+                {text === "Main" ?
+                  <ListItemIcon>
+                    <HomeIcon />
+                  </ListItemIcon> : null
+                }
+                {text === "Courses" ?
+                  <ListItemIcon>
+                    <SubjectIcon />
+                  </ListItemIcon> : null
+                }
+                {text === "Login" ?
+                  <ListItemIcon>
+                    <VpnKeyIcon />
+                  </ListItemIcon> : null  
+                }
+                {text === "Student Data" ?
+                  <ListItemIcon>
+                    <PeopleIcon />
+                  </ListItemIcon> : null
+                }
+                {text === "Course Manage" ?
+                  <ListItemIcon>
+                    <FormatListNumberedIcon />
+                  </ListItemIcon> : null
+                }
                 <ListItemText primary={text} />
               </ListItem>
             );
