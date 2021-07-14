@@ -20,10 +20,17 @@ import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import HomeIcon from '@material-ui/icons/Home'; //Main
+import ExitToAppIcon from '@material-ui/icons/ExitToApp'; //Login
+import ClassIcon from '@material-ui/icons/Class'; //Courses
+import PeopleIcon from '@material-ui/icons/People'; //Student Data
+import CloudUploadIcon from '@material-ui/icons/CloudUpload'; //Course Manage
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+
 // slices
 import { selectSession } from "../../slices/sessionSlice";
 
-const drawerWidth = 150;
+const drawerWidth = 200;
 
 const useStyles = makeStyles((theme) => ({
   drawer: {
@@ -126,26 +133,28 @@ const Drawer = ({ children }) => {
 
   const itemList = !isLogin
     ? [
-        { text: "Main", to: "/" },
-        { text: "Courses", to: "/courses" },
-        { text: "Login", to: "/login" },
+        { text: "Main", to: "/", icon: <HomeIcon /> },
+        { text: "Courses", to: "/courses", icon: <ClassIcon /> },
+        { text: "Login", to: "/login", icon: <ExitToAppIcon /> },
       ]
     : authority == "Admin" || authority == "Maintainer"
     ? [
-        { text: "Main", to: "/" },
-        { text: "Courses", to: "/courses" },
+        { text: "Main", to: "/", icon: <HomeIcon /> },
+        { text: "Courses", to: "/courses", icon: <ClassIcon /> },
         {
           text: "Student Data",
           to: "/studentdata",
+          icon: <PeopleIcon />
         },
         {
           text: "Course Manage",
           to: "/course-manage",
+          icon: <CloudUploadIcon />
         },
       ]
     : [
-        { text: "Main", to: "/" },
-        { text: "Courses", to: "/courses" },
+        { text: "Main", to: "/", icon: <HomeIcon /> },
+        { text: "Courses", to: "/courses", icon: <ClassIcon /> },
       ];
 
   return (
@@ -211,9 +220,14 @@ const Drawer = ({ children }) => {
         </div>
 
         <List>
-          {itemList.map(({ text, to }) => {
-            return (
-              <ListItem button key={text} component={Link} to={to}>
+          {itemList.map(({ text, to, icon }) => {
+            return (              
+              <ListItem
+                button
+                key={text}
+                component={Link}
+                to={to}>
+                <ListItemIcon>{icon}</ListItemIcon>
                 <ListItemText primary={text} />
               </ListItem>
             );
