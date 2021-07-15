@@ -11,23 +11,24 @@ import StudentData from "./containers/studentData";
 import CourseManage from "./containers/courseManage";
 import theme from "./theme";
 // Route
-import { Redirect } from "react-router";
 import PublicRoute from "./components/routes/publicRoute";
 import PrivateRoute from "./components/routes/privateRoute";
+import LoginRoute from "./components/routes/loginRoute";
 //initialize
 import { init } from "./slices/sessionSlice";
 //slices
 import { selectSession } from "./slices/sessionSlice";
+import Loading from "./components/loading";
 
 const Routes = () => {
   const dispatch = useDispatch();
-  const { initialized, isLogin } = useSelector(selectSession);
   useEffect(() => {
     dispatch(init());
   }, []);
-  console.log("initialized:", initialized);
-  console.log("isLogin:", isLogin);
-  return (
+  const { initialized } = useSelector(selectSession);
+  return !initialized ? (
+    <Loading />
+  ) : (
     <Switch>
       <PublicRoute exact path="/">
         <Main />
@@ -35,14 +36,15 @@ const Routes = () => {
       <PublicRoute exact path="/courses">
         <Courses />
       </PublicRoute>
-      <Route exact path="/login" render={() => <Login />} />
+      <LoginRoute exact path="/login">
+        <Login />
+      </LoginRoute>
       <PrivateRoute exact path="/studentdata">
         <StudentData />
       </PrivateRoute>
       <PrivateRoute exact path="/course-manage">
         <CourseManage />
       </PrivateRoute>
-      <Redirect to="/login" />
     </Switch>
   );
 };

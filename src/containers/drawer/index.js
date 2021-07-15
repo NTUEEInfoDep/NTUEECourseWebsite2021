@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -14,21 +14,25 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemIcon,
 } from "@material-ui/core/";
 import MenuIcon from "@material-ui/icons/Menu";
 import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import HomeIcon from '@material-ui/icons/Home'; //Main
-import ExitToAppIcon from '@material-ui/icons/ExitToApp'; //Login
-import ClassIcon from '@material-ui/icons/Class'; //Courses
-import PeopleIcon from '@material-ui/icons/People'; //Student Data
-import CloudUploadIcon from '@material-ui/icons/CloudUpload'; //Course Manage
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-
+import HomeIcon from "@material-ui/icons/Home"; //Main
+import ExitToAppIcon from "@material-ui/icons/ExitToApp"; //Login
+import ClassIcon from "@material-ui/icons/Class"; //Courses
+import PeopleIcon from "@material-ui/icons/People"; //Student Data
+import CloudUploadIcon from "@material-ui/icons/CloudUpload"; //Course Manage
+import MeetingRoomIcon from "@material-ui/icons/MeetingRoom"; //Logout
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
 // slices
 import { selectSession } from "../../slices/sessionSlice";
+//logout
+import { logout } from "../../slices/sessionSlice";
 
 const drawerWidth = 200;
 
@@ -62,6 +66,12 @@ const useStyles = makeStyles((theme) => ({
     display: "none",
   },
   drawerOpen: {
+    [theme.breakpoints.down("sm")]: {
+      transition: theme.transitions.create("all", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
     [theme.breakpoints.up("sm")]: {
       width: drawerWidth,
       transition: theme.transitions.create("width", {
@@ -75,7 +85,14 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerClose: {
     overflowX: "hidden",
+    overflowY: "hidden",
     width: theme.spacing(0),
+    [theme.breakpoints.down("sm")]: {
+      transition: theme.transitions.create("all", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
     [theme.breakpoints.up("sm")]: {
       width: theme.spacing(0) + 1,
       transition: theme.transitions.create("width", {
@@ -112,6 +129,15 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: drawerWidth,
     },
   },
+  logoutButton: {
+    justifyContent: "flex-end",
+    float: "right",
+    position: "relative",
+  },
+  logoutBox: {
+    display: "flex",
+    justifyContent: "flex-end",
+  },
   offset: theme.mixins.toolbar,
 }));
 
@@ -122,6 +148,7 @@ const Drawer = ({ children }) => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -137,19 +164,19 @@ const Drawer = ({ children }) => {
         { text: "Courses", to: "/courses", icon: <ClassIcon /> },
         { text: "Login", to: "/login", icon: <ExitToAppIcon /> },
       ]
-    : authority == "Admin" || authority == "Maintainer"
+    : authority === 1 || authority === 2
     ? [
         { text: "Main", to: "/", icon: <HomeIcon /> },
         { text: "Courses", to: "/courses", icon: <ClassIcon /> },
         {
           text: "Student Data",
           to: "/studentdata",
-          icon: <PeopleIcon />
+          icon: <PeopleIcon />,
         },
         {
           text: "Course Manage",
           to: "/course-manage",
-          icon: <CloudUploadIcon />
+          icon: <CloudUploadIcon />,
         },
       ]
     : [
@@ -192,6 +219,15 @@ const Drawer = ({ children }) => {
           <Typography variant="h6" noWrap>
             NTUEE course pre-selection
           </Typography>
+          <Box component="span" className={classes.logoutBox}>
+            <Button
+              className={classes.logoutButton}
+              startIcon={<MeetingRoomIcon />}
+              onClick={() => dispatch(logout())}
+            >
+              logout
+            </Button>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -221,12 +257,14 @@ const Drawer = ({ children }) => {
 
         <List>
           {itemList.map(({ text, to, icon }) => {
-            return (              
+            return (
               <ListItem
                 button
                 key={text}
                 component={Link}
-                to={to}>
+                to={to}
+                onClick={handleDrawerClose}
+              >
                 <ListItemIcon>{icon}</ListItemIcon>
                 <ListItemText primary={text} />
               </ListItem>

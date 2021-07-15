@@ -12,40 +12,41 @@ export const sessionSlice = createSlice({
   reducers: {
     //login
     setLogin: (state, action) => {
-      state.initialized = true;
       state.isLogin = true;
       state.authority = action.payload.authority;
       state.userID = action.payload.userID;
     },
-    //initialize
-    setInitializedLogin: (state, action) => {
-      state.initialized = true;
-      state.isLogin = true;
-      state.authority = action.payload.authority;
-      state.userID = action.payload.userID;
-    },
-    setInitializedNotLogin: (state, action) => {
-      state.initialized = true;
+    setLogout: (state) => {
       state.isLogin = false;
       state.authority = null;
       state.userID = null;
     },
+    //initialize
+    setInitialized: (state) => {
+      state.initialized = true;
+    },
   },
 });
 
+//check whether isLogin is true(session.status=="200") first
 export const init = () => async (dispatch) => {
   try {
     const session = await SessionAPI.getSession();
     if (session.status == "200") {
-      dispatch(setInitializedLogin(session.data));
+      dispatch(setInitialized());
+      dispatch(setLogin(session.data));
     }
   } catch (err) {
-    dispatch(setInitializedNotLogin());
+    dispatch(setInitialized());
   }
 };
 
-export const { setLogin, setInitializedLogin, setInitializedNotLogin } =
-  sessionSlice.actions;
+export const logout = () => async (dispatch) => {
+  const session = await SessionAPI.deleteSession();
+  dispatch(setLogout());
+};
+
+export const { setLogin, setLogout, setInitialized } = sessionSlice.actions;
 
 export const selectSession = (state) => state.session;
 
