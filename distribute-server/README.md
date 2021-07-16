@@ -18,7 +18,7 @@ python server.py
 
 演算法核心：可以參考指考分發演算法與 Stable Marriage Problem ，即學生與課程選項都有各自的志願。
 
-課程選項的志願：課程選項的志願是依據課程類型而有所改變，若優先與年級相關，則會先依年級分類，再利用random去排序同年級的優先順序。(可參考class Option 中的make_priority_list函數)
+課程選項的志願：課程選項的志願是依據課程類型而有所改變，若優先順序與年級相關，則會先依年級分類，再利用random去排序同年級的優先順序。(可參考class Option 中的make_priority_list函數)
 
 priority計算：
 （code中的priority是有加負號的，這邊為了看起來直觀一些，所以不加負號，要看code的要注意一下，不看code請無視這句話）
