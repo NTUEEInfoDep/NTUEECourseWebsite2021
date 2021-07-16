@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexWrap: "wrap",
     maxWidth: "1000px",
-    padding: "35px",
+    padding: "0px",
     "& > *": {
       margin: "auto",
     },
@@ -54,7 +54,7 @@ export default function StudentData() {
   const [data, setData] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false);
   const [newStudent, setNewStudent] = React.useState({
-    userID: "",
+    id: "",
     name: "",
     grade: "",
   });
@@ -95,8 +95,30 @@ export default function StudentData() {
     console.log("to be complete");
   };
 
+  const handleDelete = (ids) => {
+    StudentDataAPI.deleteStudentData(ids)
+      .then(() => {
+        setData(data.filter((student) => !ids.includes(student.id)));
+        console.log("delete student data finish");
+      })
+      .catch(() => {});
+  };
+
   const onAddStudent = () => {
     setData(data.concat(newStudent));
+    StudentDataAPI.postStudentData([
+      {
+        userID: newStudent.id,
+        grade: Number(newStudent.grade),
+        password: "1112",
+        name: newStudent.name,
+        authority: 2,
+      },
+    ])
+      .then(() => {
+        console.log("post student data finish");
+      })
+      .catch(() => {});
     setNewStudent({
       id: "",
       name: "",
@@ -113,7 +135,7 @@ export default function StudentData() {
         alignItems="flex-start"
         direction="row"
       >
-        <Grid item sm={12} md={3}>
+        {/* <Grid item sm={12} md={3}>
           <Grid
             container
             spacing={2}
@@ -166,9 +188,10 @@ export default function StudentData() {
               </Button>
             </Grid>
           </Grid>
-        </Grid>
-        <Grid item sm={12} md={9}>
-          <StudentTable data={data} loaded={loaded} />
+        </Grid> */}
+        {/* <Grid item sm={12} md={9}> */}
+        <Grid item sm={12}>
+          <StudentTable data={data} handleDelete={handleDelete} />
         </Grid>
         <Hidden smDown>
           <Grid item md={3} />

@@ -22,6 +22,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 
+import { StudentDataAPI } from "../../api";
+
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -137,7 +139,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, search, setSearch } = props;
+  const { numSelected, search, setSearch, handleDelete } = props;
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -171,14 +173,14 @@ const EnhancedTableToolbar = (props) => {
       <Input
         value={search}
         name="search bar"
-        placeholder="search a name"
+        placeholder="id or name"
         onChange={(e) => {
           handleSearch(e);
         }}
       />
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton aria-label="delete">
+          <IconButton aria-label="delete" onClick={() => handleDelete()}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -209,6 +211,7 @@ const useStyles = makeStyles((theme) => ({
   },
   table: {
     minWidth: 500,
+    padding: 0,
   },
   visuallyHidden: {
     border: 0,
@@ -221,16 +224,25 @@ const useStyles = makeStyles((theme) => ({
     top: 20,
     width: 1,
   },
+  tablecell: {
+    padding: 0,
+  },
+  checkbox: {
+    padding: "5px",
+  },
+  icon: {
+    padding: 0,
+  },
 }));
 
-export default function StudentTable({ data }) {
+export default function StudentTable({ data, handleDelete }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [search, setSearch] = React.useState("");
 
   //
@@ -241,7 +253,10 @@ export default function StudentTable({ data }) {
   };
 
   const studentFilter = (e) => {
-    return search ? e.name === search : true;
+    return search
+      ? e.name.toLowerCase().startsWith(search.toLowerCase()) ||
+          e.id.toLowerCase().startsWith(search.toLowerCase())
+      : true;
   };
 
   //
@@ -280,6 +295,7 @@ export default function StudentTable({ data }) {
   // change page
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+    console.log(data);
   };
 
   // change rows per page
@@ -307,12 +323,15 @@ export default function StudentTable({ data }) {
           numSelected={selected.length}
           search={search}
           setSearch={setSearch}
+          handleDelete={() => {
+            handleDelete(selected);
+          }}
         />
         <TableContainer>
           <Table
             className={classes.table}
             aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
+            // size={dense ? "small" : "medium"}
             aria-label="enhanced table"
           >
             <EnhancedTableHead
@@ -335,35 +354,48 @@ export default function StudentTable({ data }) {
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.id)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
                       selected={isItemSelected}
                     >
-                      <TableCell padding="checkbox">
+                      <TableCell className={classes.tablecell}>
                         <Checkbox
+                          onClick={(event) => handleClick(event, row.id)}
                           checked={isItemSelected}
                           inputProps={{ "aria-labelledby": labelId }}
+                          className={classes.checkbox}
                         />
                       </TableCell>
                       <TableCell
                         component="th"
                         id={row.id}
                         scope="row"
-                        padding="none"
+                        className={classes.tablecell}
                       >
                         {row.id}
                       </TableCell>
-                      <TableCell align="left">{row.name}</TableCell>
-                      <TableCell align="left">{row.grade}</TableCell>
+                      <TableCell align="left" className={classes.tablecell}>
+                        {row.name}
+                      </TableCell>
+                      <TableCell align="left" className={classes.tablecell}>
+                        {row.grade}
+                      </TableCell>
+                      <TableCell className={classes.tablecell}>
+                        <IconButton
+                          onClick={() => handleDelete([row.id])}
+                          className={classes.icon}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
               {emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
-                  <TableCell colSpan={6} />
+                <TableRow style={{ height: 35.2 * emptyRows }}>
+                  <TableCell colSpan={6} className={classes.tablecell} />
                 </TableRow>
               )}
             </TableBody>

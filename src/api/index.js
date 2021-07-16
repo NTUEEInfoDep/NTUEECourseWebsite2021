@@ -33,4 +33,6 @@ export const StudentDataAPI = {
         grade: 1,
       },
     }),
+  postStudentData: (users) => axios.post(`/api/users`, users),
+  deleteStudentData: (ids) => axios.delete(`/api/users`, { data: [...ids] }),
 };
