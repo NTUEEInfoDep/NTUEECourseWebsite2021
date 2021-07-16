@@ -21,11 +21,12 @@ python server.py
 課程選項的志願：課程選項的志願是依據課程類型而有所改變，若優先與年級相關，則會先依年級分類，再利用random去排序同年級的優先順序。(可參考class Option 中的make_priority_list函數)
 
 priority計算：
+（code中的priority是有加負號的，這邊為了看起來直觀一些，所以不加負號，要看code的要注意一下，不看code請無視這句話）
 
 1. 每個人的起始priority是 0
-2. 如果遇到有高年級優先的課，根據你是 X 年級priority減 X (4 年級以上算 4 年級)
-3. 如果是大 X 優先而且你是大 X，則你的priority減 1。
-4. 在產生課程選項志願的時候，會從priority低的人開始抽。
+2. 如果遇到有高年級優先的課，根據你是 X 年級priority加 X (4 年級以上算 4 年級)
+3. 如果是大 X 優先而且你是大 X，則你的priority加 1。
+4. 在產生課程選項志願的時候，會從priority高的人開始抽。
 
 數電實驗：選中數電實驗的人算選中一個選項，因此抽籤時不會參加到十選二的第一次分發。
 
@@ -37,9 +38,9 @@ priority計算：
 {
   "BAAAAAAAA": 0,
   "BBBBBBBBB": 0,
-  "BCCCCCCCC": -4,
-  "BDDDDDDDD" -2,
-  "BEEEEEEEE": -4,
+  "BCCCCCCCC": 4,
+  "BDDDDDDDD" 2,
+  "BEEEEEEEE": 4,
 }
 ```
 
@@ -48,14 +49,14 @@ priority計算：
 ```
 {
   0: ["BAAAAAAAA", "BBBBBBBBB"],
-  -4: ["BCCCCCCCC", "BEEEEEEEE"],
-  -2: ["BDDDDDDDD"],
+  4: ["BCCCCCCCC", "BEEEEEEEE"],
+  2: ["BDDDDDDDD"],
 }
 ```
 
-接著從中拿出priority最低的 group，即是 -4 那個 group，因此"BCCCCCCCC" 和 "BEEEEEEEE" 都會被取出來，並利用random 打亂順序後加到priority_list(即此選項的志願)中去。
+接著從中拿出priority最高的 group，即是 4 那個 group，因此"BCCCCCCCC" 和 "BEEEEEEEE" 都會被取出來，並利用random 打亂順序後加到priority_list(即此選項的志願)中去。
 
-接著依序取出priority次低的 group，重複上述動作，直到所有學生都被加到priority_list中，後面的就會依照個選項的priority_list 去分發。
+接著依序取出priority次高的 group，重複上述動作，直到所有學生都被加到priority_list中，後面的就會依照個選項的priority_list 去分發。
 
 ### 分發部份(只寫一個課程)
 
