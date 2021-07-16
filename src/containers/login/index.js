@@ -30,12 +30,12 @@ function Copyright() {
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(25),
+    marginTop: theme.spacing(10),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    border: "gray 1px solid",
-    borderRadius: "3%",
+    // border: "gray 1px solid",
+    // borderRadius: "3%",
   },
   avatar: {
     margin: theme.spacing(1),
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
   },
   form: {
     width: "80%",
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(3),
     marginBottom: theme.spacing(3),
   },
   submit: {
@@ -66,6 +66,8 @@ export default function Login() {
     showPassword: false,
     error: false,
   });
+
+  const [MDValue, setMDValue] = React.useState();
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });

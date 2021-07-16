@@ -18,7 +18,7 @@ import {
   Snackbar,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
-import { Add } from "@material-ui/icons";
+import { Add, Edit } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 
 // components
@@ -26,6 +26,10 @@ import CourseTable from "./CourseTable";
 
 // api
 import { CourseAPI } from "../../api";
+
+//MdEditor
+import MDEditor from "@uiw/react-md-editor";
+import "./mdeditor.css";
 
 const useStyles = makeStyles((theme) => ({
   optionsTitle: {
@@ -81,6 +85,9 @@ export default function CourseManage() {
   const [newOption, setNewOption] = useState("");
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({});
+  const [mdescription, setMDescription] = useState("");
+  const [openMDEditor, setMDEditor] = useState(false);
+  const [DescriptionEdited, setDescriptionEdited] = useState(false);
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -90,6 +97,9 @@ export default function CourseManage() {
     setNewOption("");
     setErrors({});
     setDialogOpen(false);
+    setMDEditor(false);
+    setDescriptionEdited(false);
+    setMDescription("");
   };
 
   const showAlert = (severity, msg) => {
@@ -212,6 +222,8 @@ export default function CourseManage() {
   const editCourse = (index) => {
     setCurrentId(courses[index].id);
     setCourse(courses[index]);
+    console.log(courses[index]);
+    console.log(course);
     handleOpen();
   };
 
@@ -219,6 +231,21 @@ export default function CourseManage() {
     setCurrentId(courses[index].id);
     setCourse(courses[index]);
     setConfirmOpen(true);
+  };
+
+  const openEditor = () => {
+    setMDescription(course.description);
+    setMDEditor(true);
+  };
+
+  const AddDescription = () => {
+    setCourse({ ...course, description: mdescription });
+    if (mdescription != "") {
+      setDescriptionEdited(true);
+    } else {
+      setDescriptionEdited(false);
+    }
+    setMDEditor(false);
   };
 
   useEffect(() => {
@@ -286,7 +313,7 @@ export default function CourseManage() {
               ))}
             </Select>
           </FormControl>
-          <TextField
+          {/* <TextField
             id="desc"
             label="Description (HTML)"
             type="text"
@@ -295,7 +322,39 @@ export default function CourseManage() {
             value={course.description}
             error={errors.description}
             onChange={(e) => handleCourse(e, "description")}
-          />
+          /> */}
+          {openMDEditor ? (
+            <div className="editor">
+              <MDEditor value={mdescription} onChange={setMDescription} />
+              <Button
+                onClick={AddDescription}
+                variant="outlined"
+                size="small"
+                className="ConfirmEditor"
+              >
+                Confirm
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={openEditor}
+              startIcon={
+                DescriptionEdited || course.description != "" ? (
+                  <Edit />
+                ) : (
+                  <Add />
+                )
+              }
+              variant="outlined"
+              className="openEditor"
+            >
+              {DescriptionEdited || course.description != ""
+                ? "Edit Description (Markdown)"
+                : "Add Description (Markdown)"}
+            </Button>
+          )}
+          {/* <MDEditor.Markdown source={description} /> */}
+
           <DialogContentText className={classes.optionsTitle}>
             Options
           </DialogContentText>
@@ -326,6 +385,7 @@ export default function CourseManage() {
               variant="outlined"
               size="small"
               onClick={handleCourseAddOption}
+              style={{ marginLeft: "10px" }}
             >
               Add
             </Button>
