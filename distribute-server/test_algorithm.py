@@ -61,41 +61,31 @@ class Test(unittest.TestCase):
 
         self.assertEqual(results, expected)
 
-    @unittest.skip("maintaining")
-    def test_03(self):  # 還不確定在測什麼
+    # @unittest.skip("maintaining")
+    def test_03(self):  # 測隨機
         student1 = Student("Michael", "B09901186",
-                           {"course1": ["teacher1a", "teacher1b"]}, 2)
+                           {"Electronic-Circuits-Experiment": ["teacher1a", "teacher1b"]}, 2)
         student2 = Student("Mecoli", "610736",
-                           {"course1": ["teacher1a", "teacher1b"]}, 1)
+                           {"Electronic-Circuits-Experiment": ["teacher1a", "teacher1b"]}, 1)
+        student3 = Student("Mecoli", "610736",
+                           {"Electronic-Circuits-Experiment": ["teacher1a", "teacher1b"]}, 1)
         students = [student1, student2]
 
         course1 = Course({
-            "id": "course1",
-            "name": "電力電子",
-            "type": "Ten-Select-Two",
+            "id": "Electronic-Circuits-Experiment",
+            "name": "電路學實驗",
+            "type": "EE-Lab",
             "description": "",
             "options": {
-                "teacher1a": 1,
-                "teacher1b": 1}
+                "teacher1a": {"limit": 1, "priority": 0},
+                "teacher1b": {"limit": 1, "priority": 0}
+            }
         })
         courses = [course1]
 
-        expected = [{
-            "studentID": "B09901186",
-            "courseName": "電力電子",
-            "optionName": "teacher1a",
-        },
-            {
-            "studentID": "610736",
-            "courseName": "電力電子",
-            "optionName": "teacher1b",
-        }
-        ]
-
         results = list_to_set(Algorithm.distribute(courses, students))
-        expected = list_to_set(expected)
 
-        self.assertEqual(results, expected)
+        self.assertEqual(len(results), 2)
 
     def test_04_priority_4_3(self):  # 十選二有三年級優先時
 
@@ -133,7 +123,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(results, expected)
 
-    @unittest.skip("preselect not finished")
+    @ unittest.skip("preselect not finished")
     def test_05_ten_select_two(self):
 
         student1 = Student("Michael", "B09901186",
