@@ -579,8 +579,7 @@
     },
     "/distribute": {
       "post": {
-        "description": "Run distribution(X)",
-        "deprecated": true,
+        "description": "Run distribution algorithm",
         "responses": {
           "201": {
             "description": "Success"

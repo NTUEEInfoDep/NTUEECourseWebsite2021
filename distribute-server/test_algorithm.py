@@ -167,26 +167,27 @@ class Test(unittest.TestCase):
         })
         courses = [course1]
 
-        expected = [{
-            "studentID": "B09901186",
-            "courseName": "Ten-Select-Two",
-            "optionName": "電力電子",
-        },
+        expected = [
             {
-            "studentID": "B09901186",
-            "courseName": "Ten-Select-Two",
-            "optionName": "數電實驗",
-        },
+                "studentID": "B09901186",
+                "courseName": "Ten-Select-Two",
+                "optionName": "電力電子",
+            },
             {
-            "studentID": "610736",
-            "courseName": "Ten-Select-Two",
-            "optionName": "嵌入式系統",
-        },
+                "studentID": "B09901186",
+                "courseName": "Ten-Select-Two",
+                "optionName": "數電實驗",
+            },
             {
-            "studentID": "610736",
-            "courseName": "Ten-Select-Two",
-            "optionName": "自動控制",
-        },
+                "studentID": "610736",
+                "courseName": "Ten-Select-Two",
+                "optionName": "嵌入式系統",
+            },
+            {
+                "studentID": "610736",
+                "courseName": "Ten-Select-Two",
+                "optionName": "自動控制",
+            },
         ]
         preselect = ["B09901186"]
         results = list_to_set(Algorithm.distribute(
