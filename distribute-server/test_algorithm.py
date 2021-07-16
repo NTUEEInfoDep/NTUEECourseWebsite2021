@@ -69,7 +69,7 @@ class Test(unittest.TestCase):
                            {"Electronic-Circuits-Experiment": ["teacher1a", "teacher1b"]}, 1)
         student3 = Student("Mecoli", "610736",
                            {"Electronic-Circuits-Experiment": ["teacher1a", "teacher1b"]}, 1)
-        students = [student1, student2]
+        students = [student1, student2, student3]
 
         course1 = Course({
             "id": "Electronic-Circuits-Experiment",
@@ -123,49 +123,27 @@ class Test(unittest.TestCase):
 
         self.assertEqual(results, expected)
 
-    @ unittest.skip("preselect not finished")
-    def test_05_ten_select_two(self):
+    def test_05_ten_select_two(self):  # 測多測資
 
-        student1 = Student("Michael", "B09901186",
-                           {"course1": ["電力電子", "自動控制"]}, 3)
-        student2 = Student("Mecoli", "610736",
-                           {"course1": ["自動控制", "數電實驗"]}, 1)
-        students = [student1, student2]
-
+        students = []
+        for i in range(100):
+            students.append(Student("Michael", "B09901186"+str(i),
+                                    {"Electronic-Circuits-Experiment": ["teacher1a", "teacher1b"]}, 2))
         course1 = Course({
-            "id": "course1",
-            "name": "電路學",
-            "type": "Ten-Select-Two",
+            "id": "Electronic-Circuits-Experiment",
+            "name": "電路學實驗",
+            "type": "EE-Lab",
             "description": "",
             "options": {
-                "電力電子": 1,
-                "自動控制": 1,
-                "數電實驗": 1, }
+                "teacher1a": {"limit": 25, "priority": 0},
+                "teacher1b": {"limit": 25, "priority": 0}
+            }
         })
         courses = [course1]
 
-        expected = [{
-            "studentID": "B09901186",
-            "courseName": course1,
-            "optionName": "電力電子",
-        },
-
-            {
-            "studentID": "610736",
-            "courseName": course1,
-            "optionName": "自動控制",
-        },
-            {
-            "studentID": "610736",
-            "courseName": course1,
-            "optionName": "數電實驗",
-        },
-        ]
-
         results = list_to_set(Algorithm.distribute(courses, students))
-        expected = list_to_set(expected)
 
-        self.assertEqual(results, expected)
+        self.assertEqual(len(results), 50)
 
     def test_06_priority_4_3(self):  # 測preselect
 
@@ -214,7 +192,6 @@ class Test(unittest.TestCase):
         results = list_to_set(Algorithm.distribute(
             courses, students, preselect))
         expected = list_to_set(expected)
-        print(results)
         self.assertEqual(results, expected)
 
 
