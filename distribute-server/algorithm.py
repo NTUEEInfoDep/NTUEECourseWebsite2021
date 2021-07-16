@@ -60,7 +60,7 @@ class Option:
         self._priority_list = list()
         self._fix = 0
 
-    def add_student(self , student_id, student_grade):
+    def add_student(self, student_id, student_grade):
         ''' Add student and count his/her priority.
 
         Count priority bases on self._priority, and add these information into self._students.
@@ -187,7 +187,7 @@ class Option:
 
         # self._selected is full and completely immutable
         else:
-             return student_id
+            return student_id
 
     def fix_index(self):
         ''' Fix the data of self._selected.
@@ -500,5 +500,3 @@ if __name__ == "__main__":
     courses = [course1]
 
     preselect = ["B22222225", "B22222224", "B22222223"]
-
-    print(Algorithm.distribute(courses, students, preselect))
