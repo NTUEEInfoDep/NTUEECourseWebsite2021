@@ -57,7 +57,7 @@ priority計算：
 
 接著依序取出priority次低的 group，重複上述動作，直到所有學生都被加到priority_list中，後面的就會依照個選項的priority_list 去分發。
 
-###分發部份(只寫一個課程)
+### 分發部份(只寫一個課程)
 
 ```
 產生該課程所有選項的priority_list
