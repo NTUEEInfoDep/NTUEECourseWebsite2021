@@ -66,9 +66,7 @@ export default function Login() {
     showPassword: false,
     error: false,
   });
-
-  const [MDValue, setMDValue] = React.useState();
-
+  
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
   };
