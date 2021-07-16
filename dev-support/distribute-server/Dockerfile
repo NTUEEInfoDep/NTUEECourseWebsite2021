@@ -1,0 +1,15 @@
+FROM python:3.8-alpine
+
+# setup working directory
+WORKDIR /app
+
+EXPOSE 8001
+
+COPY ["./distribute-server/requirements.txt", "./"]
+RUN pip install -r requirements.txt
+
+COPY ["./distribute-server/*.py", "./"]
+
+ENV FLASK_ENV development
+# startup command
+CMD ["python", "server.py"]

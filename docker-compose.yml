@@ -31,3 +31,10 @@ services:
     image: redis
     ports:
       - "6379:6379"
+
+  distribute-server:
+    build:
+      context: .
+      dockerfile: ./dev-support/distribute-server/Dockerfile
+    ports:
+      - "8001:8001"
