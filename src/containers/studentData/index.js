@@ -4,12 +4,27 @@ import Button from "@material-ui/core/Button";
 
 import Input from "@material-ui/core/Input";
 import Grid from "@material-ui/core/Grid";
+import Avatar from "@material-ui/core/Avatar";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemText from "@material-ui/core/ListItemText";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  TextField,
+  Hidden,
+  Typography,
+} from "@material-ui/core";
 
 import Container from "@material-ui/core/Container";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import Papa from "papaparse";
-import { Hidden, Typography } from "@material-ui/core";
+
 import StudentTable from "./StudentTable";
 
 import { StudentDataAPI } from "../../api";
@@ -53,6 +68,9 @@ export default function StudentData() {
 
   const [data, setData] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false);
+  const [addOpen, setAddOpen] = React.useState(false);
+  const [editId, setEditId] = React.useState("");
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [newStudent, setNewStudent] = React.useState({
     id: "",
     name: "",
@@ -104,7 +122,59 @@ export default function StudentData() {
       .catch(() => {});
   };
 
-  const onAddStudent = () => {
+  const handleOpenAdd = () => {
+    console.log("handleOpenAdd");
+    setNewStudent({
+      id: "",
+      name: "",
+      grade: "",
+    });
+    setAddOpen(true);
+  };
+
+  const handleCloseAdd = () => {
+    console.log("handleCloseAdd");
+    setNewStudent({
+      id: "",
+      name: "",
+      grade: "",
+    });
+    setAddOpen(false);
+  };
+
+  const handleOpenEdit = (id) => {
+    console.log("handleOpenEdit");
+    setEditId(id);
+    console.log(id);
+    const student = data.find((e) => e.id === id);
+    setNewStudent({
+      id: student.id,
+      name: student.name,
+      grade: student.grade,
+    });
+    setAddOpen(true);
+  };
+
+  const handleCloseEdit = () => {
+    console.log("handleCloseEdit");
+    setEditId("");
+    setNewStudent({
+      id: "",
+      name: "",
+      grade: "",
+    });
+    setAddOpen(false);
+  };
+
+  const handleOpenDelete = () => {
+    setDeleteOpen(true);
+  };
+
+  const handleCloseDelete = () => {
+    setDeleteOpen(false);
+  };
+
+  const handleAddStudent = () => {
     setData(data.concat(newStudent));
     StudentDataAPI.postStudentData([
       {
@@ -116,7 +186,7 @@ export default function StudentData() {
       },
     ])
       .then(() => {
-        console.log("post student data finish");
+        console.log("post student data finish new");
       })
       .catch(() => {});
     setNewStudent({
@@ -124,10 +194,103 @@ export default function StudentData() {
       name: "",
       grade: "",
     });
+    handleCloseAdd();
+  };
+
+  const handleEditStudent = () => {
+    setData(data.filter((e) => e.id !== editId).concat(newStudent));
+    StudentDataAPI.deleteStudentData([editId])
+      .then(() => {
+        console.log("delete student data finish in edit");
+      })
+      .catch(() => {});
+    StudentDataAPI.postStudentData([
+      {
+        userID: newStudent.id,
+        grade: Number(newStudent.grade),
+        password: "1112",
+        name: newStudent.name,
+        authority: 2,
+      },
+    ])
+      .then(() => {
+        console.log("post student data finish in edit");
+      })
+      .catch(() => {});
+    setNewStudent({
+      id: "",
+      name: "",
+      grade: "",
+    });
+    handleCloseAdd();
   };
 
   return (
     <Container className={classes.root}>
+      <Dialog
+        aria-labelledby="simple-dialog-title"
+        disableBackdropClick
+        open={addOpen}
+        onClose={handleCloseAdd}
+      >
+        <DialogTitle id="simple-dialog-title">Add Single Student</DialogTitle>
+        <DialogContent>
+          <TextField
+            id="userID"
+            label="userID"
+            type="text"
+            fullWidth
+            value={newStudent.id}
+            // error={newStudent.id}
+            onChange={(e) => {
+              setNewStudent({
+                ...newStudent,
+                id: e.target.value,
+              });
+            }}
+          />
+          <TextField
+            id="name"
+            label="name"
+            type="text"
+            fullWidth
+            value={newStudent.name}
+            // error={newStudent.name}
+            onChange={(e) => {
+              setNewStudent({
+                ...newStudent,
+                name: e.target.value,
+              });
+            }}
+          />
+          <TextField
+            id="grade"
+            label="grade"
+            type="text"
+            fullWidth
+            value={newStudent.grade}
+            // error={newStudent.grade}
+            onChange={(e) => {
+              setNewStudent({
+                ...newStudent,
+                grade: e.target.value,
+              });
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={editId === "" ? handleCloseAdd : handleCloseEdit}>
+            Cancel
+          </Button>
+          <Button
+            onClick={editId === "" ? handleAddStudent : handleEditStudent}
+            variant="contained"
+            color="primary"
+          >
+            {editId === "" ? "Add" : "Edit"}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Grid
         container
         spacing={1}
@@ -191,11 +354,15 @@ export default function StudentData() {
         </Grid> */}
         {/* <Grid item sm={12} md={9}> */}
         <Grid item sm={12}>
-          <StudentTable data={data} handleDelete={handleDelete} />
+          <StudentTable
+            data={data}
+            handleEdit={handleOpenEdit}
+            handleDelete={handleDelete}
+          />
         </Grid>
-        <Hidden smDown>
+        {/* <Hidden smDown>
           <Grid item md={3} />
-        </Hidden>
+        </Hidden> */}
         <Grid item sm={12} md={9}>
           <Typography variant="h6">Add Single Student</Typography>
           <Grid
@@ -219,7 +386,7 @@ export default function StudentData() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => onAddStudent()}
+                onClick={handleOpenAdd}
               >
                 Add
               </Button>
