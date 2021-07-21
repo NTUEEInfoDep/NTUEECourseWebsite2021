@@ -6,6 +6,7 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import Drawer from "./containers/drawer";
 import Main from "./containers/main";
 import Courses from "./containers/courses";
+import Selection from "./containers/selection";
 import Login from "./containers/login";
 import StudentData from "./containers/studentData";
 import CourseManage from "./containers/courseManage";
@@ -36,6 +37,9 @@ const Routes = () => {
       <PublicRoute exact path="/courses">
         <Courses />
       </PublicRoute>
+      <PrivateRoute exact path="/selection/:courseId">
+        <Selection />
+      </PrivateRoute>
       <LoginRoute exact path="/login">
         <Login />
       </LoginRoute>
