@@ -27,37 +27,80 @@
 //     options: PropTypes.arrayOf(PropTypes.string).isRequired,
 //   }).isRequired,
 // };
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
-import initialData from "./initial-data";
+import { useParams } from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
+// import initialData from "./initial-data";
 import Column from "./column";
+import { SelectAPI } from "../../api";
+import Loading from "../../components/loading";
 
-const Selection = (courseName) => {
+const useStyles = makeStyles({
+  styledColumns: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    margin: "10vh auto",
+    width: "80%",
+    height: "80vh",
+    gap: "8px",
+  },
+});
+const Selection = () => {
   // const selected = courseName.selected;
   // const unselected = courseName.unselected;
   // const handleSelectCourse = (selectedID) => {
   //   setSelectedCourse(courses.find(({ courseID }) => courseID === selectedID));
   // };
-  const [columns, setColumns] = useState(initialData);
+  const { courseId } = useParams();
+  const [data, setData] = useState(null);
+  // const [columns, setColumns] = useState(initialData);
+  const classes = useStyles();
 
-  function handleSelection(course) {
-    setColumns((state) => [
-      {
-        ...state[0],
-        // optionIds: state.courses.find(({ id }) => id === selectedID)
-        //   .optionIds,
-        optionIds: course.selected,
-      },
-      {
-        ...state[1],
-        optionIds: course.unselected,
-      },
-    ]);
-  }
-  handleSelection(courseName);
+  useEffect(async () => {
+    try {
+      const res = await SelectAPI.getSelections(courseId);
+      setData(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []); // only run the first time
+  // const { name, type, description, selected, unselected } = data;
+  // return (
+  //   <>
+  //     {data ? (
+  //       <div>
+  //         <h1>Thisa is course Selection page</h1>
+  //         {courseId}
+  //         {data.description}
+  //         {data.name}
+  //         {data.selected}
+  //         {}
+  //       </div>
+  //     ) : (
+  //       Loading
+  //     )}
+  //   </>
+  // );
+
+  // function handleSelection(course) {
+  //   setColumns((state) => [
+  //     {
+  //       ...state[0],
+  //       // optionIds: state.courses.find(({ id }) => id === selectedID)
+  //       //   .optionIds,
+  //     },
+  //     {
+  //       ...state[1],
+  //       optionIds: course.unselected,
+  //     },
+  //   ]);
+  // }
+  // // console.log(data);
+  // handleSelection(data);
 
   const onDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source } = result;
 
     if (!destination) {
       return;
@@ -69,55 +112,148 @@ const Selection = (courseName) => {
     ) {
       return;
     }
+    const newSelection = {
+      selected: [...data.selected],
+      unselected: [...data.unselected],
+    };
+    const [remove] = newSelection[source.droppableId].splice(source.index, 1);
+    newSelection[destination.droppableId].splice(destination.index, 0, remove);
+    setData((state) => ({
+      ...state,
+      selected: newSelection.selected,
+      unselected: newSelection.unselected,
+    }));
+    // const startcolumn = columns[source.droppableId];
+    // const endcolumn = columns[destination.droppableId];
 
-    const startcolumn = columns[source.droppableId];
-    const endcolumn = columns[destination.droppableId];
+    //   if (startcolumn === endcolumn) {
+    //     const newOptionIds = Array.from(startcolumn.optionIds);
+    //     newOptionIds.splice(source.index, 1);
+    //     newOptionIds.splice(destination.index, 0, draggableId);
 
-    if (startcolumn === endcolumn) {
-      const newOptionIds = Array.from(startcolumn.optionIds);
-      newOptionIds.splice(source.index, 1);
-      newOptionIds.splice(destination.index, 0, draggableId);
+    //     const newColumn = {
+    //       ...startcolumn,
+    //       optionIds: newOptionIds,
+    //     };
+    //     if (source.droppableId === 0) {
+    //       setColumns((state) => [newColumn, ...state[1]]);
+    //     } else {
+    //       setColumns((state) => [...state[0], newColumn]);
+    //     }
+    //   } else {
+    //     const newOptionIds = Array.from(startcolumn.optionIds);
+    //     newOptionIds.splice(source.index, 1);
 
-      const newColumn = {
-        ...startcolumn,
-        optionIds: newOptionIds,
-      };
-      if (source.droppableId === 0) {
-        setColumns((state) => [newColumn, { ...state[1] }]);
-      } else {
-        setColumns((state) => [{ ...state[0] }, newColumn]);
-      }
-    } else {
-      const newOptionIds = Array.from(startcolumn.optionIds);
-      newOptionIds.splice(source.index, 1);
-
-      const newStartCol = {
-        ...startcolumn,
-        courseIds: newOptionIds,
-      };
-      const newEnd = Array.from(endcolumn.optionIds);
-      newEnd.splice(destination.index, 0, newOptionIds[source.index]);
-      const newEndCol = {
-        ...endcolumn,
-        optionIds: newEnd,
-      };
-      if (source.droppableId === 0) {
-        setColumns(() => [newStartCol, newEndCol]);
-      } else {
-        setColumns(() => [newEndCol, newStartCol]);
-      }
-    }
+    //     const newStartCol = {
+    //       ...startcolumn,
+    //       optionIds: newOptionIds,
+    //     };
+    //     const newEnd = Array.from(endcolumn.optionIds);
+    //     newEnd.splice(destination.index, 0, newOptionIds[source.index]);
+    //     const newEndCol = {
+    //       ...endcolumn,
+    //       optionIds: newEnd,
+    //     };
+    //     if (source.droppableId === 0) {
+    //       setColumns(() => [newStartCol, newEndCol]);
+    //     } else {
+    //       setColumns(() => [newEndCol, newStartCol]);
+    //     }
+    //   }
   };
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      {columns.map((column) => {
-        // const column = columns.columnId;
-        // const options = column.optionIds; // .map((courseId) => courses[courseId]);
-        return (
-          <Column key={column.id} column={column} options={column.optionIds} />
-        );
-      })}
-    </DragDropContext>
+    <>
+      {data ? (
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className={classes.styledColumns}>
+            <Column key="selected" title="selected" column={data.selected} />
+            <Column
+              key="unselected"
+              title="unselected"
+              column={data.unselected}
+            />
+          </div>
+        </DragDropContext>
+      ) : (
+        Loading
+      )}
+    </>
   );
 };
 export default Selection;
+// const onDragEnd = (result) => {
+//   const { destination, source, draggableId } = result;
+
+//   if (!destination) {
+//     return;
+//   }
+
+//   if (
+//     destination.droppableId === source.droppableId &&
+//     destination.index === source.index
+//   ) {
+//     return;
+//   }
+
+//   const startcolumn = columns[source.droppableId];
+//   const endcolumn = columns[destination.droppableId];
+
+//   if (startcolumn === endcolumn) {
+//     const newOptionIds = Array.from(startcolumn.optionIds);
+//     newOptionIds.splice(source.index, 1);
+//     newOptionIds.splice(destination.index, 0, draggableId);
+
+//     const newColumn = {
+//       ...startcolumn,
+//       optionIds: newOptionIds,
+//     };
+//     if (source.droppableId === 0) {
+//       setColumns((state) => [newColumn, ...state[1]]);
+//     } else {
+//       setColumns((state) => [...state[0], newColumn]);
+//     }
+//   } else {
+//     const newOptionIds = Array.from(startcolumn.optionIds);
+//     newOptionIds.splice(source.index, 1);
+
+//     const newStartCol = {
+//       ...startcolumn,
+//       optionIds: newOptionIds,
+//     };
+//     const newEnd = Array.from(endcolumn.optionIds);
+//     newEnd.splice(destination.index, 0, newOptionIds[source.index]);
+//     const newEndCol = {
+//       ...endcolumn,
+//       optionIds: newEnd,
+//     };
+//     if (source.droppableId === 0) {
+//       setColumns(() => [newStartCol, newEndCol]);
+//     } else {
+//       setColumns(() => [newEndCol, newStartCol]);
+//     }
+//   }
+// };
+// return (
+//   <>
+//     {data ? (
+//       <DragDropContext onDragEnd={onDragEnd}>
+//         <div className={classes.styledColumns}>
+//           {columns.map((column) => {
+//             // const column = columns.columnId;
+//             // const options = column.optionIds; // .map((courseId) => courses[courseId]);
+//             return (
+//               <Column
+//                 key={column.id}
+//                 column={column}
+//                 options={column.optionIds}
+//               />
+//             );
+//           })}
+//         </div>
+//       </DragDropContext>
+//     ) : (
+//       Loading
+//     )}
+//   </>
+// );
+// };
