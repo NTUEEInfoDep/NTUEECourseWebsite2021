@@ -28,10 +28,11 @@ const useStyles = makeStyles({
     textAlign: "center",
   },
 });
-const Column = ({ columnId, title, column }) => {
+const Column = (props) => {
+  const { columnId, title, column } = props;
   const classes = useStyles();
   return (
-    <Droppable droppableId={columnId}>
+    <Droppable droppableId={title}>
       {(provided) => (
         <div className={classes.styledColumn}>
           <h2>{title}</h2>

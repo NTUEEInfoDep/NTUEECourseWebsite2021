@@ -123,43 +123,6 @@ const Selection = () => {
       selected: newSelection.selected,
       unselected: newSelection.unselected,
     }));
-    // const startcolumn = columns[source.droppableId];
-    // const endcolumn = columns[destination.droppableId];
-
-    //   if (startcolumn === endcolumn) {
-    //     const newOptionIds = Array.from(startcolumn.optionIds);
-    //     newOptionIds.splice(source.index, 1);
-    //     newOptionIds.splice(destination.index, 0, draggableId);
-
-    //     const newColumn = {
-    //       ...startcolumn,
-    //       optionIds: newOptionIds,
-    //     };
-    //     if (source.droppableId === 0) {
-    //       setColumns((state) => [newColumn, ...state[1]]);
-    //     } else {
-    //       setColumns((state) => [...state[0], newColumn]);
-    //     }
-    //   } else {
-    //     const newOptionIds = Array.from(startcolumn.optionIds);
-    //     newOptionIds.splice(source.index, 1);
-
-    //     const newStartCol = {
-    //       ...startcolumn,
-    //       optionIds: newOptionIds,
-    //     };
-    //     const newEnd = Array.from(endcolumn.optionIds);
-    //     newEnd.splice(destination.index, 0, newOptionIds[source.index]);
-    //     const newEndCol = {
-    //       ...endcolumn,
-    //       optionIds: newEnd,
-    //     };
-    //     if (source.droppableId === 0) {
-    //       setColumns(() => [newStartCol, newEndCol]);
-    //     } else {
-    //       setColumns(() => [newEndCol, newStartCol]);
-    //     }
-    //   }
   };
   return (
     <>

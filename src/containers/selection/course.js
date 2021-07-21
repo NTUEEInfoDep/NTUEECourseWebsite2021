@@ -19,10 +19,11 @@ const useStyles = makeStyles({
     },
   },
 });
-const Course = ({ courseId, course, index }) => {
+const Course = (props) => {
+  const { courseId, course, index } = props;
   const classes = useStyles();
   return (
-    <Draggable draggableId={courseId} index={index}>
+    <Draggable draggableId={course} index={index}>
       {(provided) => (
         <div
           className={classes.styledCourse}
