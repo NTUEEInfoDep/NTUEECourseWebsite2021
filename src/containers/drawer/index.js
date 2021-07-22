@@ -68,13 +68,6 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   drawerOpen: {
-    [theme.breakpoints.down("sm")]: {
-      height: 260,
-      transition: theme.transitions.create("height", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    },
     [theme.breakpoints.up("sm")]: {
       width: drawerWidth,
       transition: theme.transitions.create("width", {
@@ -87,13 +80,6 @@ const useStyles = makeStyles((theme) => ({
     overflowX: "hidden",
     overflowY: "hidden",
     width: theme.spacing(0),
-    [theme.breakpoints.down("sm")]: {
-      height: 0,
-      transition: theme.transitions.create("height", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-    },
     [theme.breakpoints.up("sm")]: {
       width: theme.spacing(0) + 1,
       transition: theme.transitions.create("width", {
@@ -135,8 +121,6 @@ const useStyles = makeStyles((theme) => ({
   },
   offset: theme.mixins.toolbar,
 }));
-
-//
 
 const Drawer = ({ children }) => {
   const { isLogin, authority } = useSelector(selectSession);
