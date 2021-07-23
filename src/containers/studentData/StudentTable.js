@@ -390,12 +390,16 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
                         >
                           <EditIcon />
                         </IconButton>
-                        <IconButton
-                          onClick={() => handleDelete([row.id])}
-                          className={classes.icon}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
+                        {selected.length === 0 ? (
+                          <IconButton
+                            onClick={() => handleDelete([row.id])}
+                            className={classes.icon}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )}
                       </TableCell>
                     </TableRow>
                   );

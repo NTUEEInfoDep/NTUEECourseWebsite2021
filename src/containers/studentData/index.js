@@ -71,6 +71,7 @@ export default function StudentData() {
   const [addOpen, setAddOpen] = React.useState(false);
   const [editId, setEditId] = React.useState("");
   const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [deleteIds, setDeleteIds] = React.useState([]);
   const [newStudent, setNewStudent] = React.useState({
     id: "",
     name: "",
@@ -105,21 +106,8 @@ export default function StudentData() {
     }
   };
 
-  const handleUpdate = () => {
-    console.log("to be complete");
-  };
-
   const handleDownload = () => {
     console.log("to be complete");
-  };
-
-  const handleDelete = (ids) => {
-    StudentDataAPI.deleteStudentData(ids)
-      .then(() => {
-        setData(data.filter((student) => !ids.includes(student.id)));
-        console.log("delete student data finish");
-      })
-      .catch(() => {});
   };
 
   const handleOpenAdd = () => {
@@ -166,7 +154,8 @@ export default function StudentData() {
     setAddOpen(false);
   };
 
-  const handleOpenDelete = () => {
+  const handleOpenDelete = (ids) => {
+    setDeleteIds(ids);
     setDeleteOpen(true);
   };
 
@@ -223,6 +212,17 @@ export default function StudentData() {
       grade: "",
     });
     handleCloseAdd();
+  };
+
+  const handleDeleteStudent = () => {
+    console.log(deleteIds);
+    // StudentDataAPI.deleteStudentData(deleteIds)
+    //   .then(() => {
+    //     setData(data.filter((student) => !deleteIds.includes(student.id)));
+    //     console.log("delete student data finish : ");
+    //     console.log(deleteIds);
+    //   })
+    //   .catch(() => {});
   };
 
   return (
@@ -291,6 +291,31 @@ export default function StudentData() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Dialog
+        aria-labelledby="simple-dialog-title"
+        disableBackdropClick
+        open={deleteOpen}
+        onClose={handleCloseDelete}
+      >
+        <DialogTitle id="simple-dialog-title">
+          Are you sure to delete {deleteIds.length} students?
+        </DialogTitle>
+        <DialogContent>
+          {deleteIds.map((e) => (
+            <Typography key={e}>{e}</Typography>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDelete}>Cancel</Button>
+          <Button
+            onClick={handleDeleteStudent}
+            variant="contained"
+            color="primary"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Grid
         container
         spacing={1}
@@ -324,16 +349,6 @@ export default function StudentData() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => handleUpdate()}
-                startIcon={<CloudUploadIcon />}
-              >
-                Update
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
                 onClick={() => handleDownload()}
                 startIcon={<CloudDownloadIcon />}
               >
@@ -357,7 +372,7 @@ export default function StudentData() {
           <StudentTable
             data={data}
             handleEdit={handleOpenEdit}
-            handleDelete={handleDelete}
+            handleDelete={handleOpenDelete}
           />
         </Grid>
         {/* <Hidden smDown>
@@ -372,7 +387,7 @@ export default function StudentData() {
             alignItems="flex-start"
             direction="row"
           >
-            {["id", "name", "grade"].map((e) => (
+            {/* ["id", "name", "grade"].map((e) => (
               <Grid item key={e}>
                 <InputGrid
                   type={e}
@@ -380,7 +395,7 @@ export default function StudentData() {
                   setNewStudent={setNewStudent}
                 />
               </Grid>
-            ))}
+            )) */}
 
             <Grid item>
               <Button
