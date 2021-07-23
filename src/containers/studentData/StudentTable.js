@@ -140,10 +140,11 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, search, setSearch, handleDelete } = props;
+  const { numSelected, search, setSearch, handleDelete, setPage } = props;
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
+    setPage(0);
   };
 
   return (
@@ -324,6 +325,7 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
           numSelected={selected.length}
           search={search}
           setSearch={setSearch}
+          setPage={setPage}
           handleDelete={() => {
             handleDelete(selected);
           }}
