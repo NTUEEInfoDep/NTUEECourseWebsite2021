@@ -290,6 +290,7 @@
       "post": {
         "description": "Add new users",
         "requestBody": {
+          "description": "<h2>authority</h2> <b>2:</b> Admin<br> <b>1:</b> Maintainer<br> <b>0:</b> User",
           "required": true,
           "content": {
             "application/json": {
@@ -426,6 +427,7 @@
       "post": {
         "description": "Add new course",
         "requestBody": {
+          "description": "<h2>type</h2> <b>\"1\", \"2\", \"3\", \"4\":</b> 一,二,三,四年級必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗<br><b>\"EE-Lab\":</b> 電電實驗<br><h2>limit</h2>人數上限<br><h2>priority</h2><b>0:</b> 優先序與年級無關<br><b>-1:</b> 高年級優先<br><b>1,2,3,4:</b> 此年級優先<br><b>5:</b> 3,4年級優先<br>",
           "required": true,
           "content": {
             "application/json": {
@@ -529,6 +531,7 @@
       "put": {
         "description": "Change th content of the course",
         "requestBody": {
+          "description": "<h2>type</h2> <b>\"1\", \"2\", \"3\", \"4\":</b> 一,二,三,四年級必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗<br><b>\"EE-Lab\":</b> 電電實驗<br><h2>limit</h2>人數上限<br><h2>priority</h2><b>0:</b> 優先序與年級無關<br><b>-1:</b> 高年級優先<br><b>1,2,3,4:</b> 此年級優先<br><b>5:</b> 3,4年級優先<br>",
           "required": true,
           "content": {
             "application/json": {
@@ -614,6 +617,7 @@
       "put": {
         "description": "Change someone's authority",
         "requestBody": {
+          "description": "<h2>authority</h2> <b>2:</b> Admin<br> <b>1:</b> Maintainer<br> <b>0:</b> User",
           "required": true,
           "content": {
             "application/json": {
