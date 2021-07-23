@@ -55,6 +55,13 @@ const headCells = [
   { id: "id", numeric: false, disablePadding: false, label: "id" },
   { id: "name", numeric: false, disablePadding: false, label: "name" },
   { id: "grade", numeric: false, disablePadding: false, label: "grade" },
+  {
+    id: "authority",
+    numeric: false,
+    disablePadding: false,
+    label: "authority",
+  },
+  { id: "password", numeric: false, disablePadding: false, label: "password" },
 ];
 
 function EnhancedTableHead(props) {
@@ -297,7 +304,7 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
   // change page
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    console.log(data);
+    // console.log(data);
   };
 
   // change rows per page
@@ -384,6 +391,12 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
                       </TableCell>
                       <TableCell align="left" className={classes.tablecell}>
                         {row.grade}
+                      </TableCell>
+                      <TableCell align="left" className={classes.tablecell}>
+                        {row.authority}
+                      </TableCell>
+                      <TableCell align="left" className={classes.tablecell}>
+                        {row.password}
                       </TableCell>
                       <TableCell className={classes.tablecell}>
                         <IconButton

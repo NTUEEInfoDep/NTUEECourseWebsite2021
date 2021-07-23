@@ -44,21 +44,21 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function InputGrid({ type, newStudent, setNewStudent }) {
-  return (
-    <Input
-      value={newStudent[type]}
-      name={type}
-      placeholder={type}
-      onChange={(e) => {
-        setNewStudent({
-          ...newStudent,
-          [type]: e.target.value,
-        });
-      }}
-    />
-  );
-}
+// function InputGrid({ type, newStudent, setNewStudent }) {
+//   return (
+//     <Input
+//       value={newStudent[type]}
+//       name={type}
+//       placeholder={type}
+//       onChange={(e) => {
+//         setNewStudent({
+//           ...newStudent,
+//           [type]: e.target.value,
+//         });
+//       }}
+//     />
+//   );
+// }
 
 /**
  * This is Student Data Page
@@ -76,16 +76,19 @@ export default function StudentData() {
     id: false,
     name: false,
     grade: false,
+    authority: false,
   });
   const [errorsMsg, setErrorsMsg] = React.useState({
     id: "",
     name: "",
     grade: "",
+    authority: "",
   });
   const [newStudent, setNewStudent] = React.useState({
     id: "",
     name: "",
     grade: "",
+    authority: "",
   });
 
   useEffect(() => {
@@ -97,28 +100,30 @@ export default function StudentData() {
       .catch(() => {});
   }, []);
 
-  const handleTest = () => {
-    console.log(data);
-  };
+  // const handleTest = () => {
+  //   console.log(data);
+  // };
 
-  const handleUpload = async (efile) => {
-    if (efile) {
-      Papa.parse(efile, {
-        skipEmptyLines: true,
-        complete(results) {
-          const newData = results.data.reduce((obj, cur) => {
-            return obj.concat([{ id: cur[0], name: cur[1], grade: cur[2] }]);
-          }, []);
-          setData(data.concat(newData));
-          setLoaded(true);
-        },
-      });
-    }
-  };
+  // const handleUpload = async (efile) => {
+  //   if (efile) {
+  //     Papa.parse(efile, {
+  //       skipEmptyLines: true,
+  //       complete(results) {
+  //         const newData = results.data.reduce((obj, cur) => {
+  //           return obj.concat([
+  //             { id: cur[0], name: cur[1], grade: cur[2], authority: cur[3] },
+  //           ]);
+  //         }, []);
+  //         setData(data.concat(newData));
+  //         setLoaded(true);
+  //       },
+  //     });
+  //   }
+  // };
 
-  const handleDownload = () => {
-    console.log("to be complete");
-  };
+  // const handleDownload = () => {
+  //   console.log("to be complete");
+  // };
 
   const handleOpenAdd = () => {
     console.log("handleOpenAdd");
@@ -126,16 +131,19 @@ export default function StudentData() {
       id: "",
       name: "",
       grade: "",
+      authority: "",
     });
     setErrors({
       id: true,
       name: true,
       grade: true,
+      authority: true,
     });
     setErrorsMsg({
       id: "",
       name: "",
       grade: "",
+      authority: "",
     });
     setAddOpen(true);
   };
@@ -146,16 +154,19 @@ export default function StudentData() {
       id: "",
       name: "",
       grade: "",
+      authority: "",
     });
     setErrors({
       id: false,
       name: false,
       grade: false,
+      authority: false,
     });
     setErrorsMsg({
       id: "",
       name: "",
       grade: "",
+      authority: "",
     });
     setAddOpen(false);
   };
@@ -169,16 +180,19 @@ export default function StudentData() {
       id: student.id,
       name: student.name,
       grade: student.grade,
+      authority: student.authority,
     });
     setErrors({
       id: false,
       name: false,
       grade: false,
+      authority: false,
     });
     setErrorsMsg({
       id: "",
       name: "",
       grade: "",
+      authority: "",
     });
     setAddOpen(true);
   };
@@ -190,16 +204,19 @@ export default function StudentData() {
       id: "",
       name: "",
       grade: "",
+      authority: "",
     });
     setErrors({
       id: false,
       name: false,
       grade: false,
+      authority: false,
     });
     setErrorsMsg({
       id: "",
       name: "",
       grade: "",
+      authority: "",
     });
     setAddOpen(false);
   };
@@ -258,6 +275,23 @@ export default function StudentData() {
     }
   };
 
+  const onAuthorityChange = (e) => {
+    setNewStudent({
+      ...newStudent,
+      authority: e.target.value,
+    });
+    if (!e.target.value.length) {
+      setErrors({ ...errors, authority: true });
+      setErrorsMsg({ ...errors, authority: "authority should not be empty" });
+    } else if (!/^[012]$/.test(e.target.value)) {
+      setErrors({ ...errors, authority: true });
+      setErrorsMsg({ ...errors, authority: "authority should be a 0, 1 or 2" });
+    } else {
+      setErrors({ ...errors, authority: false });
+      setErrorsMsg({ ...errors, authority: "" });
+    }
+  };
+
   const handleAddStudent = () => {
     setData(data.concat(newStudent));
     StudentDataAPI.postStudentData([
@@ -266,7 +300,7 @@ export default function StudentData() {
         grade: Number(newStudent.grade),
         password: "1112",
         name: newStudent.name,
-        authority: 2,
+        authority: newStudent.authority,
       },
     ])
       .then(() => {
@@ -277,6 +311,7 @@ export default function StudentData() {
       id: "",
       name: "",
       grade: "",
+      authority: "",
     });
     handleCloseAdd();
   };
@@ -294,7 +329,7 @@ export default function StudentData() {
         grade: Number(newStudent.grade),
         password: "1112",
         name: newStudent.name,
-        authority: 2,
+        authority: newStudent.authority,
       },
     ])
       .then(() => {
@@ -305,19 +340,20 @@ export default function StudentData() {
       id: "",
       name: "",
       grade: "",
+      authority: "",
     });
     handleCloseAdd();
   };
 
   const handleDeleteStudent = () => {
     console.log(deleteIds);
-    // StudentDataAPI.deleteStudentData(deleteIds)
-    //   .then(() => {
-    //     setData(data.filter((student) => !deleteIds.includes(student.id)));
-    //     console.log("delete student data finish : ");
-    //     console.log(deleteIds);
-    //   })
-    //   .catch(() => {});
+    StudentDataAPI.deleteStudentData(deleteIds)
+      .then(() => {
+        setData(data.filter((student) => !deleteIds.includes(student.id)));
+        console.log("delete student data finish : ");
+        console.log(deleteIds);
+      })
+      .catch(() => {});
   };
 
   return (
@@ -360,6 +396,16 @@ export default function StudentData() {
             onChange={onGradeChange}
             helperText={errorsMsg.grade}
           />
+          <TextField
+            id="authority"
+            label="authority"
+            type="text"
+            fullWidth
+            value={newStudent.authority}
+            error={errors.authority}
+            onChange={onAuthorityChange}
+            helperText={errorsMsg.authority}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={editId === "" ? handleCloseAdd : handleCloseEdit}>
@@ -389,7 +435,8 @@ export default function StudentData() {
             <Typography key={id}>
               {`id: ${data.find((e) => e.id === id).id}, 
               name: ${data.find((e) => e.id === id).name},
-              grade: ${data.find((e) => e.id === id).grade}`}
+              grade: ${data.find((e) => e.id === id).grade},
+              authority: ${data.find((e) => e.id === id).authority}`}
             </Typography>
           ))}
         </DialogContent>
