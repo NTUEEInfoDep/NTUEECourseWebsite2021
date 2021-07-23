@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { useHistory } from "react-router";
 // material-ui
 import { Grid, Toolbar, InputBase, Tabs, Tab, Paper } from "@material-ui/core";
 import { fade, makeStyles } from "@material-ui/core/styles";
@@ -7,7 +7,7 @@ import SearchIcon from "@material-ui/icons/Search";
 
 // components
 import Course from "./course";
-import Selection from "./selection";
+import Selection from "../selection";
 
 // api
 import { CourseAPI } from "../../api";
@@ -78,6 +78,7 @@ const gradeData = [
  */
 export default function Courses() {
   const classes = useStyles();
+  const history = useHistory();
   // get courses
   const grades = gradeData;
   const [courses, setCourses] = useState([]);
@@ -96,8 +97,11 @@ export default function Courses() {
 
   // select course
   const [selectedCourse, setSelectedCourse] = useState(null);
+  // const handleSelectCourse = (selectedID) => {
+  //   setSelectedCourse(courses.find(({ id }) => id === selectedID));
+  // };
   const handleSelectCourse = (selectedID) => {
-    setSelectedCourse(courses.find(({ id }) => id === selectedID));
+    history.push(`/selection/${selectedID}`); // setSelectedCourse(courses.find(({ id }) => id === selectedID));
   };
 
   return (

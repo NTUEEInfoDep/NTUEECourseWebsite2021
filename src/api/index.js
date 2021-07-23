@@ -37,3 +37,6 @@ export const StudentDataAPI = {
   postStudentData: (users) => axios.post(`/api/users`, users),
   deleteStudentData: (ids) => axios.delete(`/api/users`, { data: [...ids] }),
 };
+export const SelectAPI = {
+  getSelections: (courseID) => axios.get(`/api/selections/${courseID}`),
+};
