@@ -77,6 +77,11 @@ export default function StudentData() {
     name: false,
     grade: false,
   });
+  const [errorsMsg, setErrorsMsg] = React.useState({
+    id: "",
+    name: "",
+    grade: "",
+  });
   const [newStudent, setNewStudent] = React.useState({
     id: "",
     name: "",
@@ -122,7 +127,16 @@ export default function StudentData() {
       name: "",
       grade: "",
     });
-    setErrors({});
+    setErrors({
+      id: true,
+      name: true,
+      grade: true,
+    });
+    setErrorsMsg({
+      id: "",
+      name: "",
+      grade: "",
+    });
     setAddOpen(true);
   };
 
@@ -133,7 +147,16 @@ export default function StudentData() {
       name: "",
       grade: "",
     });
-    setErrors({});
+    setErrors({
+      id: false,
+      name: false,
+      grade: false,
+    });
+    setErrorsMsg({
+      id: "",
+      name: "",
+      grade: "",
+    });
     setAddOpen(false);
   };
 
@@ -147,7 +170,16 @@ export default function StudentData() {
       name: student.name,
       grade: student.grade,
     });
-    setErrors({});
+    setErrors({
+      id: false,
+      name: false,
+      grade: false,
+    });
+    setErrorsMsg({
+      id: "",
+      name: "",
+      grade: "",
+    });
     setAddOpen(true);
   };
 
@@ -159,7 +191,16 @@ export default function StudentData() {
       name: "",
       grade: "",
     });
-    setErrors({});
+    setErrors({
+      id: false,
+      name: false,
+      grade: false,
+    });
+    setErrorsMsg({
+      id: "",
+      name: "",
+      grade: "",
+    });
     setAddOpen(false);
   };
 
@@ -177,8 +218,13 @@ export default function StudentData() {
       ...newStudent,
       id: e.target.value,
     });
-    if (!e.target.value.length) setErrors({ ...errors, id: true });
-    else setErrors({ ...errors, id: false });
+    if (!e.target.value.length) {
+      setErrors({ ...errors, id: true });
+      setErrorsMsg({ ...errors, id: "id should not be empty" });
+    } else {
+      setErrors({ ...errors, id: false });
+      setErrorsMsg({ ...errors, id: "" });
+    }
   };
 
   const onNameChange = (e) => {
@@ -186,8 +232,13 @@ export default function StudentData() {
       ...newStudent,
       name: e.target.value,
     });
-    if (!e.target.value.length) setErrors({ ...errors, name: true });
-    else setErrors({ ...errors, name: false });
+    if (!e.target.value.length) {
+      setErrors({ ...errors, name: true });
+      setErrorsMsg({ ...errors, name: "name should not be empty" });
+    } else {
+      setErrors({ ...errors, name: false });
+      setErrorsMsg({ ...errors, name: "" });
+    }
   };
 
   const onGradeChange = (e) => {
@@ -195,10 +246,16 @@ export default function StudentData() {
       ...newStudent,
       grade: e.target.value,
     });
-    if (!e.target.value.length) setErrors({ ...errors, grade: true });
-    else if (!/^\d+$/.test(e.target.value))
+    if (!e.target.value.length) {
       setErrors({ ...errors, grade: true });
-    else setErrors({ ...errors, grade: false });
+      setErrorsMsg({ ...errors, grade: "grade should not be empty" });
+    } else if (!/^\d+$/.test(e.target.value)) {
+      setErrors({ ...errors, grade: true });
+      setErrorsMsg({ ...errors, grade: "grade should be a number" });
+    } else {
+      setErrors({ ...errors, grade: false });
+      setErrorsMsg({ ...errors, grade: "" });
+    }
   };
 
   const handleAddStudent = () => {
@@ -281,6 +338,7 @@ export default function StudentData() {
             value={newStudent.id}
             error={errors.id}
             onChange={onIdChange}
+            helperText={errorsMsg.id}
           />
           <TextField
             id="name"
@@ -290,6 +348,7 @@ export default function StudentData() {
             value={newStudent.name}
             error={errors.name}
             onChange={onNameChange}
+            helperText={errorsMsg.name}
           />
           <TextField
             id="grade"
@@ -299,6 +358,7 @@ export default function StudentData() {
             value={newStudent.grade}
             error={errors.grade}
             onChange={onGradeChange}
+            helperText={errorsMsg.grade}
           />
         </DialogContent>
         <DialogActions>
@@ -309,6 +369,7 @@ export default function StudentData() {
             onClick={editId === "" ? handleAddStudent : handleEditStudent}
             variant="contained"
             color="primary"
+            disabled={errors.id || errors.name || errors.grade}
           >
             {editId === "" ? "Add" : "Edit"}
           </Button>
