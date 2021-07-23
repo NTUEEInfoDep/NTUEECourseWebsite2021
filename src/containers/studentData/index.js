@@ -72,6 +72,11 @@ export default function StudentData() {
   const [editId, setEditId] = React.useState("");
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [deleteIds, setDeleteIds] = React.useState([]);
+  const [errors, setErrors] = React.useState({
+    id: false,
+    name: false,
+    grade: false,
+  });
   const [newStudent, setNewStudent] = React.useState({
     id: "",
     name: "",
@@ -117,6 +122,7 @@ export default function StudentData() {
       name: "",
       grade: "",
     });
+    setErrors({});
     setAddOpen(true);
   };
 
@@ -127,6 +133,7 @@ export default function StudentData() {
       name: "",
       grade: "",
     });
+    setErrors({});
     setAddOpen(false);
   };
 
@@ -140,6 +147,7 @@ export default function StudentData() {
       name: student.name,
       grade: student.grade,
     });
+    setErrors({});
     setAddOpen(true);
   };
 
@@ -151,6 +159,7 @@ export default function StudentData() {
       name: "",
       grade: "",
     });
+    setErrors({});
     setAddOpen(false);
   };
 
@@ -161,6 +170,35 @@ export default function StudentData() {
 
   const handleCloseDelete = () => {
     setDeleteOpen(false);
+  };
+
+  const onIdChange = (e) => {
+    setNewStudent({
+      ...newStudent,
+      id: e.target.value,
+    });
+    if (!e.target.value.length) setErrors({ ...errors, id: true });
+    else setErrors({ ...errors, id: false });
+  };
+
+  const onNameChange = (e) => {
+    setNewStudent({
+      ...newStudent,
+      name: e.target.value,
+    });
+    if (!e.target.value.length) setErrors({ ...errors, name: true });
+    else setErrors({ ...errors, name: false });
+  };
+
+  const onGradeChange = (e) => {
+    setNewStudent({
+      ...newStudent,
+      grade: e.target.value,
+    });
+    if (!e.target.value.length) setErrors({ ...errors, grade: true });
+    else if (!/^\d+$/.test(e.target.value))
+      setErrors({ ...errors, grade: true });
+    else setErrors({ ...errors, grade: false });
   };
 
   const handleAddStudent = () => {
@@ -241,13 +279,8 @@ export default function StudentData() {
             type="text"
             fullWidth
             value={newStudent.id}
-            // error={newStudent.id}
-            onChange={(e) => {
-              setNewStudent({
-                ...newStudent,
-                id: e.target.value,
-              });
-            }}
+            error={errors.id}
+            onChange={onIdChange}
           />
           <TextField
             id="name"
@@ -255,13 +288,8 @@ export default function StudentData() {
             type="text"
             fullWidth
             value={newStudent.name}
-            // error={newStudent.name}
-            onChange={(e) => {
-              setNewStudent({
-                ...newStudent,
-                name: e.target.value,
-              });
-            }}
+            error={errors.name}
+            onChange={onNameChange}
           />
           <TextField
             id="grade"
@@ -269,13 +297,8 @@ export default function StudentData() {
             type="text"
             fullWidth
             value={newStudent.grade}
-            // error={newStudent.grade}
-            onChange={(e) => {
-              setNewStudent({
-                ...newStudent,
-                grade: e.target.value,
-              });
-            }}
+            error={errors.grade}
+            onChange={onGradeChange}
           />
         </DialogContent>
         <DialogActions>
@@ -301,8 +324,12 @@ export default function StudentData() {
           Are you sure to delete {deleteIds.length} students?
         </DialogTitle>
         <DialogContent>
-          {deleteIds.map((e) => (
-            <Typography key={e}>{e}</Typography>
+          {deleteIds.map((id) => (
+            <Typography key={id}>
+              {`id: ${data.find((e) => e.id === id).id}, 
+              name: ${data.find((e) => e.id === id).name},
+              grade: ${data.find((e) => e.id === id).grade}`}
+            </Typography>
           ))}
         </DialogContent>
         <DialogActions>
@@ -379,7 +406,7 @@ export default function StudentData() {
           <Grid item md={3} />
         </Hidden> */}
         <Grid item sm={12} md={9}>
-          <Typography variant="h6">Add Single Student</Typography>
+          {/* <Typography variant="h6">Add Single Student</Typography> */}
           <Grid
             container
             spacing={1}
@@ -403,7 +430,7 @@ export default function StudentData() {
                 color="primary"
                 onClick={handleOpenAdd}
               >
-                Add
+                Add Single Student
               </Button>
             </Grid>
           </Grid>
