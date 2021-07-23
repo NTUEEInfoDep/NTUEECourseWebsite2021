@@ -17,6 +17,7 @@ class Option:
                 0:          Priority is not associate with the grade.
                 -1:         The higher grade students will have higher priority.
                 1,2,3,4:    Students in this grade will have higher priority.
+                5:          Students with grade 3 and 4 have higher priority.
 
         _selected: (list)
             Store the students who have been selected by this option.
@@ -49,6 +50,7 @@ class Option:
                             0:          Priority is not associate with the grade.
                             -1:         The higher grade students will have higher priority.
                             1,2,3,4:    Students in this grade will have higher priority.
+                            5:          Students with grade 3 and 4 have higher priority.
                 }
         '''
 
@@ -78,6 +80,9 @@ class Option:
         priority = 0
         if self._priority == -1:
             priority -= grade
+        elif self._priority == 5:
+            if grade == 3 or grade == 4:
+                priority -= 1
         elif grade == self._priority:
             priority -= 1
 
