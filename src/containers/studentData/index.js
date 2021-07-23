@@ -29,6 +29,19 @@ import StudentTable from "./StudentTable";
 
 import { StudentDataAPI } from "../../api";
 
+const characters =
+  "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789"; // no O, o, 0
+const charactersLength = characters.length;
+const passwordLength = 8;
+
+const genPassword = () => {
+  let result = "";
+  for (let i = 0; i < passwordLength; i += 1) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
@@ -290,17 +303,19 @@ export default function StudentData() {
       setErrors({ ...errors, authority: false });
       setErrorsMsg({ ...errors, authority: "" });
     }
+    console.log(newStudent);
   };
 
   const handleAddStudent = () => {
-    setData(data.concat(newStudent));
+    const password = genPassword();
+    setData(data.concat({ ...newStudent, password }));
     StudentDataAPI.postStudentData([
       {
         userID: newStudent.id,
         grade: Number(newStudent.grade),
-        password: "1112",
+        password,
         name: newStudent.name,
-        authority: newStudent.authority,
+        authority: Number(newStudent.authority),
       },
     ])
       .then(() => {
@@ -317,25 +332,37 @@ export default function StudentData() {
   };
 
   const handleEditStudent = () => {
-    setData(data.filter((e) => e.id !== editId).concat(newStudent));
+    const password = genPassword();
+    setData(
+      data.filter((e) => e.id !== editId).concat({ ...newStudent, password })
+    );
     StudentDataAPI.deleteStudentData([editId])
       .then(() => {
         console.log("delete student data finish in edit");
+        StudentDataAPI.postStudentData([
+          {
+            userID: newStudent.id,
+            grade: Number(newStudent.grade),
+            password,
+            name: newStudent.name,
+            authority: Number(newStudent.authority),
+          },
+        ])
+          .then(() => {
+            console.log("post student data finish in edit");
+          })
+          .catch(() => {});
       })
       .catch(() => {});
-    StudentDataAPI.postStudentData([
-      {
-        userID: newStudent.id,
-        grade: Number(newStudent.grade),
-        password: "1112",
-        name: newStudent.name,
-        authority: newStudent.authority,
-      },
-    ])
-      .then(() => {
-        console.log("post student data finish in edit");
-      })
-      .catch(() => {});
+
+    console.log({
+      userID: newStudent.id,
+      grade: Number(newStudent.grade),
+      password,
+      name: newStudent.name,
+      authority: Number(newStudent.authority),
+    });
+
     setNewStudent({
       id: "",
       name: "",
