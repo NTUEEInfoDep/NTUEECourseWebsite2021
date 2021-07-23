@@ -20,7 +20,7 @@
   {
     "id": "Electronic-Circuit",
     "name": "電路學",
-    "type": "Required",
+    "type": "1",
     "description": "",
     "options": [
       { "name": "老師A", "limit": 1 },
@@ -33,7 +33,7 @@
   {
     "id": "Electronics-two",
     "name": "電子學（二）",
-    "type": "Required",
+    "type": "2",
     "description": "",
     "options": [
       { "name": "老師F", "limit": 1 },
@@ -45,7 +45,7 @@
   {
     "id": "Electormagnetics-two",
     "name": "電磁學二",
-    "type": "Required",
+    "type": "2",
     "description": "",
     "options": [
       { "name": "老師J", "limit": 1 },
@@ -58,7 +58,7 @@
   {
     "id": "Signals-Systems",
     "name": "信號與系統",
-    "type": "Required",
+    "type": "2",
     "description": "",
     "options": [
       { "name": "老師O", "limit": 1 },
@@ -70,7 +70,7 @@
   {
     "id": "Probability-Statistics",
     "name": "機率與統計",
-    "type": "Required",
+    "type": "2",
     "description": "",
     "options": [
       { "name": "老師S", "limit": 1 },
@@ -81,7 +81,7 @@
   {
     "id": "Algorithm",
     "name": "演算法",
-    "type": "Required",
+    "type": "3",
     "description": "",
     "options": [{ "name": "老師V", "limit": 1 }]
   },
