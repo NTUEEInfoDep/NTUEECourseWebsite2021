@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
+import { Switch, BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "@material-ui/core/styles";
 // containers
 import Drawer from "./containers/drawer";
@@ -15,6 +15,7 @@ import theme from "./theme";
 import PublicRoute from "./components/routes/publicRoute";
 import PrivateRoute from "./components/routes/privateRoute";
 import LoginRoute from "./components/routes/loginRoute";
+import { Redirect } from "react-router";
 //initialize
 import { init } from "./slices/sessionSlice";
 //slices
@@ -49,6 +50,7 @@ const Routes = () => {
       <PrivateRoute exact path="/course-manage">
         <CourseManage />
       </PrivateRoute>
+      <Redirect to="/login" />
     </Switch>
   );
 };

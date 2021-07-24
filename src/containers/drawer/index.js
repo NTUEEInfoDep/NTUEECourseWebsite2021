@@ -26,8 +26,7 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp"; //Login
 import ClassIcon from "@material-ui/icons/Class"; //Courses
 import PeopleIcon from "@material-ui/icons/People"; //Student Data
 import CloudUploadIcon from "@material-ui/icons/CloudUpload"; //Course Manage
-import MeetingRoomIcon from "@material-ui/icons/MeetingRoom"; //Logout
-import Button from "@material-ui/core/Button";
+import OpenInNewIcon from "@material-ui/icons/OpenInNew"; //Logout
 // slices
 import { selectSession } from "../../slices/sessionSlice";
 //logout
@@ -91,6 +90,7 @@ const useStyles = makeStyles((theme) => ({
   menuButton: {
     marginRight: 36,
   },
+  iconButton: {},
   toolbar: {
     display: "flex",
     alignItems: "center",
@@ -123,7 +123,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Drawer = ({ children }) => {
-  const { isLogin, authority } = useSelector(selectSession);
+  const { isLogin, authority, userID } = useSelector(selectSession);
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -163,6 +163,8 @@ const Drawer = ({ children }) => {
         { text: "Courses", to: "/courses", icon: <ClassIcon /> },
       ];
 
+  const userName = isLogin ? userID : "";
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -195,15 +197,20 @@ const Drawer = ({ children }) => {
           >
             <KeyboardArrowUpIcon />
           </IconButton>
-          <Typography variant="h6" noWrap className={classes.appBarTypography}>
+          <Typography variant="h6" className={classes.appBarTypography}>
             NTUEE course pre-selection
           </Typography>
-          <Button
-            startIcon={<MeetingRoomIcon />}
+          <Typography varianr="h6">{userName}</Typography>
+          <IconButton
+            className={[
+              clsx(classes.iconButton, {
+                [classes.hide]: !isLogin,
+              }),
+            ]}
             onClick={() => dispatch(logout())}
           >
-            logout
-          </Button>
+            <OpenInNewIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
 

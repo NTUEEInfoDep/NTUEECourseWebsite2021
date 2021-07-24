@@ -60,4 +60,3 @@ docker-compose up -d
 cd ..
 npm run database reset
 npm run dev-server
-```

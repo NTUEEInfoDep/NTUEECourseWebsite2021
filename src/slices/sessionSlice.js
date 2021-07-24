@@ -32,9 +32,9 @@ export const sessionSlice = createSlice({
 export const init = () => async (dispatch) => {
   try {
     const session = await SessionAPI.getSession();
-    if (session.status == "200") {
-      dispatch(setInitialized());
+    if (session.status === 200) {
       dispatch(setLogin(session.data));
+      dispatch(setInitialized());
     }
   } catch (err) {
     dispatch(setInitialized());
