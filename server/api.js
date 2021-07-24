@@ -169,32 +169,45 @@ router
     })
   );
 
-router.route("/opentime").put(
-  express.json({ strict: false }),
-  permissionRequired(constants.AUTHORITY_ADMIN),
-  asyncHandler(async (req, res, next) => {
-    const { start } = req.body;
-    const { end } = req.body;
-    if (typeof start !== "number" || typeof end !== "number") {
-      res.status(400).end();
-      return;
-    }
-    if (start < 0 || end < 0) {
-      res.status(400).end();
-      return;
-    }
+router
+  .route("/opentime")
+  .get(
+    asyncHandler(async (req, res, next) => {
+      const start = await model.OpenTime.findOne({
+        type: constants.START_TIME_KEY,
+      });
+      const end = await model.OpenTime.findOne({
+        type: constants.END_TIME_KEY,
+      });
+      res.status(200).send({ start: start.time, end: end.time });
+    })
+  )
+  .put(
+    express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_ADMIN),
+    asyncHandler(async (req, res, next) => {
+      const { start } = req.body;
+      const { end } = req.body;
+      if (typeof start !== "number" || typeof end !== "number") {
+        res.status(400).end();
+        return;
+      }
+      if (start < 0 || end < 0) {
+        res.status(400).end();
+        return;
+      }
 
-    await model.OpenTime.updateOne(
-      { type: constants.START_TIME_KEY },
-      { time: start }
-    );
-    await model.OpenTime.updateOne(
-      { type: constants.END_TIME_KEY },
-      { time: end }
-    );
-    res.status(204).end();
-  })
-);
+      await model.OpenTime.updateOne(
+        { type: constants.START_TIME_KEY },
+        { time: start }
+      );
+      await model.OpenTime.updateOne(
+        { type: constants.END_TIME_KEY },
+        { time: end }
+      );
+      res.status(204).end();
+    })
+  );
 
 router.use(openTimeMiddleware).get(
   "/courses",
