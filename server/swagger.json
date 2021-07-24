@@ -11,10 +11,38 @@
       "description": "local environment"
     }
   ],
+  "tags": [
+    {
+      "name": "Session",
+      "description": "Everything about Logins"
+    },
+    {
+      "name": "Management",
+      "description": "other actions about system and users"
+    },
+    {
+      "name": "User",
+      "description": "Operations about users"
+    },
+    {
+      "name": "Course",
+      "description": "Get, add or delete courses"
+    },
+    {
+      "name": "Selection",
+      "description": "about selection of courses"
+    },
+    {
+      "name": "Distribution",
+      "description": "distribute the selection of courses and generate the result"
+    }
+  ],
   "paths": {
     "/session": {
       "get": {
-        "description": "Login",
+        "tags": ["Session"],
+        "summary": "get current login",
+        "description": "get current userID and authority",
         "responses": {
           "200": {
             "description": "Success",
@@ -37,12 +65,14 @@
             }
           },
           "403": {
-            "description": "Haven't login"
+            "description": "Hasn't login yet"
           }
         }
       },
       "post": {
-        "description": "Login",
+        "tags": ["Session"],
+        "summary": "log in",
+        "description": "log in",
         "requestBody": {
           "required": true,
           "content": {
@@ -64,12 +94,6 @@
           }
         },
         "responses": {
-          "400": {
-            "description": "Failed"
-          },
-          "401": {
-            "description": "Wrong password"
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -89,11 +113,19 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Failed, hasn't entered or can't find userID"
+          },
+          "401": {
+            "description": "Wrong password"
           }
         }
       },
       "delete": {
-        "description": "Log out",
+        "tags": ["Session"],
+        "summary": "log out",
+        "description": "delete session",
         "responses": {
           "204": {
             "description": "Success"
@@ -103,9 +135,11 @@
     },
     "/opentime": {
       "put": {
+        "tags": ["Management"],
+        "summary": "update open time",
         "description": "Change open time",
         "requestBody": {
-          "description": "Enter Unix timestamp",
+          "description": "Enter **Unix timestamp**",
           "required": true,
           "content": {
             "application/json": {
@@ -129,11 +163,11 @@
           "204": {
             "description": "Success"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "400": {
             "description": "Format error"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "503": {
             "$ref": "#/components/responses/503"
@@ -143,7 +177,9 @@
     },
     "/courses": {
       "get": {
-        "description": "Get all courses",
+        "tags": ["Course"],
+        "summary": "get a list of courses with selected attributes",
+        "description": "Get a list of all courses with selected attributes. <br/>Use query parameters to specify the attributes you want (id is default. Name, type, description and options are optional). <br/>For example, if you wanna get id, name and type, the request will be like \"http://localhost:8000/api/courses?name=1&type=1\"",
         "parameters": [
           {
             "name": "name",
@@ -198,11 +234,44 @@
                     "properties": {
                       "id": {
                         "type": "string"
+                      },
+                      "name (optional)": {
+                        "type": "string"
+                      },
+                      "type (optional)": {
+                        "type": "string"
+                      },
+                      "description (optional)": {
+                        "type": "string"
+                      },
+                      "options (optional)": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "limit": {
+                              "type": "number"
+                            },
+                            "priority (有些可能沒有這項）": {
+                              "type": "number"
+                            }
+                          }
+                        }
                       }
                     }
+                  }
+                },
+                "example": [
+                  {
+                    "id": "course1"
                   },
-                  "example": [{ "id": "course1" }, { "id": "course2" }]
-                }
+                  {
+                    "id": "course2"
+                  }
+                ]
               }
             }
           },
@@ -217,7 +286,9 @@
     },
     "/users": {
       "get": {
-        "description": "Get all users with query parameters",
+        "tags": ["User"],
+        "summary": "get a list of users with selected attributes",
+        "description": "Get a list of all users with optional attributes. <br/>Use query parameters to specify the attributes you want (id is default. Name, grade, authority are optional). <br/>For example, if you wanna get id, authority, and grade, the request will be like \"http://localhost:8000/api/users?grade=1&authority=1\"",
         "parameters": [
           {
             "name": "name",
@@ -254,7 +325,7 @@
           "200": {
             "description": "Success",
             "content": {
-              "application/json": {
+              "array of objects": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -273,9 +344,70 @@
                         "type": "number"
                       }
                     }
+                  }
+                },
+                "example": [
+                  {
+                    "id": "B22222222",
+                    "name": "C",
+                    "grade": 1,
+                    "authority": 1
                   },
-                  "example": "api/users/id?name?grade?authority"
-                }
+                  {
+                    "id": "B00000000",
+                    "name": "A",
+                    "grade": 2,
+                    "authority": 2
+                  },
+                  {
+                    "id": "B99999999",
+                    "name": "K",
+                    "grade": 1,
+                    "authority": 0
+                  },
+                  {
+                    "id": "B11111111",
+                    "name": "B",
+                    "grade": 3,
+                    "authority": 1
+                  },
+                  {
+                    "id": "B44444444",
+                    "name": "F",
+                    "grade": 4,
+                    "authority": 0
+                  },
+                  {
+                    "id": "B66666666",
+                    "name": "H",
+                    "grade": 5,
+                    "authority": 0
+                  },
+                  {
+                    "id": "B77777777",
+                    "name": "I",
+                    "grade": 2,
+                    "authority": 0
+                  },
+                  {
+                    "id": "B55555555",
+                    "name": "G",
+                    "grade": 2,
+                    "authority": 0
+                  },
+                  {
+                    "id": "B88888888",
+                    "name": "J",
+                    "grade": 4,
+                    "authority": 0
+                  },
+                  {
+                    "id": "B33333333",
+                    "name": "E",
+                    "grade": 1,
+                    "authority": 0
+                  }
+                ]
               }
             }
           },
@@ -289,6 +421,8 @@
       },
       "post": {
         "description": "Add new users",
+        "tags": ["User"],
+        "summary": "add users",
         "requestBody": {
           "description": "<h2>authority</h2> <b>2:</b> Admin<br> <b>1:</b> Maintainer<br> <b>0:</b> User",
           "required": true,
@@ -296,46 +430,52 @@
             "application/json": {
               "schema": {
                 "type": "array",
-                "properties": {
-                  "userID": {
-                    "type": "string"
-                  },
-                  "grade": {
-                    "type": "number"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  },
-                  "authority": {
-                    "type": "number"
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string"
+                    },
+                    "grade": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    },
+                    "authority": {
+                      "type": "number"
+                    }
                   }
+                }
+              },
+              "example": [
+                {
+                  "userID": "b787",
+                  "grade": 2,
+                  "password": "1111",
+                  "name": "A",
+                  "authority": 2
                 },
-                "example": [
-                  {
-                    "userID": "b787",
-                    "grade": 2,
-                    "password": "1111",
-                    "name": "A",
-                    "authority": 2
-                  },
-                  {
-                    "userID": "b1338",
-                    "grade": 3,
-                    "password": "1111",
-                    "name": "B",
-                    "authority": 1
-                  }
-                ]
-              }
+                {
+                  "userID": "b1338",
+                  "grade": 3,
+                  "password": "1111",
+                  "name": "B",
+                  "authority": 1
+                }
+              ]
             }
           }
         },
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "400": {
+            "description": "Type error, Format error"
           },
           "403": {
             "description": "Forbidden"
@@ -346,26 +486,29 @@
         }
       },
       "delete": {
-        "description": "Delete particular users",
+        "tags": ["User"],
+        "summary": "delete certain users",
+        "description": "Delete particular users with a list specifying their ids",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "array",
-                "properties": {
-                  "userID": {
-                    "type": "string"
-                  }
-                },
-                "example": ["b9213849", "b1432797"]
-              }
+                "items": {
+                  "type": "string"
+                }
+              },
+              "example": ["b9213849", "b1432797"]
             }
           }
         },
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "400": {
+            "description": "No input"
           },
           "403": {
             "description": "Forbidden"
@@ -378,7 +521,9 @@
     },
     "/password": {
       "put": {
-        "description": "Change password",
+        "tags": ["Management"],
+        "summary": "change password",
+        "description": "admin changes certain users' password",
         "requestBody": {
           "required": true,
           "content": {
@@ -395,12 +540,18 @@
                       "type": "string"
                     }
                   }
-                },
-                "example": [
-                  { "userID": "B33333333", "new_password": "2222" },
-                  { "userID": "B44444444", "new_password": "2222" }
-                ]
+                }
               },
+              "example": [
+                {
+                  "userID": "B33333333",
+                  "new_password": "2222"
+                },
+                {
+                  "userID": "B44444444",
+                  "new_password": "2222"
+                }
+              ],
               "encoding": {
                 "options": {
                   "style": "form",
@@ -414,8 +565,8 @@
           "204": {
             "description": "Success"
           },
-          "401": {
-            "description": "Failed"
+          "400": {
+            "description": "Failed, Type error"
           },
           "503": {
             "$ref": "#/components/responses/503"
@@ -425,9 +576,11 @@
     },
     "/course": {
       "post": {
+        "tags": ["Course"],
+        "summary": "add courses",
         "description": "Add new course",
         "requestBody": {
-          "description": "<h2>type</h2> <b>\"1\", \"2\", \"3\", \"4\":</b> 一,二,三,四年級必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗<br><b>\"EE-Lab\":</b> 電電實驗<br><h2>limit</h2>人數上限<br><h2>priority</h2><b>0:</b> 優先序與年級無關<br><b>-1:</b> 高年級優先<br><b>1,2,3,4:</b> 此年級優先<br><b>5:</b> 3,4年級優先<br>",
+          "description": "<h2>type</h2> <b>\"1\", \"2\", \"3\", \"4\":</b> 一,二,三,四年級必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗<br><b>\"EE-Lab\":</b> 電電實驗<br><h2>limit</h2>人數上限<br><h2>priority</h2><b>0:</b> 優先序與年級無關<br><b>-1:</b> 高年級優先<br><b>1,2,3,4:</b> 此年級優先<br><b>5:</b> 3,4年級優先<br><h2>以下為兩個課程範例, priority 只有 ten-select-two 會用到，必修及EE-lab無需.description 目前為必要",
           "required": true,
           "content": {
             "application/json": {
@@ -451,34 +604,59 @@
                     "options": {
                       "type": "array",
                       "items": {
-                        "type": "string"
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "limit": {
+                            "type": "number"
+                          },
+                          "priority(only ten-select-two needs this)": {
+                            "type": "number"
+                          }
+                        }
                       }
                     }
                   }
+                }
+              },
+              "example": [
+                {
+                  "id": "Electronic-Circuit test",
+                  "name": "電路學test",
+                  "type": "1",
+                  "description": "test",
+                  "options": [
+                    {
+                      "name": "Teacher A",
+                      "limit": 1
+                    },
+                    {
+                      "name": "Teacher B",
+                      "limit": 1
+                    }
+                  ]
                 },
-                "example": [
-                  {
-                    "id": "test",
-                    "name": "course_name",
-                    "type": "0",
-                    "description": "this is a tested course",
-                    "options": [
-                      { "name": "Teacher A", "limit": 1, "priority": 0 },
-                      { "name": "Teacher B", "limit": 1, "priority": 0 }
-                    ]
-                  },
-                  {
-                    "id": "test_course",
-                    "name": "course",
-                    "type": "2",
-                    "description": "this is another tested course",
-                    "options": [
-                      { "name": "Teacher B", "limit": 1, "priority": 0 },
-                      { "name": "Teacher C", "limit": 1, "priority": 0 }
-                    ]
-                  }
-                ]
-              }
+                {
+                  "id": "Ten-Select-Two test",
+                  "name": "十選二實驗 test",
+                  "type": "Ten-Select-Two",
+                  "description": "<p>(1) 請詳閱 <a href=\"https://bit.ly/3o0MrAb\" target=\"_blank\" style=\"color: #45bbff;\">實驗規定</a>，攸關各位的權利。</p><p>(2)特別轉載半導體實驗規定： ★★大學畢業後欲投入半導體領域者，可保留名額  ★★實驗期間需全程戴口罩、穿實驗衣含無塵衣,且著裝後需能自由移動。  ★★需遵守政府、臺大及實驗室之公共安全規定。  ★★環安衛法律條文規定沒有英文部份,若有外藉生不懂中文,將請助教以英文口譯告知。  ★★Electrical Engineering Lab (semiconductor) safety rules: ★In the labs,  students are required</p>",
+                  "options": [
+                    {
+                      "name": "電力電子",
+                      "limit": 1,
+                      "priority": 0
+                    },
+                    {
+                      "name": "光電",
+                      "limit": 1,
+                      "priority": 4
+                    }
+                  ]
+                }
+              ]
             }
           }
         },
@@ -487,7 +665,7 @@
             "description": "Success"
           },
           "400": {
-            "description": "The course has already existed"
+            "description": "The course has already existed, no input, format error"
           },
           "403": {
             "description": "Forbidden"
@@ -498,8 +676,11 @@
         }
       },
       "delete": {
-        "description": "Delete course",
+        "tags": ["Course"],
+        "summary": "delete courses",
+        "description": "Delete courses by **course ID**",
         "requestBody": {
+          "description": "<h2>a list of courseID (string)</h2>",
           "required": true,
           "content": {
             "application/json": {
@@ -507,15 +688,18 @@
                 "type": "array",
                 "items": {
                   "type": "string"
-                },
-                "example": ["test", "test_course"]
-              }
+                }
+              },
+              "example": ["test", "test_course"]
             }
           }
         },
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "400": {
+            "description": "No input, format error"
           },
           "403": {
             "description": "Forbidden"
@@ -529,9 +713,11 @@
         }
       },
       "put": {
-        "description": "Change th content of the course",
+        "tags": ["Course"],
+        "summary": "update courses",
+        "description": "Change the content of the course of designated ids",
         "requestBody": {
-          "description": "<h2>type</h2> <b>\"1\", \"2\", \"3\", \"4\":</b> 一,二,三,四年級必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗<br><b>\"EE-Lab\":</b> 電電實驗<br><h2>limit</h2>人數上限<br><h2>priority</h2><b>0:</b> 優先序與年級無關<br><b>-1:</b> 高年級優先<br><b>1,2,3,4:</b> 此年級優先<br><b>5:</b> 3,4年級優先<br>",
+          "description": "<h2>type</h2> <b>\"1\", \"2\", \"3\", \"4\":</b> 一,二,三,四年級必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗<br><b>\"EE-Lab\":</b> 電電實驗<br><h2>limit</h2>人數上限<br><h2>priority</h2><b>0:</b> 優先序與年級無關<br><b>-1:</b> 高年級優先<br><b>1,2,3,4:</b> 此年級優先<br><b>5:</b> 3,4年級優先<br><h2>由 id 指定要更改的課程, update 該課程的剩餘所有項目</h2>",
           "required": true,
           "content": {
             "application/json": {
@@ -555,41 +741,68 @@
                     "options": {
                       "type": "array",
                       "items": {
-                        "type": "string"
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "limit": {
+                            "type": "number"
+                          },
+                          "priority (only ten-select-two needs this)": {
+                            "type": "number"
+                          }
+                        }
                       }
                     }
                   }
+                }
+              },
+              "example": [
+                {
+                  "id": "Electronic-Circuit test",
+                  "name": "new 電路學test",
+                  "type": "1",
+                  "description": "new test",
+                  "options": [
+                    {
+                      "name": "Teacher C",
+                      "limit": 2
+                    },
+                    {
+                      "name": "Teacher D",
+                      "limit": 3
+                    }
+                  ]
                 },
-                "example": [
-                  {
-                    "id": "test",
-                    "name": "new_course_name",
-                    "type": "4",
-                    "description": "this is a modified tested course",
-                    "options": [
-                      { "name": "Teacher A", "limit": 1, "priority": 0 },
-                      { "name": "Teacher B", "limit": 1, "priority": 0 },
-                      { "name": "Teacher E", "limit": 1, "priority": 0 }
-                    ]
-                  },
-                  {
-                    "id": "test_course",
-                    "name": "course",
-                    "type": "2",
-                    "description": "this is another modified tested course",
-                    "options": [
-                      { "name": "Teacher B", "limit": 1, "priority": 0 },
-                      { "name": "Teacher C", "limit": 1, "priority": 0 }
-                    ]
-                  }
-                ]
-              }
+                {
+                  "id": "Ten-Select-Two test",
+                  "name": "new 十選二實驗 test",
+                  "type": "Ten-Select-Two",
+                  "description": "new test",
+                  "options": [
+                    {
+                      "name": "電磁波",
+                      "limit": 1,
+                      "priority": 0
+                    },
+                    {
+                      "name": "生醫工程",
+                      "limit": 1,
+                      "priority": 0
+                    }
+                  ]
+                }
+              ]
             }
           }
         },
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "400": {
+            "description": "No input, format error"
           },
           "403": {
             "description": "Forbidden"
@@ -605,16 +818,26 @@
     },
     "/distribute": {
       "post": {
+        "tags": ["Distribution"],
+        "summary": "分發",
         "description": "Run distribution algorithm",
         "responses": {
           "201": {
             "description": "Success"
+          },
+          "400": {
+            "description": "distribute server error"
+          },
+          "403": {
+            "description": "permission deny"
           }
         }
       }
     },
     "/authority": {
       "put": {
+        "tags": ["Management"],
+        "summary": "update authority",
         "description": "Change someone's authority",
         "requestBody": {
           "description": "<h2>authority</h2> <b>2:</b> Admin<br> <b>1:</b> Maintainer<br> <b>0:</b> User",
@@ -635,18 +858,18 @@
                       "example": 1
                     }
                   }
+                }
+              },
+              "example": [
+                {
+                  "userID": "B33333333",
+                  "authority": 1
                 },
-                "example": [
-                  {
-                    "userID": "B33333333",
-                    "authority": 1
-                  },
-                  {
-                    "userID": "B22222222",
-                    "authority": 0
-                  }
-                ]
-              }
+                {
+                  "userID": "B22222222",
+                  "authority": 0
+                }
+              ]
             }
           }
         },
@@ -668,12 +891,14 @@
     },
     "/selections/{courseID}": {
       "get": {
-        "description": "Show the status of a course's selection",
+        "tags": ["Selection"],
+        "summary": "get a user's selection on certain course",
+        "description": "Show the course selection status of a user according to current session",
         "parameters": [
           {
             "name": "courseID",
             "in": "path",
-            "description": "ID of a course",
+            "description": "select the id of the course that you want to know your selections",
             "required": true,
             "schema": {
               "type": "string",
@@ -695,19 +920,33 @@
                     },
                     "type": {
                       "type": "string",
-                      "example": "0"
+                      "example": "Ten-Select-Two"
                     },
                     "description": {
                       "type": "string",
-                      "example": "description of a course"
+                      "example": "description"
                     },
                     "selected": {
                       "type": "array",
-                      "example": ["course1", "course2"]
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": ["電力電子", "半導體", "嵌入式系統"]
                     },
                     "unselected": {
                       "type": "array",
-                      "example": ["course3", "course4"]
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "自動控制",
+                        "數電實驗",
+                        "電磁波",
+                        "通信專題",
+                        "網路與多媒體",
+                        "生醫工程",
+                        "光電"
+                      ]
                     }
                   }
                 }
@@ -726,7 +965,9 @@
         }
       },
       "put": {
-        "description": "Show the status of a course's selection",
+        "tags": ["Selection"],
+        "summary": "select courses",
+        "description": "select course using path parameter and req body<br><h2>Update the selection of a course </h2>",
         "parameters": [
           {
             "name": "courseID",
@@ -740,7 +981,7 @@
           }
         ],
         "requestBody": {
-          "description": "Update the selection of a course",
+          "description": "option names",
           "required": true,
           "content": {
             "application/json": {
@@ -775,8 +1016,11 @@
     },
     "/preselect": {
       "put": {
+        "tags": ["Distribution"],
+        "summary": "數電實驗預選",
         "description": "update preselect",
         "requestBody": {
+          "description": "send a list of userIDs that are preselected in 數電實驗",
           "required": true,
           "content": {
             "application/json": {
@@ -811,7 +1055,9 @@
     },
     "/result.csv": {
       "get": {
-        "description": "get distribution result",
+        "tags": ["Distribution"],
+        "summary": "generate distrubution result",
+        "description": "get distribution result (csv)<br><h2>要先跑 /distribute</h2>",
         "responses": {
           "200": {
             "description": "Success",

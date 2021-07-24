@@ -260,7 +260,7 @@ router.route("/password").put(
       }
     });
     if (ERROR_INPUT) {
-      res.status(403).end();
+      res.status(400).end();
       return;
     }
 
@@ -287,6 +287,7 @@ router
       const studentGroup = await model.Student.find({}).exec();
       const filtered = [];
       const items = Object.keys(req.query);
+      console.log(items);
       studentGroup.forEach((student) => {
         const filteredstudent = {};
         filteredstudent.id = student.userID;
@@ -420,9 +421,9 @@ router
         ranking: 1,
       });
       selected = selected.map((selection) => selection.name);
-      const unselected = options.filter(
-        (option) => !selected.includes(option.name)
-      );
+      const unselected = options
+        .filter((option) => !selected.includes(option.name))
+        .map((selection) => selection.name);
       res.send({ name, type, description, selected, unselected });
     })
   )
