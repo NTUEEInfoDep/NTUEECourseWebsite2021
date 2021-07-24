@@ -20,6 +20,7 @@ import PropTypes from "prop-types";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 import FilterListIcon from "@material-ui/icons/FilterList";
 
 import { StudentDataAPI } from "../../api";
@@ -54,6 +55,13 @@ const headCells = [
   { id: "id", numeric: false, disablePadding: false, label: "id" },
   { id: "name", numeric: false, disablePadding: false, label: "name" },
   { id: "grade", numeric: false, disablePadding: false, label: "grade" },
+  {
+    id: "authority",
+    numeric: false,
+    disablePadding: false,
+    label: "authority",
+  },
+  { id: "password", numeric: false, disablePadding: false, label: "password" },
 ];
 
 function EnhancedTableHead(props) {
@@ -139,10 +147,11 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, search, setSearch, handleDelete } = props;
+  const { numSelected, search, setSearch, handleDelete, setPage } = props;
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
+    setPage(0);
   };
 
   return (
@@ -235,7 +244,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function StudentTable({ data, handleDelete }) {
+export default function StudentTable({ data, handleEdit, handleDelete }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
@@ -295,7 +304,7 @@ export default function StudentTable({ data, handleDelete }) {
   // change page
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    console.log(data);
+    // console.log(data);
   };
 
   // change rows per page
@@ -323,6 +332,7 @@ export default function StudentTable({ data, handleDelete }) {
           numSelected={selected.length}
           search={search}
           setSearch={setSearch}
+          setPage={setPage}
           handleDelete={() => {
             handleDelete(selected);
           }}
@@ -382,13 +392,29 @@ export default function StudentTable({ data, handleDelete }) {
                       <TableCell align="left" className={classes.tablecell}>
                         {row.grade}
                       </TableCell>
+                      <TableCell align="left" className={classes.tablecell}>
+                        {row.authority}
+                      </TableCell>
+                      <TableCell align="left" className={classes.tablecell}>
+                        {row.password}
+                      </TableCell>
                       <TableCell className={classes.tablecell}>
                         <IconButton
-                          onClick={() => handleDelete([row.id])}
+                          onClick={() => handleEdit(row.id)}
                           className={classes.icon}
                         >
-                          <DeleteIcon />
+                          <EditIcon />
                         </IconButton>
+                        {selected.length === 0 ? (
+                          <IconButton
+                            onClick={() => handleDelete([row.id])}
+                            className={classes.icon}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        ) : (
+                          <></>
+                        )}
                       </TableCell>
                     </TableRow>
                   );

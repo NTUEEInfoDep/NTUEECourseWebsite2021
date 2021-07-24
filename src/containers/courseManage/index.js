@@ -87,7 +87,6 @@ export default function CourseManage() {
   const [alert, setAlert] = useState({});
   const [mdescription, setMDescription] = useState("");
   const [openMDEditor, setMDEditor] = useState(false);
-  const [DescriptionEdited, setDescriptionEdited] = useState(false);
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -98,7 +97,6 @@ export default function CourseManage() {
     setErrors({});
     setDialogOpen(false);
     setMDEditor(false);
-    setDescriptionEdited(false);
     setMDescription("");
   };
 
@@ -127,8 +125,12 @@ export default function CourseManage() {
         showAlert("warning", `The option ${newOption} is repeated.`);
       return;
     }
-    setCourse({ ...course, options: [...course.options, newOption] });
+    setCourse({
+      ...course,
+      options: [...course.options, { name: newOption, limit: 1 }],
+    });
     setNewOption("");
+    console.log(course);
   };
 
   const handleCourseDelOption = (index) => {
@@ -155,10 +157,12 @@ export default function CourseManage() {
   };
 
   const handleCourseApply = async () => {
+    setMDEditor(false);
     const errs = {};
-    ["id", "name", "type", "description", "options"].forEach((key) => {
+    ["id", "name", "type", "options"].forEach((key) => {
       errs[key] = !course[key]?.length;
     });
+    errs["description"] = !mdescription.length;
     setErrors({ ...errors, ...errs });
     if (Object.keys(errs).some((key) => errs[key])) {
       if (errs?.id) showAlert("warning", "Course ID is required.");
@@ -222,8 +226,7 @@ export default function CourseManage() {
   const editCourse = (index) => {
     setCurrentId(courses[index].id);
     setCourse(courses[index]);
-    console.log(courses[index]);
-    console.log(course);
+    setMDescription(course.description);
     handleOpen();
   };
 
@@ -238,15 +241,9 @@ export default function CourseManage() {
     setMDEditor(true);
   };
 
-  const AddDescription = () => {
+  useEffect(() => {
     setCourse({ ...course, description: mdescription });
-    if (mdescription != "") {
-      setDescriptionEdited(true);
-    } else {
-      setDescriptionEdited(false);
-    }
-    setMDEditor(false);
-  };
+  }, [mdescription]);
 
   useEffect(() => {
     handleCoursesReload();
@@ -323,37 +320,23 @@ export default function CourseManage() {
             error={errors.description}
             onChange={(e) => handleCourse(e, "description")}
           /> */}
+
           {openMDEditor ? (
             <div className="editor">
               <MDEditor value={mdescription} onChange={setMDescription} />
-              <Button
-                onClick={AddDescription}
-                variant="outlined"
-                size="small"
-                className="ConfirmEditor"
-              >
-                Confirm
-              </Button>
             </div>
           ) : (
             <Button
               onClick={openEditor}
-              startIcon={
-                DescriptionEdited || course.description != "" ? (
-                  <Edit />
-                ) : (
-                  <Add />
-                )
-              }
+              startIcon={course.description !== "" ? <Edit /> : <Add />}
               variant="outlined"
               className="openEditor"
             >
-              {DescriptionEdited || course.description != ""
+              {course.description !== ""
                 ? "Edit Description (Markdown)"
                 : "Add Description (Markdown)"}
             </Button>
           )}
-          {/* <MDEditor.Markdown source={description} /> */}
 
           <DialogContentText className={classes.optionsTitle}>
             Options
@@ -361,8 +344,8 @@ export default function CourseManage() {
           <div className={classes.options}>
             {course.options.map((option, _index) => (
               <Chip
-                key={option}
-                label={option}
+                key={option.name}
+                label={option.name}
                 variant="outlined"
                 color={option === newOption ? "secondary" : "default"}
                 onDelete={() => handleCourseDelOption(_index)}
@@ -417,9 +400,9 @@ export default function CourseManage() {
             <br />
             ID: {course.id}
             <br />
-            Type: {typeData.find((type) => type.id === course.type)?.text}
+            Type: {course.type}
             <br />
-            Options: {course.options.join(",")}
+            Options: {course.options.length}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -32,6 +32,7 @@ export const StudentDataAPI = {
       params: {
         name: 1,
         grade: 1,
+        authority: 1,
       },
     }),
   postStudentData: (users) => axios.post(`/api/users`, users),

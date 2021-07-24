@@ -27,7 +27,6 @@ import ClassIcon from "@material-ui/icons/Class"; //Courses
 import PeopleIcon from "@material-ui/icons/People"; //Student Data
 import CloudUploadIcon from "@material-ui/icons/CloudUpload"; //Course Manage
 import MeetingRoomIcon from "@material-ui/icons/MeetingRoom"; //Logout
-import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 // slices
 import { selectSession } from "../../slices/sessionSlice";
@@ -65,13 +64,10 @@ const useStyles = makeStyles((theme) => ({
   hide: {
     display: "none",
   },
+  appBarTypography: {
+    flexGrow: 1,
+  },
   drawerOpen: {
-    [theme.breakpoints.down("sm")]: {
-      transition: theme.transitions.create("all", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    },
     [theme.breakpoints.up("sm")]: {
       width: drawerWidth,
       transition: theme.transitions.create("width", {
@@ -80,19 +76,10 @@ const useStyles = makeStyles((theme) => ({
       }),
     },
   },
-  menuButton: {
-    marginRight: 36,
-  },
   drawerClose: {
     overflowX: "hidden",
     overflowY: "hidden",
     width: theme.spacing(0),
-    [theme.breakpoints.down("sm")]: {
-      transition: theme.transitions.create("all", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-    },
     [theme.breakpoints.up("sm")]: {
       width: theme.spacing(0) + 1,
       transition: theme.transitions.create("width", {
@@ -100,6 +87,9 @@ const useStyles = makeStyles((theme) => ({
         duration: theme.transitions.duration.leavingScreen,
       }),
     },
+  },
+  menuButton: {
+    marginRight: 36,
   },
   toolbar: {
     display: "flex",
@@ -129,19 +119,8 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: drawerWidth,
     },
   },
-  logoutButton: {
-    justifyContent: "flex-end",
-    float: "right",
-    position: "relative",
-  },
-  logoutBox: {
-    display: "flex",
-    justifyContent: "flex-end",
-  },
   offset: theme.mixins.toolbar,
 }));
-
-//
 
 const Drawer = ({ children }) => {
   const { isLogin, authority } = useSelector(selectSession);
@@ -216,18 +195,15 @@ const Drawer = ({ children }) => {
           >
             <KeyboardArrowUpIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
+          <Typography variant="h6" noWrap className={classes.appBarTypography}>
             NTUEE course pre-selection
           </Typography>
-          <Box component="span" className={classes.logoutBox}>
-            <Button
-              className={classes.logoutButton}
-              startIcon={<MeetingRoomIcon />}
-              onClick={() => dispatch(logout())}
-            >
-              logout
-            </Button>
-          </Box>
+          <Button
+            startIcon={<MeetingRoomIcon />}
+            onClick={() => dispatch(logout())}
+          >
+            logout
+          </Button>
         </Toolbar>
       </AppBar>
 
