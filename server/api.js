@@ -169,32 +169,45 @@ router
     })
   );
 
-router.route("/opentime").put(
-  express.json({ strict: false }),
-  permissionRequired(constants.AUTHORITY_ADMIN),
-  asyncHandler(async (req, res, next) => {
-    const { start } = req.body;
-    const { end } = req.body;
-    if (typeof start !== "number" || typeof end !== "number") {
-      res.status(400).end();
-      return;
-    }
-    if (start < 0 || end < 0) {
-      res.status(400).end();
-      return;
-    }
+router
+  .route("/opentime")
+  .get(
+    asyncHandler(async (req, res, next) => {
+      const start = await model.OpenTime.findOne({
+        type: constants.START_TIME_KEY,
+      });
+      const end = await model.OpenTime.findOne({
+        type: constants.END_TIME_KEY,
+      });
+      res.status(200).send({ start: start.time, end: end.time });
+    })
+  )
+  .put(
+    express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_ADMIN),
+    asyncHandler(async (req, res, next) => {
+      const { start } = req.body;
+      const { end } = req.body;
+      if (typeof start !== "number" || typeof end !== "number") {
+        res.status(400).end();
+        return;
+      }
+      if (start < 0 || end < 0) {
+        res.status(400).end();
+        return;
+      }
 
-    await model.OpenTime.updateOne(
-      { type: constants.START_TIME_KEY },
-      { time: start }
-    );
-    await model.OpenTime.updateOne(
-      { type: constants.END_TIME_KEY },
-      { time: end }
-    );
-    res.status(204).end();
-  })
-);
+      await model.OpenTime.updateOne(
+        { type: constants.START_TIME_KEY },
+        { time: start }
+      );
+      await model.OpenTime.updateOne(
+        { type: constants.END_TIME_KEY },
+        { time: end }
+      );
+      res.status(204).end();
+    })
+  );
 
 router.use(openTimeMiddleware).get(
   "/courses",
@@ -212,22 +225,7 @@ router.use(openTimeMiddleware).get(
       });
       filtered.push(filteredcourse);
     });
-    /*
-    const coursesGroup = await model.Course.aggregate([
-      {
-        $group: {
-          _id: "$type",
-          courses: { $push: { courseID: "$id", name: "$name" } },
-        },
-      },
-    ]);
 
-    const data = [];
-    coursesGroup.forEach((group) => {
-      /* eslint-disable-next-line no-underscore-dangle
-      data.push(group.courses);
-    });
-    */
     res.send(filtered);
   })
 );
@@ -287,19 +285,22 @@ router
       const studentGroup = await model.Student.find({}).exec();
       const filtered = [];
       const items = Object.keys(req.query);
-      console.log(items);
+      let pass = true;
       studentGroup.forEach((student) => {
         const filteredstudent = {};
         filteredstudent.id = student.userID;
         items.forEach((item) => {
           if (item === "password") {
-            res.status(403).end();
-            return;
+            pass = false;
           }
           filteredstudent[item] = student[item];
         });
         filtered.push(filteredstudent);
       });
+      if (!pass) {
+        res.status(403).end();
+        return;
+      }
       res.send(filtered);
     })
   )
@@ -310,22 +311,12 @@ router
       const studentsRaw = req.body;
       const students = [];
       let cnt = 0;
-
+      let pass = true;
       if (!studentsRaw || !Array.isArray(studentsRaw)) {
         res.status(400).end();
         return;
       }
       studentsRaw.forEach((studentRaw) => {
-        if (
-          !studentRaw.userID ||
-          !studentRaw.grade ||
-          !studentRaw.password ||
-          !studentRaw.name ||
-          !studentRaw.authority
-        ) {
-          res.status(400).end();
-          return;
-        }
         if (
           typeof studentRaw.authority !== "number" ||
           typeof studentRaw.grade !== "number" ||
@@ -333,9 +324,13 @@ router
           typeof studentRaw.password !== "string" ||
           typeof studentRaw.name !== "string"
         ) {
-          res.status(400).end();
+          pass = false;
         }
       });
+      if (!pass) {
+        res.status(400).end();
+        return;
+      }
       await Promise.all(
         studentsRaw.map(async (studentRaw) => {
           const salt = await bcrypt.genSalt(10);
@@ -369,19 +364,18 @@ router
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       const deleteData = req.body;
-
+      const deleteData_new = [];
       if (!deleteData || !Array.isArray(deleteData)) {
         res.status(400).end();
         return;
       }
       deleteData.forEach((userID) => {
-        if (typeof userID !== "string") {
-          const indexofData = deleteData.indexOf(userID);
-          deleteData.splice(indexofData, 1);
+        if (typeof userID === "string") {
+          deleteData_new.push(userID);
         }
       });
       await Promise.all(
-        deleteData.map(async (data) => {
+        deleteData_new.map(async (data) => {
           const userID = data.toUpperCase();
           const student = await model.Student.findOne({ userID }).exec();
           if (student) {
@@ -465,6 +459,8 @@ router
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       const addData = req.body;
+      const addData_new = [];
+      let pass;
       if (!addData || !Array.isArray(addData)) {
         res.status(400).end();
         return;
@@ -472,22 +468,29 @@ router
       // if the element in addData is not a valid Course type, remove it from addData
       addData.forEach((data) => {
         if (
-          !data.id ||
-          typeof data.id !== "string" ||
-          !data.name ||
-          typeof data.name !== "string" ||
-          !data.type ||
-          typeof data.type !== "string" ||
-          !data.description ||
-          typeof data.description !== "string" ||
-          !data.options
+          typeof data.id === "string" &&
+          typeof data.name === "string" &&
+          typeof data.type === "string" &&
+          typeof data.description === "string" &&
+          typeof data.options === "object"
         ) {
-          const indexofdata = addData.indexOf(data);
-          addData.splice(indexofdata, 1);
+          pass = true;
+          data.options.forEach((option) => {
+            if (
+              typeof option.name !== "string" ||
+              typeof option.limit !== "number" ||
+              typeof option.priority !== "number"
+            ) {
+              pass = false;
+            }
+          });
+          if (pass) {
+            addData_new.push(data);
+          }
         }
       });
       await Promise.all(
-        addData.map(async (data) => {
+        addData_new.map(async (data) => {
           const { id } = data;
           const { name } = data;
           const { type } = data;
@@ -519,19 +522,19 @@ router
         return;
       }
       const deleteData = req.body;
+      const deleteData_new = [];
       if (!deleteData || !Array.isArray(deleteData)) {
         res.status(400).end();
         return;
       }
       // if the element in addData is not a valid Course type, remove it from addData
       deleteData.forEach((id) => {
-        if (!id || typeof id !== "string") {
-          const indexofdata = deleteData.indexOf(id);
-          deleteData.splice(indexofdata, 1);
+        if (typeof id === "string") {
+          deleteData_new.push(id);
         }
       });
       await Promise.all(
-        deleteData.map(async (id) => {
+        deleteData_new.map(async (id) => {
           const course = await model.Course.findOne({ id }).exec();
           if (course) {
             await model.Course.deleteOne({ id });
@@ -546,19 +549,19 @@ router
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
       const modifiedData = req.body;
+      const modifiedData_new = [];
       if (!modifiedData || !Array.isArray(modifiedData)) {
         res.status(400).end();
         return;
       }
       // if the element in addData is not a valid Course type, remove it from addData
       modifiedData.forEach((data) => {
-        if (!data.id || typeof data.id !== "string") {
-          const indexofdata = modifiedData.indexOf(data);
-          modifiedData.splice(indexofdata, 1);
+        if (typeof data.id === "string") {
+          modifiedData_new.push(data);
         }
       });
       await Promise.all(
-        modifiedData.map(async (data) => {
+        modifiedData_new.map(async (data) => {
           const { id } = data;
           const { name } = data;
           const { type } = data;
@@ -589,6 +592,7 @@ router.route("/authority").put(
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const modifiedData = req.body;
+    const modifiedData_new = [];
     if (!modifiedData || !Array.isArray(modifiedData)) {
       res.status(400).end();
       return;
@@ -596,15 +600,14 @@ router.route("/authority").put(
     console.log(modifiedData);
     modifiedData.forEach((data) => {
       if (
-        typeof data.userID !== "string" ||
-        typeof data.authority !== "number"
+        typeof data.userID === "string" &&
+        typeof data.authority === "number"
       ) {
-        const indexofdata = modifiedData.indexOf(data);
-        modifiedData.splice(indexofdata, 1);
+        modifiedData_new.push(data);
       }
     });
     await Promise.all(
-      modifiedData.map(async (data) => {
+      modifiedData_new.map(async (data) => {
         let { userID } = data;
         const { authority } = data;
         userID = userID.toUpperCase();

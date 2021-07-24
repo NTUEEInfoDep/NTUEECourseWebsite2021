@@ -134,6 +134,31 @@
       }
     },
     "/opentime": {
+      "get": {
+        "description": "Get open time",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "start": {
+                      "type": "number",
+                      "example": 1600000000
+                    },
+                    "end": {
+                      "type": "number",
+                      "example": 1700000000
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": ["Management"],
         "summary": "update open time",
