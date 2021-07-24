@@ -65,6 +65,14 @@ const Selection = () => {
       console.error(err);
     }
   }, []); // only run the first time
+  useEffect(async () => {
+    try {
+      await SelectAPI.putSelections(data.selected);
+      // setData(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [data]);
   // const { name, type, description, selected, unselected } = data;
   // return (
   //   <>
@@ -123,6 +131,14 @@ const Selection = () => {
       selected: newSelection.selected,
       unselected: newSelection.unselected,
     }));
+    // useEffect(async () => {
+    //   try {
+    //     await SelectAPI.putSelections(data.selected);
+    //     // setData(res.data);
+    //   } catch (err) {
+    //     console.error(err);
+    //   }
+    // }, [data]);
   };
   return (
     <>

@@ -32,6 +32,7 @@ export const StudentDataAPI = {
       params: {
         name: 1,
         grade: 1,
+        authority: 1,
       },
     }),
   postStudentData: (users) => axios.post(`/api/users`, users),
@@ -39,4 +40,6 @@ export const StudentDataAPI = {
 };
 export const SelectAPI = {
   getSelections: (courseID) => axios.get(`/api/selections/${courseID}`),
+  putSelections: (courseID) =>
+    axios.put(`/api/selections/${courseID}`, [...courseID.data.selected]),
 };

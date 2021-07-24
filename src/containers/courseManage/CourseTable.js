@@ -45,9 +45,10 @@ export default function CourseTable({
               <TableCell>{id}</TableCell>
               <TableCell>{name}</TableCell>
               <TableCell>
-                {typeData.find(({ id: ID }) => ID === type)?.text ?? ""}
+                {/* {typeData.find(({ id: ID }) => ID === type)?.text ?? ""} */}
+                {type}
               </TableCell>
-              <TableCell>{description.length ? "✔" : ""}</TableCell>
+              <TableCell>{description ? "✔" : ""}</TableCell>
               <TableCell>{options.length}</TableCell>
               <TableCell>
                 {/* <IconButton
@@ -83,8 +84,14 @@ CourseTable.propTypes = {
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-      options: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+      description: PropTypes.string,
+      options: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string.isRequired,
+          limit: PropTypes.number.isRequired,
+          priority: PropTypes.number,
+        })
+      ).isRequired,
     })
   ).isRequired,
   typeData: PropTypes.arrayOf(

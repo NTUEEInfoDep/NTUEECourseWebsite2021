@@ -14,13 +14,7 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
-
-.MuiButtonBase-root.MuiButton-root.MuiButton-outlined.ConfirmEditor.MuiButton-outlinedSizeSmall.MuiButton-sizeSmall{
-    float: right;
-    margin-top: 10px;
-}
-
 .editor{
-  margin-bottom: 45px;
+  margin-bottom: 20px;
   margin-top: 15px;
 }
