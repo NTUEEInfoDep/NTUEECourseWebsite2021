@@ -31,10 +31,12 @@ def genCourse(raw_courses):
             }
             if data["type"] == "Ten-Select-Two":
                 options["priority"] = op["priority"]
-            elif data["type"] == "Required":
+            elif data["type"] in "1234":
                 options["priority"] = -1
-            else:  # EE-Lab
+            elif data["type"] == "EE-Lab":
                 options["priority"] = 0
+            else:
+                raise ValueError("Invalid type")
             courseDict["options"][op["name"]] = options
         courses.append(Course(courseDict))
     return courses
@@ -87,7 +89,10 @@ def distribute():
     raw_courses = db["courses"]
     raw_preselects = db["preselects"]
 
-    courses = genCourse(raw_courses)
+    try:
+        courses = genCourse(raw_courses)
+    except ValueError:
+        return "Invalid course type detected", 400
 
     course_names = getCourseid(raw_courses)
     students = genStudent(raw_students, raw_selection, course_names)
