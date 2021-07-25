@@ -4,7 +4,12 @@ import clsx from "clsx";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 // material_ui
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import {
+  makeStyles,
+  useTheme,
+  createMuiTheme,
+  ThemeProvider,
+} from "@material-ui/core/styles";
 import {
   CssBaseline,
   AppBar,
@@ -33,6 +38,19 @@ import { selectSession } from "../../slices/sessionSlice";
 import { logout } from "../../slices/sessionSlice";
 
 const drawerWidth = 200;
+const maxPhoneWidth = 700;
+
+const theme = createMuiTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 700,
+      md: 960,
+      lg: 1280,
+      xl: 1920,
+    },
+  },
+});
 
 const useStyles = makeStyles((theme) => ({
   drawer: {
@@ -90,7 +108,9 @@ const useStyles = makeStyles((theme) => ({
   menuButton: {
     marginRight: 36,
   },
-  iconButton: {},
+  iconButton: {
+    marginRight: 0,
+  },
   toolbar: {
     display: "flex",
     alignItems: "center",
@@ -167,102 +187,104 @@ const Drawer = ({ children }) => {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
-      <AppBar
-        className={clsx(classes.appBar, {
-          [classes.appBarShift]: open,
-        })}
-        position="fixed"
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            className={clsx(classes.menuButton, {
-              [classes.hide]: open,
-            })}
-          >
-            <MenuIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            aria-label="close drawer"
-            onClick={handleDrawerClose}
-            edge="start"
-            className={clsx(classes.menuButton, {
-              [classes.hide]: !open || window.innerWidth >= 600,
-            })}
-          >
-            <KeyboardArrowUpIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.appBarTypography}>
-            NTUEE course pre-selection
-          </Typography>
-          <Typography varianr="h6">{userName}</Typography>
-          <IconButton
-            className={[
-              clsx(classes.iconButton, {
-                [classes.hide]: !isLogin,
-              }),
-            ]}
-            onClick={() => dispatch(logout())}
-          >
-            <OpenInNewIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppBar
+          className={clsx(classes.appBar, {
+            [classes.appBarShift]: open,
+          })}
+          position="fixed"
+        >
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              className={clsx(classes.menuButton, {
+                [classes.hide]: open,
+              })}
+            >
+              <MenuIcon />
+            </IconButton>
+            <IconButton
+              color="inherit"
+              aria-label="close drawer"
+              onClick={handleDrawerClose}
+              edge="start"
+              className={clsx(classes.menuButton, {
+                [classes.hide]: !open || window.innerWidth >= maxPhoneWidth,
+              })}
+            >
+              <KeyboardArrowUpIcon />
+            </IconButton>
+            <Typography variant="h6" className={classes.appBarTypography}>
+              NTUEE
+            </Typography>
+            <Typography variant="h6">{userName}</Typography>
+            <IconButton
+              className={[
+                clsx(classes.iconButton, {
+                  [classes.hide]: !isLogin,
+                }),
+              ]}
+              onClick={() => dispatch(logout())}
+            >
+              <OpenInNewIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
 
-      <MUIDrawer
-        anchor={window.innerWidth >= 600 ? "left" : "top"}
-        variant="permanent"
-        className={clsx(classes.drawer, {
-          [classes.drawerOpen]: open,
-          [classes.drawerClose]: !open,
-        })}
-        classes={{
-          paper: clsx({
+        <MUIDrawer
+          anchor={window.innerWidth >= maxPhoneWidth ? "left" : "top"}
+          variant="permanent"
+          className={clsx(classes.drawer, {
             [classes.drawerOpen]: open,
             [classes.drawerClose]: !open,
-          }),
-        }}
-      >
-        <div className={classes.toolbar}>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </div>
-
-        <List>
-          {itemList.map(({ text, to, icon }) => {
-            return (
-              <ListItem
-                button
-                key={text}
-                component={Link}
-                to={to}
-                onClick={handleDrawerClose}
-              >
-                <ListItemIcon>{icon}</ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            );
           })}
-        </List>
-      </MUIDrawer>
-      <div className={classes.offset} />
-      <div
-        className={clsx(classes.content, {
-          [classes.contentShift]: open,
-        })}
-      >
-        {children}
-      </div>
+          classes={{
+            paper: clsx({
+              [classes.drawerOpen]: open,
+              [classes.drawerClose]: !open,
+            }),
+          }}
+        >
+          <div className={classes.toolbar}>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === "rtl" ? (
+                <ChevronRightIcon />
+              ) : (
+                <ChevronLeftIcon />
+              )}
+            </IconButton>
+          </div>
+
+          <List>
+            {itemList.map(({ text, to, icon }) => {
+              return (
+                <ListItem
+                  button
+                  key={text}
+                  component={Link}
+                  to={to}
+                  onClick={handleDrawerClose}
+                >
+                  <ListItemIcon>{icon}</ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItem>
+              );
+            })}
+          </List>
+        </MUIDrawer>
+        <div className={classes.offset} />
+        <div
+          className={clsx(classes.content, {
+            [classes.contentShift]: open,
+          })}
+        >
+          {children}
+        </div>
+      </ThemeProvider>
     </div>
   );
 };
