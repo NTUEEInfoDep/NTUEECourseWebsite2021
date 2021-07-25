@@ -45,8 +45,7 @@ export default function CourseTable({
               <TableCell>{id}</TableCell>
               <TableCell>{name}</TableCell>
               <TableCell>
-                {/* {typeData.find(({ id: ID }) => ID === type)?.text ?? ""} */}
-                {type}
+                {typeData.find(({ id: ID }) => ID === type)?.text ?? ""}
               </TableCell>
               <TableCell>{description ? "✔" : ""}</TableCell>
               <TableCell>{options.length}</TableCell>

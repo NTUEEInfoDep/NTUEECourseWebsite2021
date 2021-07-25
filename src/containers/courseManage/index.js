@@ -47,21 +47,39 @@ const useStyles = makeStyles((theme) => ({
 
 const typeData = [
   {
-    id: "0",
-    text: "十選二實驗",
-  },
-  {
     id: "1",
-    text: "大一",
+    text: "大一必修",
   },
   {
     id: "2",
-    text: "大二",
+    text: "大二必修",
   },
   {
     id: "3",
-    text: "大三",
+    text: "大三必修",
   },
+  {
+    id: "4",
+    text: "大四必修",
+  },
+  {
+    id: "Ten-Select-Two",
+    text: "十選二實驗",
+  },
+  {
+    id: "EE-Lab",
+    text: "電電實驗",
+  },
+];
+
+const priorityData = [
+  { id: 0, text: "無" },
+  { id: 1, text: "大一" },
+  { id: 2, text: "大二" },
+  { id: 3, text: "大三" },
+  { id: 4, text: "大四" },
+  { id: 5, text: "大三大四" },
+  { id: -1, text: "高年級" },
 ];
 
 /**
@@ -77,26 +95,29 @@ export default function CourseManage() {
     description: "",
     options: [],
   };
+  const emptyOption = {
+    name: "",
+    limit: "",
+    priority: "",
+  };
   const [courses, setCourses] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [currentId, setCurrentId] = useState("");
   const [course, setCourse] = useState(emptyCourse);
-  const [newOption, setNewOption] = useState("");
+  const [newOption, setNewOption] = useState(emptyOption);
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({});
   const [mdescription, setMDescription] = useState("");
-  const [openMDEditor, setMDEditor] = useState(false);
 
   const handleOpen = () => {
     setDialogOpen(true);
   };
 
   const handleClose = () => {
-    setNewOption("");
+    setNewOption(emptyOption);
     setErrors({});
     setDialogOpen(false);
-    setMDEditor(false);
     setMDescription("");
   };
 
@@ -109,28 +130,50 @@ export default function CourseManage() {
     if (event.target.value.length) setErrors({ ...errors, [key]: false });
   };
 
-  const handleCourseOption = (event) => {
-    setNewOption(event.target.value);
+  const handleCourseOption = (event, key) => {
+    if (key === "limit" && event.target.value.replace(/[^\d]/g, "") !== "") {
+      setNewOption({
+        ...newOption,
+        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
+      });
+    } else {
+      if (key !== "limit") {
+        setNewOption({ ...newOption, [key]: event.target.value });
+      } else {
+        setNewOption({ ...newOption, [key]: "" });
+      }
+    }
     setErrors({
       ...errors,
       newOption: !!course.options.find(
-        (option) => option === event.target.value
+        (option) => option.name === event.target.value
       ),
     });
   };
 
   const handleCourseAddOption = () => {
-    if (!newOption.length || errors.newOption) {
+    if (newOption.name === "") {
+      showAlert("warning", `Name is required.`);
+      return;
+    }
+    if (errors.newOption) {
       if (errors.newOption)
-        showAlert("warning", `The option ${newOption} is repeated.`);
+        showAlert("warning", `The option ${newOption.name} is repeated.`);
+      return;
+    }
+    if (newOption.limit === "") {
+      showAlert("warning", `Limit is required.`);
+      return;
+    }
+    if (newOption.priority === "") {
+      showAlert("warning", `Priority is required.`);
       return;
     }
     setCourse({
       ...course,
-      options: [...course.options, { name: newOption, limit: 1 }],
+      options: [...course.options, newOption],
     });
-    setNewOption("");
-    console.log(course);
+    setNewOption(emptyOption);
   };
 
   const handleCourseDelOption = (index) => {
@@ -157,12 +200,10 @@ export default function CourseManage() {
   };
 
   const handleCourseApply = async () => {
-    setMDEditor(false);
     const errs = {};
-    ["id", "name", "type", "options"].forEach((key) => {
+    ["id", "name", "type", "description", "options"].forEach((key) => {
       errs[key] = !course[key]?.length;
     });
-    errs["description"] = !mdescription.length;
     setErrors({ ...errors, ...errs });
     if (Object.keys(errs).some((key) => errs[key])) {
       if (errs?.id) showAlert("warning", "Course ID is required.");
@@ -226,7 +267,7 @@ export default function CourseManage() {
   const editCourse = (index) => {
     setCurrentId(courses[index].id);
     setCourse(courses[index]);
-    setMDescription(course.description);
+    setMDescription(courses[index].description);
     handleOpen();
   };
 
@@ -234,11 +275,6 @@ export default function CourseManage() {
     setCurrentId(courses[index].id);
     setCourse(courses[index]);
     setConfirmOpen(true);
-  };
-
-  const openEditor = () => {
-    setMDescription(course.description);
-    setMDEditor(true);
   };
 
   useEffect(() => {
@@ -321,24 +357,7 @@ export default function CourseManage() {
             onChange={(e) => handleCourse(e, "description")}
           /> */}
 
-          {openMDEditor ? (
-            <div className="editor">
-              <MDEditor value={mdescription} onChange={setMDescription} />
-            </div>
-          ) : (
-            <Button
-              onClick={openEditor}
-              startIcon={course.description !== "" ? <Edit /> : <Add />}
-              variant="outlined"
-              className="openEditor"
-            >
-              {course.description !== ""
-                ? "Edit Description (Markdown)"
-                : "Add Description (Markdown)"}
-            </Button>
-          )}
-
-          <DialogContentText className={classes.optionsTitle}>
+          <DialogContentText className={classes.optionsTitle} >
             Options
           </DialogContentText>
           <div className={classes.options}>
@@ -353,16 +372,44 @@ export default function CourseManage() {
               />
             ))}
           </div>
-          <div className={classes.optionsAdd}>
+          <div className={classes.optionsAdd} style={{ marginTop: "3px" }}>
             <TextField
-              placeholder="Add Options..."
-              value={newOption}
+              placeholder="name"
+              value={newOption.name}
               error={errors.newOption}
-              onChange={handleCourseOption}
+              onChange={(e) => handleCourseOption(e, "name")}
               onKeyDown={(e) => {
                 if (e.code === "Enter") handleCourseAddOption();
               }}
             />
+            <TextField
+              placeholder="limit"
+              value={newOption.limit}
+              error={errors.newOption}
+              style={{ width: "50px", marginLeft: "20px" }}
+              onChange={(e) => handleCourseOption(e, "limit")}
+              onKeyDown={(e) => {
+                if (e.code === "Enter") handleCourseAddOption();
+              }}
+            />
+            <FormControl
+              className={classes.formControl}
+              style={{ marginLeft: "20px", marginTop: "-16px" }}
+            >
+              <InputLabel>priority</InputLabel>
+              <Select
+                value={newOption.priority}
+                error={errors.newOption}
+                onChange={(e) => handleCourseOption(e, "priority")}
+                style={{ width: "100px" }}
+              >
+                {priorityData.map((priority) => (
+                  <MenuItem key={priority.id} value={priority.id}>
+                    {priority.text}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <Button
               startIcon={<Add />}
               variant="outlined"
@@ -372,6 +419,12 @@ export default function CourseManage() {
             >
               Add
             </Button>
+          </div>
+          <DialogContentText className={classes.optionsTitle} style={{ marginTop: "10px" }}>
+            Description
+          </DialogContentText>
+          <div className="editor">
+            <MDEditor value={mdescription} onChange={setMDescription} />
           </div>
         </DialogContent>
         <DialogActions>
@@ -400,7 +453,7 @@ export default function CourseManage() {
             <br />
             ID: {course.id}
             <br />
-            Type: {course.type}
+            Type: {typeData.find((type) => type.id === course.type)?.text}
             <br />
             Options: {course.options.length}
           </DialogContentText>
