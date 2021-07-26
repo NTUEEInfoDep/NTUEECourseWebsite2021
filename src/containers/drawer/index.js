@@ -43,11 +43,7 @@ const maxPhoneWidth = 700;
 const theme = createMuiTheme({
   breakpoints: {
     values: {
-      xs: 0,
-      sm: 700,
-      md: 960,
-      lg: 1280,
-      xl: 1920,
+      phone: 700,
     },
   },
 });
@@ -69,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   appBarShift: {
-    [theme.breakpoints.up("sm")]: {
+    [theme.breakpoints.up("phone")]: {
       marginLeft: drawerWidth,
       width: `calc(100% - ${drawerWidth}px)`,
       transition: theme.transitions.create(["width", "margin"], {
@@ -85,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   drawerOpen: {
-    [theme.breakpoints.up("sm")]: {
+    [theme.breakpoints.up("phone")]: {
       width: drawerWidth,
       transition: theme.transitions.create("width", {
         easing: theme.transitions.easing.sharp,
@@ -97,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
     overflowX: "hidden",
     overflowY: "hidden",
     width: theme.spacing(0),
-    [theme.breakpoints.up("sm")]: {
+    [theme.breakpoints.up("phone")]: {
       width: theme.spacing(0) + 1,
       transition: theme.transitions.create("width", {
         easing: theme.transitions.easing.sharp,
@@ -122,7 +118,7 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
-    [theme.breakpoints.up("sm")]: {
+    [theme.breakpoints.up("phone")]: {
       transition: theme.transitions.create("margin", {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
@@ -131,7 +127,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 0,
   },
   contentShift: {
-    [theme.breakpoints.up("sm")]: {
+    [theme.breakpoints.up("phone")]: {
       transition: theme.transitions.create("margin", {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
