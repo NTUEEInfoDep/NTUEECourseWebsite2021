@@ -374,7 +374,7 @@ export default function CourseManage() {
           </div>
           <div className={classes.optionsAdd} style={{ marginTop: "3px" }}>
             <TextField
-              placeholder="name"
+              placeholder="名字"
               value={newOption.name}
               error={errors.newOption}
               onChange={(e) => handleCourseOption(e, "name")}
@@ -383,20 +383,17 @@ export default function CourseManage() {
               }}
             />
             <TextField
-              placeholder="limit"
+              placeholder="人數限制"
               value={newOption.limit}
               error={errors.newOption}
-              style={{ width: "50px", marginLeft: "20px" }}
+              style={{ width: "100px", marginLeft: "20px" }}
               onChange={(e) => handleCourseOption(e, "limit")}
-              onKeyDown={(e) => {
-                if (e.code === "Enter") handleCourseAddOption();
-              }}
             />
             <FormControl
               className={classes.formControl}
               style={{ marginLeft: "20px", marginTop: "-16px" }}
             >
-              <InputLabel>priority</InputLabel>
+              <InputLabel>優先年級</InputLabel>
               <Select
                 value={newOption.priority}
                 error={errors.newOption}
@@ -415,13 +412,13 @@ export default function CourseManage() {
               variant="outlined"
               size="small"
               onClick={handleCourseAddOption}
-              style={{ marginLeft: "10px" }}
+              style={{ marginLeft: "20px" }}
             >
               Add
             </Button>
           </div>
           <DialogContentText className={classes.optionsTitle} style={{ marginTop: "10px" }}>
-            Description
+            Description(Markdown)
           </DialogContentText>
           <div className="editor">
             <MDEditor value={mdescription} onChange={setMDescription} />
