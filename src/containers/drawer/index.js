@@ -217,6 +217,7 @@ const Drawer = ({ children }) => {
             <Typography variant="h6" className={classes.appBarTypography}>
               NTUEE
             </Typography>
+            <Typography variant="h6">{userName}</Typography>
             <IconButton
               className={[
                 clsx(classes.iconButton, {
@@ -226,8 +227,7 @@ const Drawer = ({ children }) => {
               onClick={() => dispatch(logout())}
             >
               <KeyboardTabIcon />
-            </IconButton>
-            <Typography variant="h6">{userName}</Typography>
+            </IconButton>            
           </Toolbar>
         </AppBar>
 
