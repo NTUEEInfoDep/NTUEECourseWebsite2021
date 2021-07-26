@@ -84,6 +84,7 @@ export default function StudentData() {
   const [uploaded, setUploaded] = React.useState(false);
   const [addOpen, setAddOpen] = React.useState(false);
   const [addMultipleOpen, setAddMultipleOpen] = React.useState(false);
+  const [csv, setCsv] = React.useState("");
   const [editId, setEditId] = React.useState("");
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [deleteIds, setDeleteIds] = React.useState([]);
@@ -345,16 +346,18 @@ export default function StudentData() {
         return { ...student, password };
       });
       console.log("start post datas");
-      newData.forEach((student) => {
-        StudentDataAPI.postStudentData([
-          {
+      StudentDataAPI.postStudentData(
+        newData.map((student) => {
+          return {
             userID: student.id,
             grade: Number(student.grade),
             password: student.password,
             name: student.name,
             authority: Number(student.authority),
-          },
-        ]).then(() => {
+          };
+        })
+      )
+        .then(() => {
           console.log("finish post");
           setUploaded(true);
           setData(data.concat(newData));
@@ -367,10 +370,32 @@ export default function StudentData() {
             grade: "",
             authority: "",
           });
+        })
+        .then(() => {
+          setCsv(Papa.unparse(newData));
         });
-        console.log(`post student data finish: ${student.id}`);
-      });
     }
+  };
+
+  const download = (filename, text) => {
+    const element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`
+    );
+    element.setAttribute("download", filename);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  };
+
+  const handleDownload = () => {
+    console.log(csv);
+    download("datas.csv", csv);
   };
 
   const handleAddStudent = () => {
@@ -565,7 +590,12 @@ export default function StudentData() {
           {uploaded ? (
             <>
               upload completed
-              <Button variant="contained" color="primary" component="span">
+              <Button
+                variant="contained"
+                color="primary"
+                component="span"
+                onClick={handleDownload}
+              >
                 Download
               </Button>
             </>
