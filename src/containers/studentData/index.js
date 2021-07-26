@@ -81,7 +81,9 @@ export default function StudentData() {
 
   const [data, setData] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false);
+  const [uploaded, setUploaded] = React.useState(false);
   const [addOpen, setAddOpen] = React.useState(false);
+  const [addMultipleOpen, setAddMultipleOpen] = React.useState(false);
   const [editId, setEditId] = React.useState("");
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [deleteIds, setDeleteIds] = React.useState([]);
@@ -92,6 +94,12 @@ export default function StudentData() {
     authority: false,
   });
   const [errorsMsg, setErrorsMsg] = React.useState({
+    id: "",
+    name: "",
+    grade: "",
+    authority: "",
+  });
+  const [newStudentMultiple, setNewStudentMultiple] = React.useState({
     id: "",
     name: "",
     grade: "",
@@ -117,26 +125,46 @@ export default function StudentData() {
   //   console.log(data);
   // };
 
-  // const handleUpload = async (efile) => {
-  //   if (efile) {
-  //     Papa.parse(efile, {
-  //       skipEmptyLines: true,
-  //       complete(results) {
-  //         const newData = results.data.reduce((obj, cur) => {
-  //           return obj.concat([
-  //             { id: cur[0], name: cur[1], grade: cur[2], authority: cur[3] },
-  //           ]);
-  //         }, []);
-  //         setData(data.concat(newData));
-  //         setLoaded(true);
-  //       },
-  //     });
-  //   }
-  // };
+  const handleUploadCsv = async (efile) => {
+    if (efile) {
+      Papa.parse(efile, {
+        skipEmptyLines: true,
+        complete(results) {
+          const newData = results.data.slice(1).reduce((obj, cur) => {
+            return obj.concat([
+              { id: cur[0], name: cur[1], grade: cur[2], authority: cur[3] },
+            ]);
+          }, []);
+          setNewStudentMultiple(newData);
+          // loaded should be completed
+          setLoaded(true);
+          console.log("Multiple student data loaded");
+          console.log(newData);
+        },
+      });
+    }
+  };
 
   // const handleDownload = () => {
   //   console.log("to be complete");
   // };
+
+  const handleOpenAddMultiple = () => {
+    console.log("handleOpenAddMultiple");
+    setUploaded(false);
+    setAddMultipleOpen(true);
+    setNewStudentMultiple({
+      id: "",
+      name: "",
+      grade: "",
+      authority: "",
+    });
+  };
+
+  const handleCloseAddMultiple = () => {
+    console.log("handleCloseAddMultiple");
+    setAddMultipleOpen(false);
+  };
 
   const handleOpenAdd = () => {
     console.log("handleOpenAdd");
@@ -309,6 +337,42 @@ export default function StudentData() {
     console.log(newStudent);
   };
 
+  const handleAddMultipleStudents = () => {
+    console.log("handleAddMultipleStudents");
+    if (loaded) {
+      const newData = newStudentMultiple.map((student) => {
+        const password = genPassword();
+        return { ...student, password };
+      });
+      console.log("start post datas");
+      newData.forEach((student) => {
+        StudentDataAPI.postStudentData([
+          {
+            userID: student.id,
+            grade: Number(student.grade),
+            password: student.password,
+            name: student.name,
+            authority: Number(student.authority),
+          },
+        ]).then(() => {
+          console.log("finish post");
+          setUploaded(true);
+          setData(data.concat(newData));
+          console.log(newData);
+          console.log(data);
+
+          setNewStudentMultiple({
+            id: "",
+            name: "",
+            grade: "",
+            authority: "",
+          });
+        });
+        console.log(`post student data finish: ${student.id}`);
+      });
+    }
+  };
+
   const handleAddStudent = () => {
     const password = genPassword();
     setData(data.concat({ ...newStudent, password }));
@@ -381,10 +445,10 @@ export default function StudentData() {
     console.log(deleteIds);
     StudentDataAPI.deleteStudentData(deleteIds)
       .then(() => {
+        setDeleteOpen(false);
         setData(data.filter((student) => !deleteIds.includes(student.id)));
         console.log("delete student data finish : ");
         console.log(deleteIds);
-        setDeleteIds([]);
       })
       .catch(() => {});
   };
@@ -464,14 +528,18 @@ export default function StudentData() {
           Are you sure to delete {deleteIds.length} students?
         </DialogTitle>
         <DialogContent>
-          {deleteIds.map((id) => (
-            <Typography key={id}>
-              {`id: ${data.find((e) => e.id === id).id}, 
+          {deleteOpen ? (
+            deleteIds.map((id) => (
+              <Typography key={id}>
+                {`id: ${data.find((e) => e.id === id).id}, 
               name: ${data.find((e) => e.id === id).name},
               grade: ${data.find((e) => e.id === id).grade},
               authority: ${data.find((e) => e.id === id).authority}`}
-            </Typography>
-          ))}
+              </Typography>
+            ))
+          ) : (
+            <></>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDelete}>Cancel</Button>
@@ -482,6 +550,59 @@ export default function StudentData() {
           >
             Delete
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-dialog-title"
+        disableBackdropClick
+        open={addMultipleOpen}
+        onClose={handleCloseAddMultiple}
+      >
+        <DialogTitle id="simple-dialog-title">
+          Add multiple students from csv file
+        </DialogTitle>
+        <DialogContent>
+          {uploaded ? (
+            <>
+              upload completed
+              <Button variant="contained" color="primary" component="span">
+                Download
+              </Button>
+            </>
+          ) : (
+            <label htmlFor="contained-button-file">
+              <input
+                accept=".csv"
+                className={classes.input}
+                id="contained-button-file"
+                type="file"
+                onChange={(e) => handleUploadCsv(e.target.files[0])}
+              />
+              <Button variant="contained" color="primary" component="span">
+                Select csv file
+              </Button>
+            </label>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAddMultiple}>Cancel</Button>
+          {uploaded ? (
+            <Button
+              onClick={handleCloseAddMultiple}
+              variant="contained"
+              color="primary"
+            >
+              Finish
+            </Button>
+          ) : (
+            <Button
+              onClick={handleAddMultipleStudents}
+              variant="contained"
+              color="primary"
+            >
+              Upload
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
       <Grid
@@ -537,16 +658,6 @@ export default function StudentData() {
         </Grid> */}
         {/* <Grid item sm={12} md={9}> */}
         <Grid item sm={12}>
-          <StudentTable
-            data={data}
-            handleEdit={handleOpenEdit}
-            handleDelete={handleOpenDelete}
-          />
-        </Grid>
-        {/* <Hidden smDown>
-          <Grid item md={3} />
-        </Hidden> */}
-        <Grid item sm={12} md={9}>
           {/* <Typography variant="h6">Add Single Student</Typography> */}
           <Grid
             container
@@ -574,8 +685,27 @@ export default function StudentData() {
                 Add Single Student
               </Button>
             </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleOpenAddMultiple}
+              >
+                Add Multiple Students
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
+        <Grid item sm={12}>
+          <StudentTable
+            data={data}
+            handleEdit={handleOpenEdit}
+            handleDelete={handleOpenDelete}
+          />
+        </Grid>
+        {/* <Hidden smDown>
+          <Grid item md={3} />
+        </Hidden> */}
       </Grid>
     </Container>
   );

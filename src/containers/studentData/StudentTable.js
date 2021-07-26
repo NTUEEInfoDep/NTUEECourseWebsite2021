@@ -354,6 +354,7 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
           setPage={setPage}
           handleDelete={() => {
             handleDelete(selected);
+            // how to remove selected after delete should be completed
           }}
         />
         <TableContainer className={classes.container}>
