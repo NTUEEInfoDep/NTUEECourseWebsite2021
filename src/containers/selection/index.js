@@ -67,7 +67,7 @@ const Selection = () => {
   }, []); // only run the first time
   useEffect(async () => {
     try {
-      await SelectAPI.putSelections(data.selected);
+      await SelectAPI.putSelections(courseId, data.selected);
       // setData(res.data);
     } catch (err) {
       console.error(err);
