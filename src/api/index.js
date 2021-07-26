@@ -43,3 +43,6 @@ export const SelectAPI = {
   putSelections: (courseID, data) =>
     axios.put(`/api/selections/${courseID}`, [...data]),//, [...courseID.data.selected]),
 };
+export const OpentimeAPI={
+  getOpentime: () => axios.get(`/api/opentime`),
+}
