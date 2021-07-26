@@ -251,6 +251,9 @@ export default function StudentData() {
     if (!e.target.value.length) {
       setErrors({ ...errors, id: true });
       setErrorsMsg({ ...errors, id: "id should not be empty" });
+    } else if (!/^(b|r|d)\d{8}$/i.test(e.target.value)) {
+      setErrors({ ...errors, id: true });
+      setErrorsMsg({ ...errors, id: "id invalid format" });
     } else {
       setErrors({ ...errors, id: false });
       setErrorsMsg({ ...errors, id: "" });
@@ -350,6 +353,8 @@ export default function StudentData() {
         ])
           .then(() => {
             console.log("post student data finish in edit");
+            console.log(`student id: ${newStudent.id}`);
+            console.log(`password id: ${password}`);
           })
           .catch(() => {});
       })
@@ -379,6 +384,7 @@ export default function StudentData() {
         setData(data.filter((student) => !deleteIds.includes(student.id)));
         console.log("delete student data finish : ");
         console.log(deleteIds);
+        setDeleteIds([]);
       })
       .catch(() => {});
   };

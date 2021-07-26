@@ -52,16 +52,16 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: "id", numeric: false, disablePadding: false, label: "id" },
-  { id: "name", numeric: false, disablePadding: false, label: "name" },
-  { id: "grade", numeric: false, disablePadding: false, label: "grade" },
+  { id: "id", numeric: false, disablePadding: true, label: "id" },
+  { id: "name", numeric: false, disablePadding: true, label: "name" },
+  { id: "grade", numeric: false, disablePadding: true, label: "grade" },
   {
     id: "authority",
     numeric: false,
-    disablePadding: false,
+    disablePadding: true,
     label: "authority",
   },
-  { id: "password", numeric: false, disablePadding: false, label: "password" },
+  { id: "password", numeric: false, disablePadding: true, label: "password" },
 ];
 
 function EnhancedTableHead(props) {
@@ -79,9 +79,9 @@ function EnhancedTableHead(props) {
   };
 
   return (
-    <TableHead>
+    <TableHead className={classes.head}>
       <TableRow>
-        <TableCell padding="checkbox">
+        <TableCell padding="none" className={classes.headCell}>
           <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
@@ -91,6 +91,7 @@ function EnhancedTableHead(props) {
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
+            className={classes.headCell}
             key={headCell.id}
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "default"}
@@ -110,6 +111,7 @@ function EnhancedTableHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell className={classes.headCell} />
       </TableRow>
     </TableHead>
   );
@@ -147,7 +149,8 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, search, setSearch, handleDelete, setPage } = props;
+  const { rootClasses, numSelected, search, setSearch, handleDelete, setPage } =
+    props;
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -156,9 +159,12 @@ const EnhancedTableToolbar = (props) => {
 
   return (
     <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0,
-      })}
+      className={
+        (clsx(classes.root, {
+          [classes.highlight]: numSelected > 0,
+        }),
+        rootClasses.toolbar)
+      }
     >
       {numSelected > 0 ? (
         <Typography
@@ -218,9 +224,21 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     marginBottom: theme.spacing(2),
   },
+  container: {
+    maxHeight: 440,
+  },
+  toolbar: {
+    minHeight: "50px",
+  },
   table: {
     minWidth: 500,
     padding: 0,
+  },
+  // head: {
+  //   height: "50px",
+  // },
+  headCell: {
+    backgroundColor: "#424242",
   },
   visuallyHidden: {
     border: 0,
@@ -251,7 +269,7 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(100);
   const [search, setSearch] = React.useState("");
 
   //
@@ -329,6 +347,7 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
     <div className={classes.root}>
       <Paper className={classes.paper}>
         <EnhancedTableToolbar
+          rootClasses={classes}
           numSelected={selected.length}
           search={search}
           setSearch={setSearch}
@@ -337,8 +356,9 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
             handleDelete(selected);
           }}
         />
-        <TableContainer>
+        <TableContainer className={classes.container}>
           <Table
+            stickyHeader
             className={classes.table}
             aria-labelledby="tableTitle"
             // size={dense ? "small" : "medium"}
@@ -370,6 +390,12 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
                       key={row.id}
                       selected={isItemSelected}
                     >
+                      {/* <TableCell
+                        key={headCell.id}
+                        align={headCell.numeric ? "right" : "left"}
+                        padding={headCell.disablePadding ? "none" : "default"}
+                        sortDirection={orderBy === headCell.id ? order : false}
+                      /> */}
                       <TableCell className={classes.tablecell}>
                         <Checkbox
                           onClick={(event) => handleClick(event, row.id)}
@@ -379,6 +405,11 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
                         />
                       </TableCell>
                       <TableCell
+                        key={headCells[0].id}
+                        align={headCells[0].numeric ? "right" : "left"}
+                        padding={
+                          headCells[0].disablePadding ? "none" : "default"
+                        }
                         component="th"
                         id={row.id}
                         scope="row"
@@ -386,16 +417,44 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
                       >
                         {row.id}
                       </TableCell>
-                      <TableCell align="left" className={classes.tablecell}>
+                      <TableCell
+                        key={headCells[1].id}
+                        align={headCells[1].numeric ? "right" : "left"}
+                        padding={
+                          headCells[1].disablePadding ? "none" : "default"
+                        }
+                        className={classes.tablecell}
+                      >
                         {row.name}
                       </TableCell>
-                      <TableCell align="left" className={classes.tablecell}>
+                      <TableCell
+                        key={headCells[2].id}
+                        align={headCells[2].numeric ? "right" : "left"}
+                        padding={
+                          headCells[2].disablePadding ? "none" : "default"
+                        }
+                        className={classes.tablecell}
+                      >
                         {row.grade}
                       </TableCell>
-                      <TableCell align="left" className={classes.tablecell}>
+                      <TableCell
+                        key={headCells[3].id}
+                        align={headCells[3].numeric ? "right" : "left"}
+                        padding={
+                          headCells[3].disablePadding ? "none" : "default"
+                        }
+                        className={classes.tablecell}
+                      >
                         {row.authority}
                       </TableCell>
-                      <TableCell align="left" className={classes.tablecell}>
+                      <TableCell
+                        key={headCells[4].id}
+                        align={headCells[4].numeric ? "right" : "left"}
+                        padding={
+                          headCells[4].disablePadding ? "none" : "default"
+                        }
+                        className={classes.tablecell}
+                      >
                         {row.password}
                       </TableCell>
                       <TableCell className={classes.tablecell}>
@@ -419,16 +478,16 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
                     </TableRow>
                   );
                 })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 35.2 * emptyRows }}>
+              {/* emptyRows > 0 && (
+                <TableRow style={{ height: "100px" }}>
                   <TableCell colSpan={6} className={classes.tablecell} />
                 </TableRow>
-              )}
+              ) */}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[5, 10, 25, 100]}
           component="div"
           count={data.filter((e) => studentFilter(e)).length}
           rowsPerPage={rowsPerPage}
