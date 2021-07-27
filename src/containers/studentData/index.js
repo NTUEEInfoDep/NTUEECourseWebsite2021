@@ -356,9 +356,52 @@ export default function StudentData() {
     document.body.removeChild(element);
   };
 
+  const handleDownloadPassword = () => {
+    console.log("download password");
+    download("datas.csv", csv);
+  };
+
   const handleDownload = () => {
     console.log(csv);
     download("datas.csv", csv);
+  };
+
+  const handleGeneratePassword = () => {
+    console.log("generate password");
+    const newData = data
+      .filter((e) => selected.includes(e.id))
+      .map((student) => {
+        const password = genPassword();
+        return { ...student, password };
+      });
+    console.log(`delete in regenerate: `);
+    console.log(selected);
+    StudentDataAPI.deleteStudentData(selected)
+      .then(() => {
+        console.log("delete student data finish in regenerate");
+        StudentDataAPI.postStudentData(
+          newData.map((student) => {
+            return {
+              userID: student.id,
+              grade: Number(student.grade),
+              password: student.password,
+              name: student.name,
+              authority: Number(student.authority),
+            };
+          })
+        )
+          .then(() => {
+            console.log("post student data finish in regeneration");
+            setData(
+              data.filter((e) => !selected.includes(e.id)).concat(newData)
+            );
+          })
+          .then(() => {
+            setCsv(Papa.unparse(newData));
+          })
+          .catch(() => {});
+      })
+      .catch(() => {});
   };
 
   const judgeNewStudent = () => {
@@ -612,22 +655,23 @@ export default function StudentData() {
         open={addMultipleOpen}
         onClose={handleCloseAddMultiple}
       >
-        <DialogTitle id="simple-dialog-title">
-          Add multiple students from csv file
-        </DialogTitle>
+        {uploaded ? (
+          <DialogTitle id="simple-dialog-title">Upload Completed</DialogTitle>
+        ) : (
+          <DialogTitle id="simple-dialog-title">
+            Add multiple students from csv file
+          </DialogTitle>
+        )}
         <DialogContent>
           {uploaded ? (
-            <>
-              upload completed
-              <Button
-                variant="contained"
-                color="primary"
-                component="span"
-                onClick={handleDownload}
-              >
-                Download
-              </Button>
-            </>
+            <Button
+              variant="contained"
+              color="primary"
+              component="span"
+              onClick={handleDownload}
+            >
+              Download password
+            </Button>
           ) : (
             <label htmlFor="contained-button-file">
               <input
@@ -671,53 +715,7 @@ export default function StudentData() {
         alignItems="flex-start"
         direction="row"
       >
-        {/* <Grid item sm={12} md={3}>
-          <Grid
-            container
-            spacing={2}
-            justify="flex-start"
-            alignItems="flex-start"
-            direction="column"
-          >
-            <Grid item>
-              <label htmlFor="contained-button-file">
-                <input
-                  accept=".csv"
-                  className={classes.input}
-                  id="contained-button-file"
-                  type="file"
-                  onChange={(e) => handleUpload(e.target.files[0])}
-                />
-                <Button variant="contained" color="primary" component="span">
-                  Select csv file
-                </Button>
-              </label>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleDownload()}
-                startIcon={<CloudDownloadIcon />}
-              >
-                Download csv
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                component="span"
-                onClick={() => handleTest()}
-              >
-                Test
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid> */}
-        {/* <Grid item sm={12} md={9}> */}
         <Grid item sm={12}>
-          {/* <Typography variant="h6">Add Single Student</Typography> */}
           <Grid
             container
             spacing={1}
@@ -725,16 +723,6 @@ export default function StudentData() {
             alignItems="flex-start"
             direction="row"
           >
-            {/* ["id", "name", "grade"].map((e) => (
-              <Grid item key={e}>
-                <InputGrid
-                  type={e}
-                  newStudent={newStudent}
-                  setNewStudent={setNewStudent}
-                />
-              </Grid>
-            )) */}
-
             <Grid item>
               <Button
                 variant="contained"
@@ -751,6 +739,25 @@ export default function StudentData() {
                 onClick={handleOpenAddMultiple}
               >
                 Add Multiple Students
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleDownloadPassword}
+                disabled={csv === ""}
+              >
+                Download Password
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleGeneratePassword}
+              >
+                Generate Password
               </Button>
             </Grid>
           </Grid>
