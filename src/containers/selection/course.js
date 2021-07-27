@@ -6,15 +6,24 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
   styledCourse: {
-    backgroundColor: "#eee",
-    borderRadius: 4,
-    padding: "4px 8px",
-    transition: "background-color .8s ease-out",
+    backgroundImage: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)", // #eee
+    opacity: 1.0,
+    border: 0,
+    borderRadius: 3, // 4
+    padding: "15px 15px", // 4px, 8px
+    //transition: "background-color .8s ease-out",
     marginTop: 8,
-    color: "#071214",
+    color: "white", //#071214
+    height: 45,
+    boxShadow: "0 3px 5px 2px rgba(255, 105, 135, .3)",
+    textAlign: "center",
+    fontFamily: "Times, Times New Roman, serif",
+    //opacity: 1.0,
+    zIndex: 1,
+
 
     ":hover": {
-      backgroundColor: "#fff",
+      backgroundColor: "gold",
       transition: "background-color .1s ease-in",
     },
   },
