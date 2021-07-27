@@ -71,6 +71,7 @@ function EnhancedTableHead(props) {
     order,
     orderBy,
     numSelected,
+    numSelectedInPage,
     rowCount,
     onRequestSort,
   } = props;
@@ -83,8 +84,10 @@ function EnhancedTableHead(props) {
       <TableRow>
         <TableCell padding="none" className={classes.headCell}>
           <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
+            indeterminate={
+              numSelectedInPage > 0 && numSelectedInPage < rowCount
+            }
+            checked={rowCount > 0 && numSelectedInPage === rowCount}
             onChange={onSelectAllClick}
             inputProps={{ "aria-label": "select all desserts" }}
           />
@@ -262,11 +265,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function StudentTable({ data, handleEdit, handleDelete }) {
+export default function StudentTable({
+  data,
+  handleEdit,
+  handleDelete,
+  selected,
+  setSelected,
+}) {
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
-  const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(100);
@@ -288,13 +296,27 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
 
   //
   const handleSelectAllClick = (event) => {
+    // console.log(`event.target.checked: ${event.target.checked}`);
+    // console.log(`search: ${search}`);
+    // console.log(`selected: (${selected.length})`);
+    // console.log(selected);
     if (event.target.checked) {
-      const newSelecteds = data
+      // console.log("checked");
+      // data.filter((student) => !deleteIds.includes(student.id));
+      const nowSelecteds = data
         .filter((e) => studentFilter(e))
         .map((n) => n.id);
-      setSelected(newSelecteds);
+      // console.log(`now length: ${nowSelecteds.length}`);
+      const newSelecteds = nowSelecteds.filter((id) => !selected.includes(id));
+      // console.log(`new length: ${newSelecteds.length}`);
+      if (newSelecteds.length === 0) {
+        setSelected(selected.filter((id) => !nowSelecteds.includes(id)));
+      } else {
+        setSelected(selected.concat(newSelecteds));
+      }
       return;
     }
+    // console.log("why are you here?");
     setSelected([]);
   };
 
@@ -368,11 +390,17 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
             <EnhancedTableHead
               classes={classes}
               numSelected={selected.length}
+              numSelectedInPage={
+                data
+                  .filter((e) => studentFilter(e))
+                  .map((n) => n.id)
+                  .filter((id) => selected.includes(id)).length
+              }
               order={order}
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={data.length}
+              rowCount={data.filter((e) => studentFilter(e)).length}
             />
             <TableBody>
               {stableSort(data, getComparator(order, orderBy))
@@ -488,7 +516,7 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 100]}
+          rowsPerPageOptions={[50, 100, 200, 400]}
           component="div"
           count={data.filter((e) => studentFilter(e)).length}
           rowsPerPage={rowsPerPage}

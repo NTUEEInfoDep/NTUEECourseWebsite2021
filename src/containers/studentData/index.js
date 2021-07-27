@@ -86,8 +86,11 @@ export default function StudentData() {
   const [addMultipleOpen, setAddMultipleOpen] = React.useState(false);
   const [csv, setCsv] = React.useState("");
   const [editId, setEditId] = React.useState("");
+  const [selected, setSelected] = React.useState([]);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [deleteIds, setDeleteIds] = React.useState([]);
+  const [regenerateOpen, setRegenerateOpen] = React.useState(false);
+  const [invalidRegenerate, setInvalidRegenerate] = React.useState(false);
   const [errors, setErrors] = React.useState({
     id: false,
     name: false,
@@ -176,10 +179,10 @@ export default function StudentData() {
       authority: "",
     });
     setErrors({
-      id: true,
-      name: true,
-      grade: true,
-      authority: true,
+      id: false,
+      name: false,
+      grade: false,
+      authority: false,
     });
     setErrorsMsg({
       id: "",
@@ -272,21 +275,28 @@ export default function StudentData() {
     setDeleteOpen(false);
   };
 
+  const handleOpenRegenerate = () => {
+    if (
+      data
+        .filter((e) => selected.includes(e.id))
+        .filter((e) => e.authority === 2).length !== 0
+    ) {
+      setInvalidRegenerate(true);
+    } else {
+      setInvalidRegenerate(false);
+    }
+    setRegenerateOpen(true);
+  };
+
+  const handleCloseRegenerate = () => {
+    setRegenerateOpen(false);
+  };
+
   const onIdChange = (e) => {
     setNewStudent({
       ...newStudent,
       id: e.target.value,
     });
-    if (!e.target.value.length) {
-      setErrors({ ...errors, id: true });
-      setErrorsMsg({ ...errors, id: "id should not be empty" });
-    } else if (!/^(b|r|d)\d{8}$/i.test(e.target.value)) {
-      setErrors({ ...errors, id: true });
-      setErrorsMsg({ ...errors, id: "id invalid format" });
-    } else {
-      setErrors({ ...errors, id: false });
-      setErrorsMsg({ ...errors, id: "" });
-    }
   };
 
   const onNameChange = (e) => {
@@ -294,13 +304,6 @@ export default function StudentData() {
       ...newStudent,
       name: e.target.value,
     });
-    if (!e.target.value.length) {
-      setErrors({ ...errors, name: true });
-      setErrorsMsg({ ...errors, name: "name should not be empty" });
-    } else {
-      setErrors({ ...errors, name: false });
-      setErrorsMsg({ ...errors, name: "" });
-    }
   };
 
   const onGradeChange = (e) => {
@@ -308,16 +311,6 @@ export default function StudentData() {
       ...newStudent,
       grade: e.target.value,
     });
-    if (!e.target.value.length) {
-      setErrors({ ...errors, grade: true });
-      setErrorsMsg({ ...errors, grade: "grade should not be empty" });
-    } else if (!/^\d+$/.test(e.target.value)) {
-      setErrors({ ...errors, grade: true });
-      setErrorsMsg({ ...errors, grade: "grade should be a number" });
-    } else {
-      setErrors({ ...errors, grade: false });
-      setErrorsMsg({ ...errors, grade: "" });
-    }
   };
 
   const onAuthorityChange = (e) => {
@@ -325,17 +318,6 @@ export default function StudentData() {
       ...newStudent,
       authority: e.target.value,
     });
-    if (!e.target.value.length) {
-      setErrors({ ...errors, authority: true });
-      setErrorsMsg({ ...errors, authority: "authority should not be empty" });
-    } else if (!/^[012]$/.test(e.target.value)) {
-      setErrors({ ...errors, authority: true });
-      setErrorsMsg({ ...errors, authority: "authority should be a 0, 1 or 2" });
-    } else {
-      setErrors({ ...errors, authority: false });
-      setErrorsMsg({ ...errors, authority: "" });
-    }
-    console.log(newStudent);
   };
 
   const handleAddMultipleStudents = () => {
@@ -393,87 +375,199 @@ export default function StudentData() {
     document.body.removeChild(element);
   };
 
+  const handleDownloadPassword = () => {
+    console.log("download password");
+    download("datas.csv", csv);
+  };
+
   const handleDownload = () => {
     console.log(csv);
     download("datas.csv", csv);
   };
 
+  const handleGeneratePassword = () => {
+    console.log("generate password");
+    const newData = data
+      .filter((e) => selected.includes(e.id))
+      .map((student) => {
+        const password = genPassword();
+        return { ...student, password };
+      });
+    console.log(`delete in regenerate: `);
+    console.log(selected);
+    StudentDataAPI.deleteStudentData(selected)
+      .then(() => {
+        console.log("delete student data finish in regenerate");
+        StudentDataAPI.postStudentData(
+          newData.map((student) => {
+            return {
+              userID: student.id,
+              grade: Number(student.grade),
+              password: student.password,
+              name: student.name,
+              authority: Number(student.authority),
+            };
+          })
+        )
+          .then(() => {
+            console.log("post student data finish in regeneration");
+            setData(
+              data.filter((e) => !selected.includes(e.id)).concat(newData)
+            );
+          })
+          .then(() => {
+            setCsv(Papa.unparse(newData));
+            setRegenerateOpen(false);
+            setSelected([]);
+          })
+          .catch(() => {});
+      })
+      .catch(() => {});
+  };
+
+  const judgeNewStudent = () => {
+    let error = false;
+    let newErrors = errors;
+    let newErrorsMsg = errorsMsg;
+    if (!newStudent.id) {
+      newErrors = { ...newErrors, id: true };
+      newErrorsMsg = { ...newErrorsMsg, id: "id should not be empty" };
+      error = true;
+    } else if (!/^(b|r|d)\d{8}$/i.test(newStudent.id)) {
+      newErrors = { ...newErrors, id: true };
+      newErrorsMsg = { ...newErrorsMsg, id: "id invalid format" };
+      error = true;
+    } else {
+      newErrors = { ...newErrors, id: false };
+      newErrorsMsg = { ...newErrorsMsg, id: "" };
+    }
+    if (!newStudent.name) {
+      newErrors = { ...newErrors, name: true };
+      newErrorsMsg = { ...newErrorsMsg, name: "name should not be empty" };
+      error = true;
+    } else {
+      newErrors = { ...newErrors, name: false };
+      newErrorsMsg = { ...newErrorsMsg, name: "" };
+    }
+    if (!newStudent.grade) {
+      newErrors = { ...newErrors, grade: true };
+      newErrorsMsg = { ...newErrorsMsg, grade: "grade should not be empty" };
+      error = true;
+    } else if (!/^\d+$/.test(newStudent.grade)) {
+      newErrors = { ...newErrors, grade: true };
+      newErrorsMsg = { ...newErrorsMsg, grade: "grade should be a number" };
+      error = true;
+    } else {
+      newErrors = { ...newErrors, grade: false };
+      newErrorsMsg = { ...newErrorsMsg, grade: "" };
+    }
+    if (!newStudent.authority) {
+      newErrors = { ...newErrors, authority: true };
+      newErrorsMsg = {
+        ...newErrorsMsg,
+        authority: "authority should not be empty",
+      };
+      error = true;
+    } else if (!/^[012]$/.test(newStudent.authority)) {
+      newErrors = { ...newErrors, authority: true };
+      newErrorsMsg = {
+        ...newErrorsMsg,
+        authority: "authority should be a 0, 1 or 2",
+      };
+      error = true;
+    } else {
+      newErrors = { ...newErrors, authority: false };
+      newErrorsMsg = { ...newErrorsMsg, authority: "" };
+    }
+    setErrors(newErrors);
+    setErrorsMsg(newErrorsMsg);
+    return error;
+  };
+
   const handleAddStudent = () => {
-    const password = genPassword();
-    setData(data.concat({ ...newStudent, password }));
-    StudentDataAPI.postStudentData([
-      {
+    const error = judgeNewStudent();
+
+    if (!error) {
+      const password = genPassword();
+      setData(data.concat({ ...newStudent, password }));
+      StudentDataAPI.postStudentData([
+        {
+          userID: newStudent.id,
+          grade: Number(newStudent.grade),
+          password,
+          name: newStudent.name,
+          authority: Number(newStudent.authority),
+        },
+      ])
+        .then(() => {
+          console.log("post student data finish new");
+        })
+        .catch(() => {});
+      setNewStudent({
+        id: "",
+        name: "",
+        grade: "",
+        authority: "",
+      });
+      handleCloseAdd();
+    }
+  };
+
+  const handleEditStudent = () => {
+    const error = judgeNewStudent();
+    if (!error) {
+      const password = genPassword();
+      setData(
+        data.filter((e) => e.id !== editId).concat({ ...newStudent, password })
+      );
+      StudentDataAPI.deleteStudentData([editId])
+        .then(() => {
+          console.log("delete student data finish in edit");
+          StudentDataAPI.postStudentData([
+            {
+              userID: newStudent.id,
+              grade: Number(newStudent.grade),
+              password,
+              name: newStudent.name,
+              authority: Number(newStudent.authority),
+            },
+          ])
+            .then(() => {
+              console.log("post student data finish in edit");
+              console.log(`student id: ${newStudent.id}`);
+              console.log(`password id: ${password}`);
+            })
+            .catch(() => {});
+        })
+        .catch(() => {});
+
+      console.log({
         userID: newStudent.id,
         grade: Number(newStudent.grade),
         password,
         name: newStudent.name,
         authority: Number(newStudent.authority),
-      },
-    ])
-      .then(() => {
-        console.log("post student data finish new");
-      })
-      .catch(() => {});
-    setNewStudent({
-      id: "",
-      name: "",
-      grade: "",
-      authority: "",
-    });
-    handleCloseAdd();
-  };
+      });
 
-  const handleEditStudent = () => {
-    const password = genPassword();
-    setData(
-      data.filter((e) => e.id !== editId).concat({ ...newStudent, password })
-    );
-    StudentDataAPI.deleteStudentData([editId])
-      .then(() => {
-        console.log("delete student data finish in edit");
-        StudentDataAPI.postStudentData([
-          {
-            userID: newStudent.id,
-            grade: Number(newStudent.grade),
-            password,
-            name: newStudent.name,
-            authority: Number(newStudent.authority),
-          },
-        ])
-          .then(() => {
-            console.log("post student data finish in edit");
-            console.log(`student id: ${newStudent.id}`);
-            console.log(`password id: ${password}`);
-          })
-          .catch(() => {});
-      })
-      .catch(() => {});
-
-    console.log({
-      userID: newStudent.id,
-      grade: Number(newStudent.grade),
-      password,
-      name: newStudent.name,
-      authority: Number(newStudent.authority),
-    });
-
-    setNewStudent({
-      id: "",
-      name: "",
-      grade: "",
-      authority: "",
-    });
-    handleCloseAdd();
+      setNewStudent({
+        id: "",
+        name: "",
+        grade: "",
+        authority: "",
+      });
+      handleCloseAdd();
+    }
   };
 
   const handleDeleteStudent = () => {
-    console.log(deleteIds);
+    setDeleteIds([]);
     StudentDataAPI.deleteStudentData(deleteIds)
       .then(() => {
         setDeleteOpen(false);
         setData(data.filter((student) => !deleteIds.includes(student.id)));
         console.log("delete student data finish : ");
         console.log(deleteIds);
+        setSelected([]);
       })
       .catch(() => {});
   };
@@ -537,7 +631,6 @@ export default function StudentData() {
             onClick={editId === "" ? handleAddStudent : handleEditStudent}
             variant="contained"
             color="primary"
-            disabled={errors.id || errors.name || errors.grade}
           >
             {editId === "" ? "Add" : "Edit"}
           </Button>
@@ -583,22 +676,23 @@ export default function StudentData() {
         open={addMultipleOpen}
         onClose={handleCloseAddMultiple}
       >
-        <DialogTitle id="simple-dialog-title">
-          Add multiple students from csv file
-        </DialogTitle>
+        {uploaded ? (
+          <DialogTitle id="simple-dialog-title">Upload Completed</DialogTitle>
+        ) : (
+          <DialogTitle id="simple-dialog-title">
+            Add multiple students from csv file
+          </DialogTitle>
+        )}
         <DialogContent>
           {uploaded ? (
-            <>
-              upload completed
-              <Button
-                variant="contained"
-                color="primary"
-                component="span"
-                onClick={handleDownload}
-              >
-                Download
-              </Button>
-            </>
+            <Button
+              variant="contained"
+              color="primary"
+              component="span"
+              onClick={handleDownload}
+            >
+              Download password
+            </Button>
           ) : (
             <label htmlFor="contained-button-file">
               <input
@@ -635,6 +729,66 @@ export default function StudentData() {
           )}
         </DialogActions>
       </Dialog>
+      <Dialog
+        aria-labelledby="simple-dialog-title"
+        disableBackdropClick
+        open={regenerateOpen}
+        onClose={handleCloseRegenerate}
+      >
+        {invalidRegenerate ? (
+          <DialogTitle id="simple-dialog-title">
+            These student are invalid to regenerate password?
+          </DialogTitle>
+        ) : (
+          <DialogTitle id="simple-dialog-title">
+            Are you sure to Regenerate password of {selected.length} students?
+          </DialogTitle>
+        )}
+        <DialogContent>
+          {invalidRegenerate
+            ? data
+                .filter((e) => selected.includes(e.id))
+                .filter((e) => e.authority === 2)
+                .map((e) => (
+                  <Typography key={e.id}>
+                    {`id: ${e.id}, 
+              name: ${e.name},
+              grade: ${e.grade},
+              authority: ${e.authority}`}
+                  </Typography>
+                ))
+            : selected.map((id) => (
+                <Typography key={id}>
+                  {`id: ${data.find((e) => e.id === id).id}, 
+              name: ${data.find((e) => e.id === id).name},
+              grade: ${data.find((e) => e.id === id).grade},
+              authority: ${data.find((e) => e.id === id).authority}`}
+                </Typography>
+              ))}
+        </DialogContent>
+        <DialogActions>
+          {invalidRegenerate ? (
+            <Button
+              onClick={handleCloseRegenerate}
+              variant="contained"
+              color="primary"
+            >
+              Close
+            </Button>
+          ) : (
+            <>
+              <Button onClick={handleCloseRegenerate}>Cancel</Button>
+              <Button
+                onClick={handleGeneratePassword}
+                variant="contained"
+                color="primary"
+              >
+                Regenerate
+              </Button>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
       <Grid
         container
         spacing={1}
@@ -642,53 +796,7 @@ export default function StudentData() {
         alignItems="flex-start"
         direction="row"
       >
-        {/* <Grid item sm={12} md={3}>
-          <Grid
-            container
-            spacing={2}
-            justify="flex-start"
-            alignItems="flex-start"
-            direction="column"
-          >
-            <Grid item>
-              <label htmlFor="contained-button-file">
-                <input
-                  accept=".csv"
-                  className={classes.input}
-                  id="contained-button-file"
-                  type="file"
-                  onChange={(e) => handleUpload(e.target.files[0])}
-                />
-                <Button variant="contained" color="primary" component="span">
-                  Select csv file
-                </Button>
-              </label>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleDownload()}
-                startIcon={<CloudDownloadIcon />}
-              >
-                Download csv
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                component="span"
-                onClick={() => handleTest()}
-              >
-                Test
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid> */}
-        {/* <Grid item sm={12} md={9}> */}
         <Grid item sm={12}>
-          {/* <Typography variant="h6">Add Single Student</Typography> */}
           <Grid
             container
             spacing={1}
@@ -696,16 +804,6 @@ export default function StudentData() {
             alignItems="flex-start"
             direction="row"
           >
-            {/* ["id", "name", "grade"].map((e) => (
-              <Grid item key={e}>
-                <InputGrid
-                  type={e}
-                  newStudent={newStudent}
-                  setNewStudent={setNewStudent}
-                />
-              </Grid>
-            )) */}
-
             <Grid item>
               <Button
                 variant="contained"
@@ -724,6 +822,26 @@ export default function StudentData() {
                 Add Multiple Students
               </Button>
             </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleDownloadPassword}
+                disabled={csv === ""}
+              >
+                Download Password
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleOpenRegenerate}
+                disabled={selected.length === 0}
+              >
+                Generate Password
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
         <Grid item sm={12}>
@@ -731,6 +849,8 @@ export default function StudentData() {
             data={data}
             handleEdit={handleOpenEdit}
             handleDelete={handleOpenDelete}
+            selected={selected}
+            setSelected={setSelected}
           />
         </Grid>
         {/* <Hidden smDown>

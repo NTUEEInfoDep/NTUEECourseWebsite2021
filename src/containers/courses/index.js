@@ -131,10 +131,10 @@ export default function Courses() {
           onChange={handleSelectGrade}
           textColor="secondary"
           indicatorColor="secondary"
-          variant="fullWidth"
+          variant="scrollable"
         >
           {grades.map(({ id, text }) => (
-            <Tab key={id} value={id} label={text} style={{padding:"0px 0px 0px 0px"}}/>
+            <Tab key={id} value={id} label={text} style={{padding:"0px 0px 0px 0px", width:"20%"}}/>
           ))}
         </Tabs>
       </div>
