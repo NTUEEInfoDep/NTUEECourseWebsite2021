@@ -22,11 +22,10 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import HomeIcon from "@material-ui/icons/Home"; //Main
-import ExitToAppIcon from "@material-ui/icons/ExitToApp"; //Login
+import ExitToAppIcon from "@material-ui/icons/ExitToApp"; //Login, Logout
 import ClassIcon from "@material-ui/icons/Class"; //Courses
 import PeopleIcon from "@material-ui/icons/People"; //Student Data
 import CloudUploadIcon from "@material-ui/icons/CloudUpload"; //Course Manage
-import MeetingRoomIcon from "@material-ui/icons/MeetingRoom"; //Logout
 // slices
 import { selectSession } from "../../slices/sessionSlice";
 //logout
@@ -212,11 +211,10 @@ const Drawer = ({ children }) => {
             ]}
             onClick={() => dispatch(logout())}
           >
-            <MeetingRoomIcon />
+            <ExitToAppIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
-
       <MUIDrawer
         anchor={window.innerWidth >= maxPhoneWidth ? "left" : "top"}
         variant="permanent"
