@@ -176,10 +176,10 @@ export default function StudentData() {
       authority: "",
     });
     setErrors({
-      id: true,
-      name: true,
-      grade: true,
-      authority: true,
+      id: false,
+      name: false,
+      grade: false,
+      authority: false,
     });
     setErrorsMsg({
       id: "",
@@ -277,16 +277,6 @@ export default function StudentData() {
       ...newStudent,
       id: e.target.value,
     });
-    if (!e.target.value.length) {
-      setErrors({ ...errors, id: true });
-      setErrorsMsg({ ...errors, id: "id should not be empty" });
-    } else if (!/^(b|r|d)\d{8}$/i.test(e.target.value)) {
-      setErrors({ ...errors, id: true });
-      setErrorsMsg({ ...errors, id: "id invalid format" });
-    } else {
-      setErrors({ ...errors, id: false });
-      setErrorsMsg({ ...errors, id: "" });
-    }
   };
 
   const onNameChange = (e) => {
@@ -294,13 +284,6 @@ export default function StudentData() {
       ...newStudent,
       name: e.target.value,
     });
-    if (!e.target.value.length) {
-      setErrors({ ...errors, name: true });
-      setErrorsMsg({ ...errors, name: "name should not be empty" });
-    } else {
-      setErrors({ ...errors, name: false });
-      setErrorsMsg({ ...errors, name: "" });
-    }
   };
 
   const onGradeChange = (e) => {
@@ -308,16 +291,6 @@ export default function StudentData() {
       ...newStudent,
       grade: e.target.value,
     });
-    if (!e.target.value.length) {
-      setErrors({ ...errors, grade: true });
-      setErrorsMsg({ ...errors, grade: "grade should not be empty" });
-    } else if (!/^\d+$/.test(e.target.value)) {
-      setErrors({ ...errors, grade: true });
-      setErrorsMsg({ ...errors, grade: "grade should be a number" });
-    } else {
-      setErrors({ ...errors, grade: false });
-      setErrorsMsg({ ...errors, grade: "" });
-    }
   };
 
   const onAuthorityChange = (e) => {
@@ -325,17 +298,6 @@ export default function StudentData() {
       ...newStudent,
       authority: e.target.value,
     });
-    if (!e.target.value.length) {
-      setErrors({ ...errors, authority: true });
-      setErrorsMsg({ ...errors, authority: "authority should not be empty" });
-    } else if (!/^[012]$/.test(e.target.value)) {
-      setErrors({ ...errors, authority: true });
-      setErrorsMsg({ ...errors, authority: "authority should be a 0, 1 or 2" });
-    } else {
-      setErrors({ ...errors, authority: false });
-      setErrorsMsg({ ...errors, authority: "" });
-    }
-    console.log(newStudent);
   };
 
   const handleAddMultipleStudents = () => {
@@ -398,72 +360,138 @@ export default function StudentData() {
     download("datas.csv", csv);
   };
 
+  const judgeNewStudent = () => {
+    let error = false;
+    let newErrors = errors;
+    let newErrorsMsg = errorsMsg;
+    if (!newStudent.id) {
+      newErrors = { ...newErrors, id: true };
+      newErrorsMsg = { ...newErrorsMsg, id: "id should not be empty" };
+      error = true;
+    } else if (!/^(b|r|d)\d{8}$/i.test(newStudent.id)) {
+      newErrors = { ...newErrors, id: true };
+      newErrorsMsg = { ...newErrorsMsg, id: "id invalid format" };
+      error = true;
+    } else {
+      newErrors = { ...newErrors, id: false };
+      newErrorsMsg = { ...newErrorsMsg, id: "" };
+    }
+    if (!newStudent.name) {
+      newErrors = { ...newErrors, name: true };
+      newErrorsMsg = { ...newErrorsMsg, name: "name should not be empty" };
+      error = true;
+    } else {
+      newErrors = { ...newErrors, name: false };
+      newErrorsMsg = { ...newErrorsMsg, name: "" };
+    }
+    if (!newStudent.grade) {
+      newErrors = { ...newErrors, grade: true };
+      newErrorsMsg = { ...newErrorsMsg, grade: "grade should not be empty" };
+      error = true;
+    } else if (!/^\d+$/.test(newStudent.grade)) {
+      newErrors = { ...newErrors, grade: true };
+      newErrorsMsg = { ...newErrorsMsg, grade: "grade should be a number" };
+      error = true;
+    } else {
+      newErrors = { ...newErrors, grade: false };
+      newErrorsMsg = { ...newErrorsMsg, grade: "" };
+    }
+    if (!newStudent.authority) {
+      newErrors = { ...newErrors, authority: true };
+      newErrorsMsg = {
+        ...newErrorsMsg,
+        authority: "authority should not be empty",
+      };
+      error = true;
+    } else if (!/^[012]$/.test(newStudent.authority)) {
+      newErrors = { ...newErrors, authority: true };
+      newErrorsMsg = {
+        ...newErrorsMsg,
+        authority: "authority should be a 0, 1 or 2",
+      };
+      error = true;
+    } else {
+      newErrors = { ...newErrors, authority: false };
+      newErrorsMsg = { ...newErrorsMsg, authority: "" };
+    }
+    setErrors(newErrors);
+    setErrorsMsg(newErrorsMsg);
+    return error;
+  };
+
   const handleAddStudent = () => {
-    const password = genPassword();
-    setData(data.concat({ ...newStudent, password }));
-    StudentDataAPI.postStudentData([
-      {
+    const error = judgeNewStudent();
+
+    if (!error) {
+      const password = genPassword();
+      setData(data.concat({ ...newStudent, password }));
+      StudentDataAPI.postStudentData([
+        {
+          userID: newStudent.id,
+          grade: Number(newStudent.grade),
+          password,
+          name: newStudent.name,
+          authority: Number(newStudent.authority),
+        },
+      ])
+        .then(() => {
+          console.log("post student data finish new");
+        })
+        .catch(() => {});
+      setNewStudent({
+        id: "",
+        name: "",
+        grade: "",
+        authority: "",
+      });
+      handleCloseAdd();
+    }
+  };
+
+  const handleEditStudent = () => {
+    const error = judgeNewStudent();
+    if (!error) {
+      const password = genPassword();
+      setData(
+        data.filter((e) => e.id !== editId).concat({ ...newStudent, password })
+      );
+      StudentDataAPI.deleteStudentData([editId])
+        .then(() => {
+          console.log("delete student data finish in edit");
+          StudentDataAPI.postStudentData([
+            {
+              userID: newStudent.id,
+              grade: Number(newStudent.grade),
+              password,
+              name: newStudent.name,
+              authority: Number(newStudent.authority),
+            },
+          ])
+            .then(() => {
+              console.log("post student data finish in edit");
+              console.log(`student id: ${newStudent.id}`);
+              console.log(`password id: ${password}`);
+            })
+            .catch(() => {});
+        })
+        .catch(() => {});
+
+      console.log({
         userID: newStudent.id,
         grade: Number(newStudent.grade),
         password,
         name: newStudent.name,
         authority: Number(newStudent.authority),
-      },
-    ])
-      .then(() => {
-        console.log("post student data finish new");
-      })
-      .catch(() => {});
-    setNewStudent({
-      id: "",
-      name: "",
-      grade: "",
-      authority: "",
-    });
-    handleCloseAdd();
-  };
+      });
 
-  const handleEditStudent = () => {
-    const password = genPassword();
-    setData(
-      data.filter((e) => e.id !== editId).concat({ ...newStudent, password })
-    );
-    StudentDataAPI.deleteStudentData([editId])
-      .then(() => {
-        console.log("delete student data finish in edit");
-        StudentDataAPI.postStudentData([
-          {
-            userID: newStudent.id,
-            grade: Number(newStudent.grade),
-            password,
-            name: newStudent.name,
-            authority: Number(newStudent.authority),
-          },
-        ])
-          .then(() => {
-            console.log("post student data finish in edit");
-            console.log(`student id: ${newStudent.id}`);
-            console.log(`password id: ${password}`);
-          })
-          .catch(() => {});
-      })
-      .catch(() => {});
-
-    console.log({
-      userID: newStudent.id,
-      grade: Number(newStudent.grade),
-      password,
-      name: newStudent.name,
-      authority: Number(newStudent.authority),
-    });
-
-    setNewStudent({
-      id: "",
-      name: "",
-      grade: "",
-      authority: "",
-    });
-    handleCloseAdd();
+      setNewStudent({
+        id: "",
+        name: "",
+        grade: "",
+        authority: "",
+      });
+      handleCloseAdd();
+    }
   };
 
   const handleDeleteStudent = () => {
@@ -537,7 +565,6 @@ export default function StudentData() {
             onClick={editId === "" ? handleAddStudent : handleEditStudent}
             variant="contained"
             color="primary"
-            disabled={errors.id || errors.name || errors.grade}
           >
             {editId === "" ? "Add" : "Edit"}
           </Button>
