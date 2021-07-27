@@ -488,7 +488,7 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 100]}
+          rowsPerPageOptions={[50, 100, 200, 400]}
           component="div"
           count={data.filter((e) => studentFilter(e)).length}
           rowsPerPage={rowsPerPage}
