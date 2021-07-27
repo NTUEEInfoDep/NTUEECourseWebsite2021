@@ -86,6 +86,7 @@ export default function StudentData() {
   const [addMultipleOpen, setAddMultipleOpen] = React.useState(false);
   const [csv, setCsv] = React.useState("");
   const [editId, setEditId] = React.useState("");
+  const [selected, setSelected] = React.useState([]);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [deleteIds, setDeleteIds] = React.useState([]);
   const [errors, setErrors] = React.useState({
@@ -495,13 +496,14 @@ export default function StudentData() {
   };
 
   const handleDeleteStudent = () => {
-    console.log(deleteIds);
+    setDeleteIds([]);
     StudentDataAPI.deleteStudentData(deleteIds)
       .then(() => {
         setDeleteOpen(false);
         setData(data.filter((student) => !deleteIds.includes(student.id)));
         console.log("delete student data finish : ");
         console.log(deleteIds);
+        setSelected([]);
       })
       .catch(() => {});
   };
@@ -758,6 +760,8 @@ export default function StudentData() {
             data={data}
             handleEdit={handleOpenEdit}
             handleDelete={handleOpenDelete}
+            selected={selected}
+            setSelected={setSelected}
           />
         </Grid>
         {/* <Hidden smDown>
