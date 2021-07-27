@@ -89,6 +89,8 @@ export default function StudentData() {
   const [selected, setSelected] = React.useState([]);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [deleteIds, setDeleteIds] = React.useState([]);
+  const [regenerateOpen, setRegenerateOpen] = React.useState(false);
+  const [invalidRegenerate, setInvalidRegenerate] = React.useState(false);
   const [errors, setErrors] = React.useState({
     id: false,
     name: false,
@@ -273,6 +275,23 @@ export default function StudentData() {
     setDeleteOpen(false);
   };
 
+  const handleOpenRegenerate = () => {
+    if (
+      data
+        .filter((e) => selected.includes(e.id))
+        .filter((e) => e.authority === 2).length !== 0
+    ) {
+      setInvalidRegenerate(true);
+    } else {
+      setInvalidRegenerate(false);
+    }
+    setRegenerateOpen(true);
+  };
+
+  const handleCloseRegenerate = () => {
+    setRegenerateOpen(false);
+  };
+
   const onIdChange = (e) => {
     setNewStudent({
       ...newStudent,
@@ -398,6 +417,8 @@ export default function StudentData() {
           })
           .then(() => {
             setCsv(Papa.unparse(newData));
+            setRegenerateOpen(false);
+            setSelected([]);
           })
           .catch(() => {});
       })
@@ -708,6 +729,66 @@ export default function StudentData() {
           )}
         </DialogActions>
       </Dialog>
+      <Dialog
+        aria-labelledby="simple-dialog-title"
+        disableBackdropClick
+        open={regenerateOpen}
+        onClose={handleCloseRegenerate}
+      >
+        {invalidRegenerate ? (
+          <DialogTitle id="simple-dialog-title">
+            These student are invalid to regenerate password?
+          </DialogTitle>
+        ) : (
+          <DialogTitle id="simple-dialog-title">
+            Are you sure to Regenerate password of {selected.length} students?
+          </DialogTitle>
+        )}
+        <DialogContent>
+          {invalidRegenerate
+            ? data
+                .filter((e) => selected.includes(e.id))
+                .filter((e) => e.authority === 2)
+                .map((e) => (
+                  <Typography key={e.id}>
+                    {`id: ${e.id}, 
+              name: ${e.name},
+              grade: ${e.grade},
+              authority: ${e.authority}`}
+                  </Typography>
+                ))
+            : selected.map((id) => (
+                <Typography key={id}>
+                  {`id: ${data.find((e) => e.id === id).id}, 
+              name: ${data.find((e) => e.id === id).name},
+              grade: ${data.find((e) => e.id === id).grade},
+              authority: ${data.find((e) => e.id === id).authority}`}
+                </Typography>
+              ))}
+        </DialogContent>
+        <DialogActions>
+          {invalidRegenerate ? (
+            <Button
+              onClick={handleCloseRegenerate}
+              variant="contained"
+              color="primary"
+            >
+              Close
+            </Button>
+          ) : (
+            <>
+              <Button onClick={handleCloseRegenerate}>Cancel</Button>
+              <Button
+                onClick={handleGeneratePassword}
+                variant="contained"
+                color="primary"
+              >
+                Regenerate
+              </Button>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
       <Grid
         container
         spacing={1}
@@ -755,7 +836,8 @@ export default function StudentData() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleGeneratePassword}
+                onClick={handleOpenRegenerate}
+                disabled={selected.length === 0}
               >
                 Generate Password
               </Button>
