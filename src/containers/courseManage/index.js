@@ -59,10 +59,6 @@ const typeData = [
     text: "大三必修",
   },
   {
-    id: "4",
-    text: "大四必修",
-  },
-  {
     id: "Ten-Select-Two",
     text: "十選二實驗",
   },

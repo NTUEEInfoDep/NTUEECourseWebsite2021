@@ -68,8 +68,12 @@ const gradeData = [
     text: "大三",
   },
   {
-    id: "0",
+    id: "Ten-Select-Two",
     text: "十選二實驗",
+  },
+  {
+    id: "EE-Lab",
+    text: "電電實驗",
   },
 ];
 
@@ -106,7 +110,7 @@ export default function Courses() {
 
   return (
     <div>
-      <Toolbar>
+      {/* <Toolbar>
         <div className={classes.search}>
           <div className={classes.searchIcon}>
             <SearchIcon />
@@ -119,18 +123,21 @@ export default function Courses() {
             }}
           />
         </div>
-      </Toolbar>
-      <Tabs
-        value={selectedGrade}
-        onChange={handleSelectGrade}
-        textColor="secondary"
-        indicatorColor="secondary"
-        variant="fullWidth"
-      >
-        {grades.map(({ id, text }) => (
-          <Tab key={id} value={id} label={text} />
-        ))}
-      </Tabs>
+      </Toolbar> */}
+      <div className="TABS">
+        <Tabs
+          className="TABS"
+          value={selectedGrade}
+          onChange={handleSelectGrade}
+          textColor="secondary"
+          indicatorColor="secondary"
+          variant="fullWidth"
+        >
+          {grades.map(({ id, text }) => (
+            <Tab key={id} value={id} label={text} style={{padding:"0px 0px 0px 0px"}}/>
+          ))}
+        </Tabs>
+      </div>
       <Grid container>
         {courses
           .filter((c) => c.type === selectedGrade)
