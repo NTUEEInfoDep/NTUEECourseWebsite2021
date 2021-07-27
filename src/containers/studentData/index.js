@@ -708,7 +708,7 @@ export default function StudentData() {
 
             <Grid item>
               <Button
-                variant="contained"
+                variant="outlined"
                 color="primary"
                 onClick={handleOpenAdd}
               >

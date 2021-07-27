@@ -289,7 +289,7 @@ export default function CourseManage() {
     <div>
       <Grid container spacing={3} direction="row">
         <Grid item sm={12}>
-          <Button onClick={addCourse} variant="contained" color="primary">
+          <Button onClick={addCourse} variant="outlined" color="primary">
             Add Course
           </Button>
         </Grid>
@@ -357,7 +357,7 @@ export default function CourseManage() {
             onChange={(e) => handleCourse(e, "description")}
           /> */}
 
-          <DialogContentText className={classes.optionsTitle} >
+          <DialogContentText className={classes.optionsTitle}>
             Options
           </DialogContentText>
           <div className={classes.options}>
@@ -417,7 +417,10 @@ export default function CourseManage() {
               Add
             </Button>
           </div>
-          <DialogContentText className={classes.optionsTitle} style={{ marginTop: "10px" }}>
+          <DialogContentText
+            className={classes.optionsTitle}
+            style={{ marginTop: "10px" }}
+          >
             Description(Markdown)
           </DialogContentText>
           <div className="editor">
