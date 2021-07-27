@@ -44,6 +44,10 @@ const useStyles = makeStyles((theme) => ({
     //  display: "flex",
   },
   appBar: {
+    marginTop: theme.spacing(1),
+    color: "#fff",
+    boxShadow: "none",
+    backgroundColor: "rgba(0, 0, 0, 0)",
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
@@ -88,12 +92,13 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   menuButton: {
-    marginRight: 36,
+    marginRight: 10,
   },
   iconButton: {
     marginRight: 0,
   },
   toolbar: {
+    marginTop: theme.spacing(1),
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
@@ -199,7 +204,7 @@ const Drawer = ({ children }) => {
           >
             <KeyboardArrowUpIcon />
           </IconButton>
-          <Typography variant="h6" className={classes.appBarTypography}>
+          <Typography variant="h5" className={classes.appBarTypography}>
             NTUEE
           </Typography>
           <Typography variant="h6">{userName}</Typography>
