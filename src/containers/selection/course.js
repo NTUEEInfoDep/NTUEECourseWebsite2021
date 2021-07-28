@@ -10,17 +10,16 @@ const useStyles = makeStyles({
     opacity: 1.0,
     border: 0,
     borderRadius: 3, // 4
-    padding: "15px 15px", // 4px, 8px
+    padding: "15px 5px", // 4px, 8px
     //transition: "background-color .8s ease-out",
     marginTop: 8,
     color: "white", //#071214
     height: 45,
     boxShadow: "0 3px 5px 2px rgba(255, 105, 135, .3)",
-    textAlign: "center",
+    //textAlign: "center",
     fontFamily: "Times, Times New Roman, serif",
     //opacity: 1.0,
     zIndex: 1,
-
 
     ":hover": {
       backgroundColor: "gold",

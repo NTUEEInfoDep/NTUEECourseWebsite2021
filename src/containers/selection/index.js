@@ -49,7 +49,9 @@ const useStyles = makeStyles((theme) => ({
     gap: "8px",
     [theme.breakpoints.down("sm")]: {
       margin: "1vh auto",
-      width: "90%",
+      width: "95%",
+      paddingLeft: "0px",
+      paddingRight: "0px",
     },
   },
 }));
