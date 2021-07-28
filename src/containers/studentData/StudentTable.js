@@ -203,11 +203,7 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton aria-label="filter list">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <></>
       )}
     </Toolbar>
   );
@@ -490,19 +486,17 @@ export default function StudentTable({
                         <IconButton
                           onClick={() => handleEdit(row.id)}
                           className={classes.icon}
+                          disabled={selected.length !== 0}
                         >
                           <EditIcon />
                         </IconButton>
-                        {selected.length === 0 ? (
-                          <IconButton
-                            onClick={() => handleDelete([row.id])}
-                            className={classes.icon}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        ) : (
-                          <></>
-                        )}
+                        <IconButton
+                          onClick={() => handleDelete([row.id])}
+                          className={classes.icon}
+                          disabled={selected.length !== 0}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   );
