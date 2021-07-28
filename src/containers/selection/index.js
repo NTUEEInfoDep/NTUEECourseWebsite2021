@@ -31,7 +31,6 @@ import React, { useEffect, useState } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
 import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
-import { Paper } from "@material-ui/core";
 // import initialData from "./initial-data";
 import Column from "./column";
 import { SelectAPI } from "../../api";
@@ -163,7 +162,6 @@ const Selection = () => {
             border:"1px white solid",
             borderRadius: "4px" 
           }}
-          className="intro"
         >
           <h2 style={{marginTop:"0px"}}>Introduction</h2>
           <MDEditor.Markdown source={data.description} />

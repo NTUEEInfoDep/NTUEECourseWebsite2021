@@ -94,7 +94,7 @@ export default function Courses() {
   }, []);
 
   // select grade
-  const [selectedGrade, setSelectedGrade] = useState(false);
+  const [selectedGrade, setSelectedGrade] = useState("1");
   const handleSelectGrade = (event, value) => {
     setSelectedGrade(value);
   };
@@ -124,9 +124,8 @@ export default function Courses() {
           />
         </div>
       </Toolbar> */}
-      <div className="TABS">
+      <div>
         <Tabs
-          className="TABS"
           value={selectedGrade}
           onChange={handleSelectGrade}
           textColor="secondary"
