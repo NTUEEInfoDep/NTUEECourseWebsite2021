@@ -30,15 +30,15 @@
 import React, { useEffect, useState } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
-import { 
-  makeStyles,
-  ThemeProvider,
-  useTheme,
-} from "@material-ui/core/styles";
+import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
+import { Paper } from "@material-ui/core";
 // import initialData from "./initial-data";
 import Column from "./column";
 import { SelectAPI } from "../../api";
 import Loading from "../../components/loading";
+
+//MdEditor
+import MDEditor from "@uiw/react-md-editor";
 
 const useStyles = makeStyles((theme) => ({
   styledColumns: {
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("sm")]: {
       margin: "1vh auto",
       width: "90%",
-    }
+    },
   },
 }));
 const Selection = () => {
@@ -149,20 +149,40 @@ const Selection = () => {
     //   }
     // }, [data]);
   };
+
   return (
     <>
       {data ? (
+        <div
+          style={{
+            width: "75%",
+            padding:"10px",
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginBottom: "30px",
+            border:"1px white solid",
+            borderRadius: "4px" 
+          }}
+          className="intro"
+        >
+          <h2 style={{marginTop:"0px"}}>Introduction</h2>
+          <MDEditor.Markdown source={data.description} />
+        </div>
+      ) : (
+        ""
+      )}
+      {data ? (
         <ThemeProvider theme={theme}>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div className={classes.styledColumns}>
-            <Column key="selected" title="selected" column={data.selected} />
-            <Column
-              key="unselect"
-              title="unselect"
-              column={data.unselected}
-            />
-          </div>
-        </DragDropContext>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className={classes.styledColumns}>
+              <Column key="selected" title="selected" column={data.selected} />
+              <Column
+                key="unselect"
+                title="unselect"
+                column={data.unselected}
+              />
+            </div>
+          </DragDropContext>
         </ThemeProvider>
       ) : (
         Loading
