@@ -116,13 +116,17 @@ export default function StudentData() {
     authority: "",
   });
 
+  const handleStudentDataReload = async () => {
+    try {
+      setData((await StudentDataAPI.getStudentData()).data);
+    } catch (err) {
+      // showAlert("error", "Failed to load courses.");
+      console.log("Failed to load student data");
+    }
+  };
+
   useEffect(() => {
-    // const courseData = fakeCourseData;
-    StudentDataAPI.getStudentData()
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch(() => {});
+    handleStudentDataReload();
   }, []);
 
   // const handleTest = () => {

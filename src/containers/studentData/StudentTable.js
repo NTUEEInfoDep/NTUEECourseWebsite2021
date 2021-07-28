@@ -14,16 +14,11 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Paper from "@material-ui/core/Paper";
 import Checkbox from "@material-ui/core/Checkbox";
 import Input from "@material-ui/core/Input";
-import Switch from "@material-ui/core/Switch";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 import PropTypes from "prop-types";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import FilterListIcon from "@material-ui/icons/FilterList";
-
-import { StudentDataAPI } from "../../api";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -70,7 +65,6 @@ function EnhancedTableHead(props) {
     onSelectAllClick,
     order,
     orderBy,
-    numSelected,
     numSelectedInPage,
     rowCount,
     onRequestSort,
@@ -122,7 +116,7 @@ function EnhancedTableHead(props) {
 
 EnhancedTableHead.propTypes = {
   classes: PropTypes.object.isRequired,
-  numSelected: PropTypes.number.isRequired,
+  numSelectedInPage: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
@@ -292,19 +286,11 @@ export default function StudentTable({
 
   //
   const handleSelectAllClick = (event) => {
-    // console.log(`event.target.checked: ${event.target.checked}`);
-    // console.log(`search: ${search}`);
-    // console.log(`selected: (${selected.length})`);
-    // console.log(selected);
     if (event.target.checked) {
-      // console.log("checked");
-      // data.filter((student) => !deleteIds.includes(student.id));
       const nowSelecteds = data
         .filter((e) => studentFilter(e))
         .map((n) => n.id);
-      // console.log(`now length: ${nowSelecteds.length}`);
       const newSelecteds = nowSelecteds.filter((id) => !selected.includes(id));
-      // console.log(`new length: ${newSelecteds.length}`);
       if (newSelecteds.length === 0) {
         setSelected(selected.filter((id) => !nowSelecteds.includes(id)));
       } else {
@@ -312,7 +298,6 @@ export default function StudentTable({
       }
       return;
     }
-    // console.log("why are you here?");
     setSelected([]);
   };
 
@@ -385,7 +370,6 @@ export default function StudentTable({
           >
             <EnhancedTableHead
               classes={classes}
-              numSelected={selected.length}
               numSelectedInPage={
                 data
                   .filter((e) => studentFilter(e))
@@ -501,11 +485,6 @@ export default function StudentTable({
                     </TableRow>
                   );
                 })}
-              {/* emptyRows > 0 && (
-                <TableRow style={{ height: "100px" }}>
-                  <TableCell colSpan={6} className={classes.tablecell} />
-                </TableRow>
-              ) */}
             </TableBody>
           </Table>
         </TableContainer>
@@ -519,10 +498,6 @@ export default function StudentTable({
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      {/* <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      /> */}
     </div>
   );
 }
