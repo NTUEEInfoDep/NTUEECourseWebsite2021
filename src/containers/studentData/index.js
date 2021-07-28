@@ -136,7 +136,7 @@ export default function StudentData() {
         complete(results) {
           const newData = results.data.slice(1).reduce((obj, cur) => {
             return obj.concat([
-              { id: cur[0], name: cur[1], grade: cur[2], authority: cur[3] },
+              { id: cur[0], name: cur[1], grade: cur[2], authority: "0" },
             ]);
           }, []);
           setNewStudentMultiple(newData);
@@ -560,13 +560,13 @@ export default function StudentData() {
   };
 
   const handleDeleteStudent = () => {
-    setDeleteIds([]);
+    setDeleteOpen(false);
     StudentDataAPI.deleteStudentData(deleteIds)
       .then(() => {
-        setDeleteOpen(false);
         setData(data.filter((student) => !deleteIds.includes(student.id)));
         console.log("delete student data finish : ");
         console.log(deleteIds);
+        setDeleteIds([]);
         setSelected([]);
       })
       .catch(() => {});
@@ -647,14 +647,17 @@ export default function StudentData() {
         </DialogTitle>
         <DialogContent>
           {deleteOpen ? (
-            deleteIds.map((id) => (
-              <Typography key={id}>
-                {`id: ${data.find((e) => e.id === id).id}, 
+            data
+              .filter((e) => deleteIds.includes(e.id))
+              .map((e) => e.id)
+              .map((id) => (
+                <Typography key={id}>
+                  {`id: ${data.find((e) => e.id === id).id}, 
               name: ${data.find((e) => e.id === id).name},
               grade: ${data.find((e) => e.id === id).grade},
               authority: ${data.find((e) => e.id === id).authority}`}
-              </Typography>
-            ))
+                </Typography>
+              ))
           ) : (
             <></>
           )}
@@ -757,14 +760,17 @@ export default function StudentData() {
               authority: ${e.authority}`}
                   </Typography>
                 ))
-            : selected.map((id) => (
-                <Typography key={id}>
-                  {`id: ${data.find((e) => e.id === id).id}, 
+            : data
+                .filter((e) => selected.includes(e.id))
+                .map((e) => e.id)
+                .map((id) => (
+                  <Typography key={id}>
+                    {`id: ${data.find((e) => e.id === id).id}, 
               name: ${data.find((e) => e.id === id).name},
               grade: ${data.find((e) => e.id === id).grade},
               authority: ${data.find((e) => e.id === id).authority}`}
-                </Typography>
-              ))}
+                  </Typography>
+                ))}
         </DialogContent>
         <DialogActions>
           {invalidRegenerate ? (
