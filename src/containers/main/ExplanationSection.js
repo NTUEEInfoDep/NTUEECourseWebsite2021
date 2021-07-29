@@ -16,24 +16,24 @@ import Card from "./Cards/Card";
 import Card2 from "./Cards/Card2";
 import Card3 from "./Cards/Card3";
 
-
 const useStyles = makeStyles(() => ({
   root: {
     width: "80%",
     margin: "auto",
-    maxHeight: "700px", 
+    maxHeight: "700px",
     display: "flex",
     borderRadius: "3%",
     flexDirection: "column",
     alignItems: "center",
-    boxShadow: "0 0 150px #A5DEE4 inset",
+    background: "rgb(0,0,0,.7)",
+    // boxShadow: "0 0 150px #A5DEE4 inset",
     flexGrow: 1,
-    padding: "20px"
+    padding: "20px",
   },
   title: {
     padding: "10px",
-    textAlign: "center"
-  }
+    textAlign: "center",
+  },
 }));
 const StyledSlide = styled(Slide)`
   .carousel__inner-slide {
@@ -89,7 +89,7 @@ export default function Explanation() {
 
   return (
     <Element name="explanation">
-      <div style={{height:'55px'}}/>
+      <div style={{ height: "55px" }} />
       {/* 讓網頁下滑 */}
       <div className={classes.root}>
         <Typography

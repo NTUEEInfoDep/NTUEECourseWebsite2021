@@ -6,22 +6,23 @@ import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   paper: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(5),
     margin: "10% auto",
-    backgroundColor: "rgba(1,1,1,.2)",
-    boxShadow: "0 0 15px #f3d42e inset",
+    backgroundColor: "rgba(0,0,0,.7)",
+    // boxShadow: "0 0 15px #f3d42e inset",
     maxWidth: 900,
-    width: "80%"
+    width: "80%",
+    borderRadius: "3%",
   },
   img: {
     margin: "auto",
     display: "block",
     maxWidth: "100%",
-    maxHeight: "100%"
-  }
+    maxHeight: "100%",
+  },
 }));
 
 export default function Usage() {

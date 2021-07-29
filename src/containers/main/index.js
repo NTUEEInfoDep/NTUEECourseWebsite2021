@@ -8,15 +8,7 @@ export default function Main() {
     <div>
       <Top />
       <Explanation />
-      <div style={{ height: "95px" }} />
-      <hr
-        style={{
-          height: "5px",
-          border: "none",
-          borderTop: "5px double #62deda",
-          width: "90%",
-        }}
-      />
+      <div style={{ height: "100px" }} />
       <Usage />
       <Footer />
     </div>
