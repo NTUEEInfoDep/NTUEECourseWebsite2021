@@ -2,23 +2,19 @@ import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 
-import Input from "@material-ui/core/Input";
 import Grid from "@material-ui/core/Grid";
-import Avatar from "@material-ui/core/Avatar";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import ListItemText from "@material-ui/core/ListItemText";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   TextField,
   Hidden,
   Typography,
+  Snackbar,
 } from "@material-ui/core";
+
+import { Alert } from "@material-ui/lab";
 
 import Container from "@material-ui/core/Container";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
@@ -57,22 +53,6 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-// function InputGrid({ type, newStudent, setNewStudent }) {
-//   return (
-//     <Input
-//       value={newStudent[type]}
-//       name={type}
-//       placeholder={type}
-//       onChange={(e) => {
-//         setNewStudent({
-//           ...newStudent,
-//           [type]: e.target.value,
-//         });
-//       }}
-//     />
-//   );
-// }
-
 /**
  * This is Student Data Page
  */
@@ -91,6 +71,7 @@ export default function StudentData() {
   const [deleteIds, setDeleteIds] = React.useState([]);
   const [regenerateOpen, setRegenerateOpen] = React.useState(false);
   const [invalidRegenerate, setInvalidRegenerate] = React.useState(false);
+  const [alert, setAlert] = React.useState({});
   const [errors, setErrors] = React.useState({
     id: false,
     name: false,
@@ -116,22 +97,21 @@ export default function StudentData() {
     authority: "",
   });
 
+  const showAlert = (severity, msg) => {
+    setAlert({ open: true, severity, msg });
+  };
+
   const handleStudentDataReload = async () => {
     try {
       setData((await StudentDataAPI.getStudentData()).data);
     } catch (err) {
-      // showAlert("error", "Failed to load courses.");
-      console.log("Failed to load student data");
+      showAlert("error", "Failed to load student data.");
     }
   };
 
   useEffect(() => {
     handleStudentDataReload();
   }, []);
-
-  // const handleTest = () => {
-  //   console.log(data);
-  // };
 
   const handleUploadCsv = async (efile) => {
     if (efile) {
@@ -146,19 +126,15 @@ export default function StudentData() {
           setNewStudentMultiple(newData);
           // loaded should be completed
           setLoaded(true);
-          console.log("Multiple student data loaded");
-          console.log(newData);
+          // console.log("Multiple student data loaded");
+          // console.log(newData);
         },
       });
     }
   };
 
-  // const handleDownload = () => {
-  //   console.log("to be complete");
-  // };
-
   const handleOpenAddMultiple = () => {
-    console.log("handleOpenAddMultiple");
+    // console.log("handleOpenAddMultiple");
     setUploaded(false);
     setAddMultipleOpen(true);
     setNewStudentMultiple({
@@ -170,12 +146,12 @@ export default function StudentData() {
   };
 
   const handleCloseAddMultiple = () => {
-    console.log("handleCloseAddMultiple");
+    // console.log("handleCloseAddMultiple");
     setAddMultipleOpen(false);
   };
 
   const handleOpenAdd = () => {
-    console.log("handleOpenAdd");
+    // console.log("handleOpenAdd");
     setNewStudent({
       id: "",
       name: "",
@@ -198,7 +174,7 @@ export default function StudentData() {
   };
 
   const handleCloseAdd = () => {
-    console.log("handleCloseAdd");
+    // console.log("handleCloseAdd");
     setNewStudent({
       id: "",
       name: "",
@@ -221,9 +197,9 @@ export default function StudentData() {
   };
 
   const handleOpenEdit = (id) => {
-    console.log("handleOpenEdit");
+    // console.log("handleOpenEdit");
     setEditId(id);
-    console.log(id);
+    // console.log(id);
     const student = data.find((e) => e.id === id);
     setNewStudent({
       id: student.id,
@@ -247,7 +223,7 @@ export default function StudentData() {
   };
 
   const handleCloseEdit = () => {
-    console.log("handleCloseEdit");
+    // console.log("handleCloseEdit");
     setEditId("");
     setNewStudent({
       id: "",
@@ -324,42 +300,44 @@ export default function StudentData() {
     });
   };
 
-  const handleAddMultipleStudents = () => {
-    console.log("handleAddMultipleStudents");
+  const handleAddMultipleStudents = async () => {
+    // console.log("handleAddMultipleStudents");
     if (loaded) {
       const newData = newStudentMultiple.map((student) => {
         const password = genPassword();
         return { ...student, password };
       });
-      console.log("start post datas");
-      StudentDataAPI.postStudentData(
-        newData.map((student) => {
-          return {
-            userID: student.id,
-            grade: Number(student.grade),
-            password: student.password,
-            name: student.name,
-            authority: Number(student.authority),
-          };
-        })
-      )
-        .then(() => {
-          console.log("finish post");
-          setUploaded(true);
-          setData(data.concat(newData));
-          console.log(newData);
-          console.log(data);
+      // console.log("start post datas");
+      try {
+        await StudentDataAPI.postStudentData(
+          newData.map((student) => {
+            return {
+              userID: student.id,
+              grade: Number(student.grade),
+              password: student.password,
+              name: student.name,
+              authority: Number(student.authority),
+            };
+          })
+        );
+        // console.log("finish post");
+        setUploaded(true);
+        setData(data.concat(newData));
+        // console.log(newData);
+        // console.log(data);
 
-          setNewStudentMultiple({
-            id: "",
-            name: "",
-            grade: "",
-            authority: "",
-          });
-        })
-        .then(() => {
-          setCsv(Papa.unparse(newData));
+        setNewStudentMultiple({
+          id: "",
+          name: "",
+          grade: "",
+          authority: "",
         });
+
+        setCsv(Papa.unparse(newData));
+        showAlert("success", "Add multiple student data complete.");
+      } catch (err) {
+        showAlert("error", "Failed to Add multiple student data.");
+      }
     }
   };
 
@@ -380,53 +358,56 @@ export default function StudentData() {
   };
 
   const handleDownloadPassword = () => {
-    console.log("download password");
+    // console.log("download password");
     download("datas.csv", csv);
   };
 
   const handleDownload = () => {
-    console.log(csv);
+    // console.log(csv);
     download("datas.csv", csv);
   };
 
-  const handleGeneratePassword = () => {
-    console.log("generate password");
+  const handleGeneratePassword = async () => {
+    // console.log("generate password");
     const newData = data
       .filter((e) => selected.includes(e.id))
       .map((student) => {
         const password = genPassword();
         return { ...student, password };
       });
-    console.log(`delete in regenerate: `);
-    console.log(selected);
-    StudentDataAPI.deleteStudentData(selected)
-      .then(() => {
-        console.log("delete student data finish in regenerate");
-        StudentDataAPI.postStudentData(
-          newData.map((student) => {
-            return {
-              userID: student.id,
-              grade: Number(student.grade),
-              password: student.password,
-              name: student.name,
-              authority: Number(student.authority),
-            };
-          })
-        )
-          .then(() => {
-            console.log("post student data finish in regeneration");
-            setData(
-              data.filter((e) => !selected.includes(e.id)).concat(newData)
-            );
-          })
-          .then(() => {
-            setCsv(Papa.unparse(newData));
-            setRegenerateOpen(false);
-            setSelected([]);
-          })
-          .catch(() => {});
-      })
-      .catch(() => {});
+    // console.log(`delete in regenerate: `);
+    // console.log(selected);
+    try {
+      await StudentDataAPI.deleteStudentData(selected);
+    } catch (err) {
+      showAlert("error", "Failed to Delete student data in generate password.");
+      handleCloseRegenerate();
+      return;
+    }
+    // console.log("delete student data finish in regenerate");
+    try {
+      await StudentDataAPI.postStudentData(
+        newData.map((student) => {
+          return {
+            userID: student.id,
+            grade: Number(student.grade),
+            password: student.password,
+            name: student.name,
+            authority: Number(student.authority),
+          };
+        })
+      );
+    } catch (err) {
+      showAlert("error", "Failed to Post student data when generate password.");
+      handleCloseRegenerate();
+      return;
+    }
+    showAlert("success", "Generate password complete.");
+    // console.log("post student data finish in regeneration");
+    setData(data.filter((e) => !selected.includes(e.id)).concat(newData));
+    setCsv(Papa.unparse(newData));
+    handleCloseRegenerate();
+    setSelected([]);
   };
 
   const judgeNewStudent = () => {
@@ -488,92 +469,105 @@ export default function StudentData() {
     return error;
   };
 
-  const handleAddStudent = () => {
+  const handleAddStudent = async () => {
     const error = judgeNewStudent();
 
     if (!error) {
       const password = genPassword();
-      setData(data.concat({ ...newStudent, password }));
-      StudentDataAPI.postStudentData([
-        {
-          userID: newStudent.id,
-          grade: Number(newStudent.grade),
-          password,
-          name: newStudent.name,
-          authority: Number(newStudent.authority),
-        },
-      ])
-        .then(() => {
-          console.log("post student data finish new");
-        })
-        .catch(() => {});
-      setNewStudent({
-        id: "",
-        name: "",
-        grade: "",
-        authority: "",
-      });
-      handleCloseAdd();
+      try {
+        await StudentDataAPI.postStudentData([
+          {
+            userID: newStudent.id,
+            grade: Number(newStudent.grade),
+            password,
+            name: newStudent.name,
+            authority: Number(newStudent.authority),
+          },
+        ]);
+        setData(data.concat({ ...newStudent, password }));
+        setNewStudent({
+          id: "",
+          name: "",
+          grade: "",
+          authority: "",
+        });
+        handleCloseAdd();
+        showAlert("success", "Add student data success.");
+      } catch {
+        handleCloseAdd();
+        showAlert("error", "Failed to Add student data.");
+      }
     }
   };
 
-  const handleEditStudent = () => {
+  const handleEditStudent = async () => {
     const error = judgeNewStudent();
     if (!error) {
       const password = genPassword();
-      setData(
-        data.filter((e) => e.id !== editId).concat({ ...newStudent, password })
-      );
-      StudentDataAPI.deleteStudentData([editId])
-        .then(() => {
-          console.log("delete student data finish in edit");
-          StudentDataAPI.postStudentData([
-            {
-              userID: newStudent.id,
-              grade: Number(newStudent.grade),
-              password,
-              name: newStudent.name,
-              authority: Number(newStudent.authority),
-            },
-          ])
-            .then(() => {
-              console.log("post student data finish in edit");
-              console.log(`student id: ${newStudent.id}`);
-              console.log(`password id: ${password}`);
-            })
-            .catch(() => {});
-        })
-        .catch(() => {});
+      try {
+        StudentDataAPI.deleteStudentData([editId]);
+      } catch (err) {
+        showAlert("error", "Failed to Delete student data in Edit.");
+        handleCloseAdd();
+        return;
+      }
+      // console.log("delete student data finish in edit");
 
-      console.log({
-        userID: newStudent.id,
-        grade: Number(newStudent.grade),
-        password,
-        name: newStudent.name,
-        authority: Number(newStudent.authority),
-      });
+      try {
+        await StudentDataAPI.postStudentData([
+          {
+            userID: newStudent.id,
+            grade: Number(newStudent.grade),
+            password,
+            name: newStudent.name,
+            authority: Number(newStudent.authority),
+          },
+        ]);
+        // console.log("post student data finish in edit");
+        // console.log(`student id: ${newStudent.id}`);
+        // console.log(`password id: ${password}`);
+        setData(
+          data
+            .filter((e) => e.id !== editId)
+            .concat({ ...newStudent, password })
+        );
+        // console.log({
+        //  userID: newStudent.id,
+        //  grade: Number(newStudent.grade),
+        //  password,
+        //  name: newStudent.name,
+        //  authority: Number(newStudent.authority),
+        // });
 
-      setNewStudent({
-        id: "",
-        name: "",
-        grade: "",
-        authority: "",
-      });
-      handleCloseAdd();
+        setNewStudent({
+          id: "",
+          name: "",
+          grade: "",
+          authority: "",
+        });
+        handleCloseAdd();
+        showAlert("success", "Edit student data success.");
+      } catch (err) {
+        showAlert("error", "Failed to post student data in Edit.");
+        handleCloseAdd();
+      }
     }
   };
 
-  const handleDeleteStudent = () => {
-    setDeleteOpen(false);
-    StudentDataAPI.deleteStudentData(deleteIds)
-      .then(() => {
-        setData(data.filter((student) => !deleteIds.includes(student.id)));
-        console.log("delete student data finish : ");
-        console.log(deleteIds);
-        setDeleteIds([]);
-        setSelected([]);
-      })
-      .catch(() => {});
+  const handleDeleteStudent = async () => {
+    try {
+      await StudentDataAPI.deleteStudentData(deleteIds);
+      setData(data.filter((student) => !deleteIds.includes(student.id)));
+      // console.log("delete student data finish : ");
+      // console.log(deleteIds);
+      setDeleteIds([]);
+      setSelected([]);
+      handleCloseDelete();
+      showAlert("success", "delete student data success.");
+    } catch (err) {
+      showAlert("error", "Failed to delete student data.");
+      handleCloseDelete();
+    }
   };
 
   return (
@@ -716,7 +710,6 @@ export default function StudentData() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAddMultiple}>Cancel</Button>
           {uploaded ? (
             <Button
               onClick={handleCloseAddMultiple}
@@ -726,13 +719,16 @@ export default function StudentData() {
               Finish
             </Button>
           ) : (
-            <Button
-              onClick={handleAddMultipleStudents}
-              variant="contained"
-              color="primary"
-            >
-              Upload
-            </Button>
+            <>
+              <Button onClick={handleCloseAddMultiple}>Cancel</Button>
+              <Button
+                onClick={handleAddMultipleStudents}
+                variant="contained"
+                color="primary"
+              >
+                Upload
+              </Button>
+            </>
           )}
         </DialogActions>
       </Dialog>
@@ -867,6 +863,16 @@ export default function StudentData() {
           <Grid item md={3} />
         </Hidden> */}
       </Grid>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={alert?.open}
+        autoHideDuration={3000}
+        onClose={() => setAlert({ ...alert, open: false })}
+      >
+        <Alert variant="filled" severity={alert?.severity}>
+          {alert?.msg}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
