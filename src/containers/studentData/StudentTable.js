@@ -115,7 +115,7 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.oneOfType([PropTypes.object]).isRequired,
   numSelectedInPage: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
@@ -204,9 +204,12 @@ const EnhancedTableToolbar = (props) => {
 };
 
 EnhancedTableToolbar.propTypes = {
+  rootClasses: PropTypes.oneOfType([PropTypes.object]).isRequired,
   numSelected: PropTypes.number.isRequired,
   search: PropTypes.string.isRequired,
   setSearch: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  setPage: PropTypes.func.isRequired,
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -227,9 +230,6 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 500,
     padding: 0,
   },
-  // head: {
-  //   height: "50px",
-  // },
   headCell: {
     backgroundColor: "#424242",
   },
@@ -266,7 +266,6 @@ export default function StudentTable({
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(100);
   const [search, setSearch] = React.useState("");
 
@@ -325,7 +324,6 @@ export default function StudentTable({
   // change page
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    // console.log(data);
   };
 
   // change rows per page
@@ -334,17 +332,8 @@ export default function StudentTable({
     setPage(0);
   };
 
-  // change rows density
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
-
   // select
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
-  // empty row for maintain constant height
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
   return (
     <div className={classes.root}>
@@ -357,7 +346,6 @@ export default function StudentTable({
           setPage={setPage}
           handleDelete={() => {
             handleDelete(selected);
-            // how to remove selected after delete should be completed
           }}
         />
         <TableContainer className={classes.container}>
@@ -365,7 +353,6 @@ export default function StudentTable({
             stickyHeader
             className={classes.table}
             aria-labelledby="tableTitle"
-            // size={dense ? "small" : "medium"}
             aria-label="enhanced table"
           >
             <EnhancedTableHead
@@ -501,3 +488,21 @@ export default function StudentTable({
     </div>
   );
 }
+
+StudentTable.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      grade: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+      authority: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+      password: PropTypes.string,
+    })
+  ).isRequired,
+  handleEdit: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  selected: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  setSelected: PropTypes.func.isRequired,
+};
