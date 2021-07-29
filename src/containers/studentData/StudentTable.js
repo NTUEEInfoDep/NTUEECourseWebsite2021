@@ -14,16 +14,13 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Paper from "@material-ui/core/Paper";
 import Checkbox from "@material-ui/core/Checkbox";
 import Input from "@material-ui/core/Input";
-import Switch from "@material-ui/core/Switch";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 import PropTypes from "prop-types";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import FilterListIcon from "@material-ui/icons/FilterList";
 
-import { StudentDataAPI } from "../../api";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -70,7 +67,7 @@ function EnhancedTableHead(props) {
     onSelectAllClick,
     order,
     orderBy,
-    numSelected,
+    numSelectedInPage,
     rowCount,
     onRequestSort,
   } = props;
@@ -83,8 +80,10 @@ function EnhancedTableHead(props) {
       <TableRow>
         <TableCell padding="none" className={classes.headCell}>
           <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
+            indeterminate={
+              numSelectedInPage > 0 && numSelectedInPage < rowCount
+            }
+            checked={rowCount > 0 && numSelectedInPage === rowCount}
             onChange={onSelectAllClick}
             inputProps={{ "aria-label": "select all desserts" }}
           />
@@ -118,8 +117,8 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  classes: PropTypes.object.isRequired,
-  numSelected: PropTypes.number.isRequired,
+  classes: PropTypes.oneOfType([PropTypes.object]).isRequired,
+  numSelectedInPage: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
@@ -200,20 +199,19 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton aria-label="filter list">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <></>
       )}
     </Toolbar>
   );
 };
 
 EnhancedTableToolbar.propTypes = {
+  rootClasses: PropTypes.oneOfType([PropTypes.object]).isRequired,
   numSelected: PropTypes.number.isRequired,
   search: PropTypes.string.isRequired,
   setSearch: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  setPage: PropTypes.func.isRequired,
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -234,9 +232,6 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 500,
     padding: 0,
   },
-  // head: {
-  //   height: "50px",
-  // },
   headCell: {
     backgroundColor: "#424242",
   },
@@ -262,13 +257,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function StudentTable({ data, handleEdit, handleDelete }) {
+export default function StudentTable({
+  data,
+  handleEdit,
+  handleDelete,
+  selected,
+  setSelected,
+}) {
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
-  const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(100);
   const [search, setSearch] = React.useState("");
 
@@ -289,10 +288,15 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
   //
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = data
+      const nowSelecteds = data
         .filter((e) => studentFilter(e))
         .map((n) => n.id);
-      setSelected(newSelecteds);
+      const newSelecteds = nowSelecteds.filter((id) => !selected.includes(id));
+      if (newSelecteds.length === 0) {
+        setSelected(selected.filter((id) => !nowSelecteds.includes(id)));
+      } else {
+        setSelected(selected.concat(newSelecteds));
+      }
       return;
     }
     setSelected([]);
@@ -322,7 +326,6 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
   // change page
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    // console.log(data);
   };
 
   // change rows per page
@@ -331,17 +334,8 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
     setPage(0);
   };
 
-  // change rows density
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
-
   // select
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
-  // empty row for maintain constant height
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
   return (
     <div className={classes.root}>
@@ -354,7 +348,6 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
           setPage={setPage}
           handleDelete={() => {
             handleDelete(selected);
-            // how to remove selected after delete should be completed
           }}
         />
         <TableContainer className={classes.container}>
@@ -362,17 +355,21 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
             stickyHeader
             className={classes.table}
             aria-labelledby="tableTitle"
-            // size={dense ? "small" : "medium"}
             aria-label="enhanced table"
           >
             <EnhancedTableHead
               classes={classes}
-              numSelected={selected.length}
+              numSelectedInPage={
+                data
+                  .filter((e) => studentFilter(e))
+                  .map((n) => n.id)
+                  .filter((id) => selected.includes(id)).length
+              }
               order={order}
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={data.length}
+              rowCount={data.filter((e) => studentFilter(e)).length}
             />
             <TableBody>
               {stableSort(data, getComparator(order, orderBy))
@@ -456,39 +453,38 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
                         }
                         className={classes.tablecell}
                       >
-                        {row.password}
+                        {row.password ? (
+                          <CopyToClipboard text={row.password}>
+                            <button type="button">{row.password}</button>
+                          </CopyToClipboard>
+                        ) : (
+                          <></>
+                        )}
                       </TableCell>
                       <TableCell className={classes.tablecell}>
                         <IconButton
                           onClick={() => handleEdit(row.id)}
                           className={classes.icon}
+                          disabled={selected.length !== 0}
                         >
                           <EditIcon />
                         </IconButton>
-                        {selected.length === 0 ? (
-                          <IconButton
-                            onClick={() => handleDelete([row.id])}
-                            className={classes.icon}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        ) : (
-                          <></>
-                        )}
+                        <IconButton
+                          onClick={() => handleDelete([row.id])}
+                          className={classes.icon}
+                          disabled={selected.length !== 0}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   );
                 })}
-              {/* emptyRows > 0 && (
-                <TableRow style={{ height: "100px" }}>
-                  <TableCell colSpan={6} className={classes.tablecell} />
-                </TableRow>
-              ) */}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 100]}
+          rowsPerPageOptions={[50, 100, 200, 400]}
           component="div"
           count={data.filter((e) => studentFilter(e)).length}
           rowsPerPage={rowsPerPage}
@@ -497,10 +493,24 @@ export default function StudentTable({ data, handleEdit, handleDelete }) {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      {/* <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      /> */}
     </div>
   );
 }
+
+StudentTable.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      grade: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+      authority: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+      password: PropTypes.string,
+    })
+  ).isRequired,
+  handleEdit: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  selected: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  setSelected: PropTypes.func.isRequired,
+};
