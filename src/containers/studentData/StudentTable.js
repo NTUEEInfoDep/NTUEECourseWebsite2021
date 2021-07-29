@@ -20,6 +20,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 
+import { CopyToClipboard } from "react-copy-to-clipboard";
+
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -451,7 +453,13 @@ export default function StudentTable({
                         }
                         className={classes.tablecell}
                       >
-                        {row.password}
+                        {row.password ? (
+                          <CopyToClipboard text={row.password}>
+                            <button type="button">{row.password}</button>
+                          </CopyToClipboard>
+                        ) : (
+                          <></>
+                        )}
                       </TableCell>
                       <TableCell className={classes.tablecell}>
                         <IconButton

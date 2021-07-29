@@ -120,7 +120,7 @@ export default function StudentData() {
         complete(results) {
           const newData = results.data.slice(1).reduce((obj, cur) => {
             return obj.concat([
-              { id: cur[0], name: cur[1], grade: cur[2], authority: "0" },
+              { id: cur[0], name: cur[1], grade: Number(cur[2]), authority: 0 },
             ]);
           }, []);
           setNewStudentMultiple(newData);
@@ -204,8 +204,8 @@ export default function StudentData() {
     setNewStudent({
       id: student.id,
       name: student.name,
-      grade: student.grade,
-      authority: student.authority,
+      grade: String(student.grade),
+      authority: String(student.authority),
     });
     setErrors({
       id: false,
@@ -411,6 +411,7 @@ export default function StudentData() {
   };
 
   const judgeNewStudent = () => {
+    // console.log(newStudent);
     let error = false;
     let newErrors = errors;
     let newErrorsMsg = errorsMsg;
