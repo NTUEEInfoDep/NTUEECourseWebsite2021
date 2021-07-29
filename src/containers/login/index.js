@@ -30,27 +30,27 @@ function Copyright() {
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(10),
+    marginTop: theme.spacing(5),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    // border: "gray 1px solid",
-    // borderRadius: "3%",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: "5%",
   },
   avatar: {
     margin: theme.spacing(1),
-    marginTop: theme.spacing(3),
-    backgroundColor: theme.palette.success.light,
+    marginTop: theme.spacing(8),
+    backgroundColor: theme.palette.secondary.main,
     height: "70px",
     width: "70px",
   },
   form: {
     width: "80%",
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
+    marginTop: theme.spacing(5),
+    marginBottom: theme.spacing(8),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
+    margin: theme.spacing(5, 0, 2),
   },
   accountmargin: {
     marginBottom: theme.spacing(2),

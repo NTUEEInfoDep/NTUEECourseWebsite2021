@@ -44,10 +44,10 @@ const useStyles = makeStyles((theme) => ({
     //  display: "flex",
   },
   appBar: {
-    marginTop: theme.spacing(1),
+    paddingTop: theme.spacing(1),
     color: "#fff",
     boxShadow: "none",
-    backgroundColor: "rgba(0, 0, 0, 0)",
+    backgroundColor: "#192231",
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,

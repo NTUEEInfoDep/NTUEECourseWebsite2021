@@ -608,7 +608,7 @@ export default function StudentData() {
                 type="file"
                 onChange={(e) => handleUploadCsv(e.target.files[0])}
               />
-              <Button variant="contained" color="primary" component="span">
+              <Button variant="outlined" color="primary" component="span">
                 Select csv file
               </Button>
             </label>
