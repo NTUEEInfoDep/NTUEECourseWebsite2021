@@ -673,4 +673,91 @@ router.get(
   })
 );
 
+router.get(
+  "/statistics.csv",
+  asyncHandler(async (req, res, next) => {
+    const courses = await model.Course.find({}).exec();
+    const students = await model.Student.find({}).exec();
+    const rows = [
+      [
+        "courseName",
+        "Zero",
+        "One",
+        "Two",
+        "first",
+        "second",
+        "third",
+        "fourth",
+        "fifth",
+      ],
+    ];
+    courses.forEach(async (course) => {
+      const numbers = { Zero: 0, One: 0, Two: 0 };
+      const choices = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0 };
+      const selections = await model.Selection.find({
+        courseID: course.id,
+      }).exec();
+      const results = await model.Result.find({
+        courseName: course.name,
+      }).exec();
+      students.forEach((student) => {
+        const result = results.filter((re) => {
+          re.studentID = student.userID;
+        });
+        const selection = selections.filter((sel) => {
+          sel.userID = student.userID;
+        });
+        switch (result.length) {
+          case 0:
+            numbers["Zero"] += 1;
+            break;
+          case 1:
+            numbers["One"] += 1;
+            break;
+          default:
+            numbers["Two"] += 1;
+            break;
+        }
+        result.forEach((re) => {
+          const order = selection.find((sel) => {
+            sel.name = re.optionName;
+          }).ranking;
+          switch (order) {
+            case 1:
+              choices["first"] += 1;
+              break;
+            case 2:
+              choices["second"] += 1;
+              break;
+            case 3:
+              choice["third"] += 1;
+              break;
+            case 4:
+              choice["fourth"] += 1;
+              break;
+            default:
+              choice["fifth"] += 1;
+              break;
+          }
+        });
+      });
+      rows.push([
+        course.name,
+        numbers.Zero,
+        numbers.One,
+        numbers.Two,
+        choices.first,
+        choices.second,
+        choices.third,
+        choices.fourth,
+        choices.fifth,
+      ]);
+    });
+    const output = await csvStringifyPromise(rows);
+    res.setHeader("content-type", "application/csv");
+    res.setHeader("content-disposition", "attachment; filename=statistics.csv");
+    res.status(200).send(output);
+  })
+);
+
 module.exports = router;
