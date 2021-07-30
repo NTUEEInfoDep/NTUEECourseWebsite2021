@@ -61,6 +61,7 @@ export default function StudentData() {
 
   const [data, setData] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false);
+  const [filename, setFilename] = React.useState("");
   const [uploaded, setUploaded] = React.useState(false);
   const [addOpen, setAddOpen] = React.useState(false);
   const [addMultipleOpen, setAddMultipleOpen] = React.useState(false);
@@ -113,21 +114,70 @@ export default function StudentData() {
     handleStudentDataReload();
   }, []);
 
+  const testRepeatId = (id) => {
+    return data.map((e) => e.id.toLowerCase()).includes(id.toLowerCase());
+  };
+
   const handleUploadCsv = async (efile) => {
+    // console.log(efile);
     if (efile) {
       Papa.parse(efile, {
         skipEmptyLines: true,
         complete(results) {
-          const newData = results.data.slice(1).reduce((obj, cur) => {
-            return obj.concat([
-              { id: cur[0], name: cur[1], grade: Number(cur[2]), authority: 0 },
-            ]);
-          }, []);
-          setNewStudentMultiple(newData);
-          // loaded should be completed
-          setLoaded(true);
-          // console.log("Multiple student data loaded");
-          // console.log(newData);
+          let valid = true;
+          let repeat = false;
+          results.data.slice(1).forEach((student) => {
+            if (
+              !/^(b|r|d)\d{8}$/i.test(student[0]) ||
+              !student[1] ||
+              !/^\d+$/.test(student[2])
+            ) {
+              valid = false;
+              console.log(student);
+            }
+            if (testRepeatId(student[0])) {
+              repeat = true;
+              console.log(student);
+            }
+          });
+          if (valid && !repeat) {
+            const newData = results.data.slice(1).reduce((obj, cur) => {
+              return obj.concat([
+                {
+                  id: cur[0],
+                  name: cur[1],
+                  grade: Number(cur[2]),
+                  authority: 0,
+                },
+              ]);
+            }, []);
+            setNewStudentMultiple(newData);
+            setLoaded(true);
+            // console.log("Multiple student data loaded");
+            // console.log(newData);
+            setFilename(efile.name);
+            return;
+          }
+          if (!valid && !repeat) {
+            showAlert("error", "Invalid student data format.");
+          }
+          if (valid && repeat) {
+            showAlert("error", "Student UserId repeat.");
+          }
+          if (!valid && repeat) {
+            showAlert(
+              "error",
+              "Invalid student data format & Student UserId repeat."
+            );
+          }
+          setNewStudentMultiple({
+            id: "",
+            name: "",
+            grade: "",
+            authority: "",
+          });
+          setLoaded(false);
+          setFilename("");
         },
       });
     }
@@ -143,6 +193,8 @@ export default function StudentData() {
       grade: "",
       authority: "",
     });
+    setLoaded(false);
+    setFilename("");
   };
 
   const handleCloseAddMultiple = () => {
@@ -333,6 +385,8 @@ export default function StudentData() {
           authority: "",
         });
 
+        setLoaded(false);
+
         setCsv(Papa.unparse(newData));
         showAlert("success", "Add multiple student data complete.");
       } catch (err) {
@@ -422,6 +476,10 @@ export default function StudentData() {
     } else if (!/^(b|r|d)\d{8}$/i.test(newStudent.id)) {
       newErrors = { ...newErrors, id: true };
       newErrorsMsg = { ...newErrorsMsg, id: "id invalid format" };
+      error = true;
+    } else if (testRepeatId(newStudent.id)) {
+      newErrors = { ...newErrors, id: true };
+      newErrorsMsg = { ...newErrorsMsg, id: "repeat userId" };
       error = true;
     } else {
       newErrors = { ...newErrors, id: false };
@@ -579,7 +637,13 @@ export default function StudentData() {
         open={addOpen}
         onClose={handleCloseAdd}
       >
-        <DialogTitle id="simple-dialog-title">Add Single Student</DialogTitle>
+        {editId === "" ? (
+          <DialogTitle id="simple-dialog-title">Add Single Student</DialogTitle>
+        ) : (
+          <DialogTitle id="simple-dialog-title">
+            Edit Single Student
+          </DialogTitle>
+        )}
         <DialogContent>
           <TextField
             id="userID"
@@ -709,6 +773,7 @@ export default function StudentData() {
               </Button>
             </label>
           )}
+          {loaded && !uploaded ? filename : ""}
         </DialogContent>
         <DialogActions>
           {uploaded ? (
@@ -722,13 +787,17 @@ export default function StudentData() {
           ) : (
             <>
               <Button onClick={handleCloseAddMultiple}>Cancel</Button>
-              <Button
-                onClick={handleAddMultipleStudents}
-                variant="contained"
-                color="primary"
-              >
-                Upload
-              </Button>
+              {loaded ? (
+                <Button
+                  onClick={handleAddMultipleStudents}
+                  variant="contained"
+                  color="primary"
+                >
+                  Upload
+                </Button>
+              ) : (
+                <> </>
+              )}
             </>
           )}
         </DialogActions>
@@ -867,7 +936,7 @@ export default function StudentData() {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={alert?.open}
-        autoHideDuration={3000}
+        autoHideDuration={6000}
         onClose={() => setAlert({ ...alert, open: false })}
       >
         <Alert variant="filled" severity={alert?.severity}>
