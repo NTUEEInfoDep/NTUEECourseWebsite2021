@@ -477,7 +477,7 @@ export default function StudentData() {
       newErrors = { ...newErrors, id: true };
       newErrorsMsg = { ...newErrorsMsg, id: "id invalid format" };
       error = true;
-    } else if (testRepeatId(newStudent.id)) {
+    } else if (editId === "" && testRepeatId(newStudent.id)) {
       newErrors = { ...newErrors, id: true };
       newErrorsMsg = { ...newErrorsMsg, id: "repeat userId" };
       error = true;
@@ -927,6 +927,7 @@ export default function StudentData() {
             handleDelete={handleOpenDelete}
             selected={selected}
             setSelected={setSelected}
+            showAlert={showAlert}
           />
         </Grid>
         {/* <Hidden smDown>
@@ -936,7 +937,7 @@ export default function StudentData() {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={alert?.open}
-        autoHideDuration={6000}
+        autoHideDuration={5000}
         onClose={() => setAlert({ ...alert, open: false })}
       >
         <Alert variant="filled" severity={alert?.severity}>
