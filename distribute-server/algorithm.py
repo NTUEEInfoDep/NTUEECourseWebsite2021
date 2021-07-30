@@ -1,6 +1,8 @@
 import heapq
 import random
 
+# random.seed(0)
+
 
 class Option:
     ''' Option with the functions supporting course distribution.
