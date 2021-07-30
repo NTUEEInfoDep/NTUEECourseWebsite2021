@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
   root: {
     width: "80%",
     margin: "auto",
-    maxHeight: "700px",
+    // maxHeight: "700px",
     display: "flex",
     borderRadius: "3%",
     flexDirection: "column",
@@ -29,6 +29,7 @@ const useStyles = makeStyles(() => ({
     // boxShadow: "0 0 150px #A5DEE4 inset",
     flexGrow: 1,
     padding: "20px",
+    paddingBottom: "40px",
   },
   title: {
     padding: "10px",
@@ -71,7 +72,7 @@ const StyledDotGroup = styled(DotGroup)`
     border: none;
     outline: none;
     &:not(:last-of-type) {
-      margin-right: 3px;
+      margin-right: 10px;
     }
   }
   .carousel__dot--selected {
