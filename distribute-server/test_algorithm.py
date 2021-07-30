@@ -474,6 +474,575 @@ class Test(unittest.TestCase):
         expected = list_to_set(expected)
         self.assertEqual(results, expected)
 
+    def test_14_2_courses1(self): # test for multiple courses
+        student1 = Student(
+            "Michael",
+            "B09901186",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"]
+            },
+            4
+        )
+        student2 = Student(
+            "Mecoli",
+            "610736",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"]
+            },
+            2
+        )
+        students = [student1, student2]
+
+        course1 = Course({
+            "id": "course1",
+            "name": "電磁學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher1a": {"limit": 1, "priority": -1},
+                "teacher1b": {"limit": 1, "priority": -1}
+            }
+        })
+        course2 = Course({
+            "id": "course2",
+            "name": "電子學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher2a": {"limit": 1, "priority": -1},
+                "teacher2b": {"limit": 1, "priority": -1}
+            }
+        })
+        courses = [course1, course2]
+
+        results = Algorithm.distribute(courses, students)
+        expected = [
+            {
+                "studentID": "610736",
+                "courseName": "電子學(一)",
+                "optionName": "teacher2b",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電子學(一)",
+                "optionName": "teacher2a",
+            },
+            {
+                "studentID": "610736",
+                "courseName": "電磁學(一)",
+                "optionName": "teacher1b",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電磁學(一)",
+                "optionName": "teacher1a",
+            },
+        ]
+
+        results = list_to_set(results)
+        expected = list_to_set(expected)
+
+        self.assertEqual(results, expected)
+
+    def test_15_2_courses2(self): # test for multiple courses
+        student1 = Student(
+            "Michael",
+            "B09901186",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"]
+            },
+            2
+        )
+        student2 = Student(
+            "Mecoli",
+            "610736",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"]
+            },
+            3
+        )
+        student3 = Student(
+            "Pekoli",
+            "A123456",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"]
+            },
+            4
+        )
+        students = [student1, student2, student3]
+
+        course1 = Course({
+            "id": "course1",
+            "name": "電路學實驗",
+            "type": "EE-Lab",
+            "description": "",
+            "options": {
+                "teacher1a": {"limit": 2, "priority": 0},
+                "teacher1b": {"limit": 1, "priority": 0}
+            }
+        })
+        course2 = Course({
+            "id": "course2",
+            "name": "電子學實驗",
+            "type": "EE-Lab",
+            "description": "",
+            "options": {
+                "teacher2a": {"limit": 1, "priority": 0},
+                "teacher2b": {"limit": 1, "priority": 0}
+            }
+        })
+        courses = [course1, course2]
+
+        results = Algorithm.distribute(courses, students)
+        self.assertEqual(len(results), 5)
+
+    def test_16_2_courses3(self): # test for multiple courses
+        student1 = Student(
+            "Michael",
+            "B09901186",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2b", "teacher2a"]
+            },
+            4
+        )
+        student2 = Student(
+            "Mecoli",
+            "610736",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"]
+            },
+            2
+        )
+        students = [student1, student2]
+
+        course1 = Course({
+            "id": "course1",
+            "name": "電子學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher1a": {"limit": 1, "priority": -1},
+                "teacher1b": {"limit": 1, "priority": -1}
+            }
+        })
+        course2 = Course({
+            "id": "course2",
+            "name": "電子學實驗",
+            "type": "EE-Lab",
+            "description": "",
+            "options": {
+                "teacher2a": {"limit": 1, "priority": 0},
+                "teacher2b": {"limit": 1, "priority": 0}
+            }
+        })
+        courses = [course1, course2]
+
+        results = Algorithm.distribute(courses, students)
+        expected = [
+            {
+                "studentID": "610736",
+                "courseName": "電子學(一)",
+                "optionName": "teacher1b",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電子學(一)",
+                "optionName": "teacher1a",
+            },
+            {
+                "studentID": "610736",
+                "courseName": "電子學實驗",
+                "optionName": "teacher2a",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電子學實驗",
+                "optionName": "teacher2b",
+            },
+        ]
+
+        results = list_to_set(results)
+        expected = list_to_set(expected)
+
+        self.assertEqual(results, expected)
+
+    def test_17_3_cousres1(self): # test for multiple courses
+        student1 = Student(
+            "Michael",
+            "B09901186",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"],
+             "course3": ["自動控制", "電力電子"]
+            },
+            2
+        )
+        student2 = Student(
+            "Mecoli",
+            "610736",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"],
+             "course3": ["自動控制", "電力電子"]
+            },
+            3
+        )
+        students = [student1, student2]
+
+        course1 = Course({
+            "id": "course1",
+            "name": "電磁學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher1a": {"limit": 1, "priority": -1},
+                "teacher1b": {"limit": 1, "priority": -1}
+            }
+        })
+        course2 = Course({
+            "id": "course2",
+            "name": "電子學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher2a": {"limit": 1, "priority": -1},
+                "teacher2b": {"limit": 1, "priority": -1}
+            }
+        })
+        course3 = Course({
+            "id": "course3",
+            "name": "十選二實驗",
+            "type": "Ten-Select-Two",
+            "description": "",
+            "options": {
+                "電力電子": {"limit": 1, "priority": 0},
+                "自動控制": {"limit": 1, "priority": 3}
+            }
+        })
+        courses = [course1, course2, course3]
+
+        results = Algorithm.distribute(courses, students)
+        expected = [
+            {
+                "studentID": "610736",
+                "courseName": "電磁學(一)",
+                "optionName": "teacher1a",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電磁學(一)",
+                "optionName": "teacher1b",
+            },
+            {
+                "studentID": "610736",
+                "courseName": "電子學(一)",
+                "optionName": "teacher2a",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電子學(一)",
+                "optionName": "teacher2b",
+            },
+            {
+                "studentID": "610736",
+                "courseName": "十選二實驗",
+                "optionName": "自動控制",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "十選二實驗",
+                "optionName": "電力電子",
+            },
+        ]
+
+        results = list_to_set(results)
+        expected = list_to_set(expected)
+
+        self.assertEqual(results, expected)
+
+    def test_18_3_courses2(self): # test for multiple courses
+        student1 = Student(
+            "Michael",
+            "B09901186",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"],
+             "course3": ["自動控制", "電力電子"]
+            },
+            2
+        )
+        student2 = Student(
+            "Mecoli",
+            "610736",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"],
+             "course3": ["自動控制", "電力電子"]
+            },
+            3
+        )
+        students = [student1, student2]
+
+        course1 = Course({
+            "id": "course1",
+            "name": "電子學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher1a": {"limit": 1, "priority": -1},
+                "teacher1b": {"limit": 1, "priority": -1}
+            }
+        })
+        course2 = Course({
+            "id": "course2",
+            "name": "電子學實驗",
+            "type": "EE-Lab",
+            "description": "",
+            "options": {
+                "teacher2a": {"limit": 2, "priority": 0},
+                "teacher2b": {"limit": 2, "priority": 0}
+            }
+        })
+        course3 = Course({
+            "id": "course3",
+            "name": "十選二實驗",
+            "type": "Ten-Select-Two",
+            "description": "",
+            "options": {
+                "電力電子": {"limit": 1, "priority": 0},
+                "自動控制": {"limit": 1, "priority": 3}
+            }
+        })
+        courses = [course1, course2, course3]
+
+        results = Algorithm.distribute(courses, students)
+        expected = [
+            {
+                "studentID": "610736",
+                "courseName": "電子學(一)",
+                "optionName": "teacher1a",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電子學(一)",
+                "optionName": "teacher1b",
+            },
+            {
+                "studentID": "610736",
+                "courseName": "電子學實驗",
+                "optionName": "teacher2a",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電子學實驗",
+                "optionName": "teacher2a",
+            },
+            {
+                "studentID": "610736",
+                "courseName": "十選二實驗",
+                "optionName": "自動控制",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "十選二實驗",
+                "optionName": "電力電子",
+            },
+        ]
+
+        results = list_to_set(results)
+        expected = list_to_set(expected)
+
+        self.assertEqual(results, expected)
+
+    def test_19_4_courses1(self): # test for multiple courses
+        student1 = Student(
+            "Michael",
+            "B09901186",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teaher2b"],
+             "course4": ["自動控制", "電力電子"]
+            },
+            2
+        )
+        student2 = Student(
+            "Mecoli",
+            "610736",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course3": ["teacher3a", "teacher3b"],
+             "course4": ["自動控制", "電力電子"]
+            },
+            3
+        )
+        students = [student1, student2]
+
+        course1 = Course({
+            "id": "course1",
+            "name": "電子學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher1a": {"limit": 1, "priority": -1},
+                "teacher1b": {"limit": 1, "priority": -1}
+            }
+        })
+        course2 = Course({
+            "id": "course2",
+            "name": "電磁學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher2a": {"limit": 1, "priority": -1},
+                "teacher2b": {"limit": 1, "priority": -1}
+            }
+        })
+        course3 = Course({
+            "id": "course3",
+            "name": "電子學實驗",
+            "type": "EE-Lab",
+            "description": "",
+            "options": {
+                "teacher3a": {"limit": 1, "priority": 0},
+                "teacher3b": {"limit": 1, "priority": 0}
+            }
+        })
+        course4 = Course({
+            "id": "course4",
+            "name": "十選二實驗",
+            "type": "Ten-Select-Two",
+            "description": "",
+            "options": {
+                "電力電子": {"limit": 1, "priority": 0},
+                "自動控制": {"limit": 1, "priority": 3}
+            }
+        })
+        courses = [course1, course2, course3, course4]
+
+        results = Algorithm.distribute(courses, students)
+        expected = [
+            {
+                "studentID": "610736",
+                "courseName": "電子學(一)",
+                "optionName": "teacher1a",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電子學(一)",
+                "optionName": "teacher1b",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "電磁學(一)",
+                "optionName": "teacher2a",
+            },
+            {
+                "studentID": "610736",
+                "courseName": "電子學實驗",
+                "optionName": "teacher3a",
+            },
+            {
+                "studentID": "610736",
+                "courseName": "十選二實驗",
+                "optionName": "自動控制",
+            },
+            {
+                "studentID": "B09901186",
+                "courseName": "十選二實驗",
+                "optionName": "電力電子",
+            },
+        ]
+
+        results = list_to_set(results)
+        expected = list_to_set(expected)
+
+        self.assertEqual(results, expected)
+
+    def test_20_4_courses2(self): # test for multiple courses
+        student1 = Student(
+            "Michael",
+            "B09901186",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"],
+             "course3": ["teacher3a", "teacher3b"],
+             "course4": ["自動控制", "嵌入式系統", "電力電子"]
+            },
+            2
+        )
+        student2 = Student(
+            "Mecoli",
+            "610736",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"],
+             "course3": ["teacher3a", "teacher3b"],
+             "course4": ["自動控制", "電力電子", "嵌入式系統"]
+            },
+            3
+        )
+        student3 = Student(
+            "Pekoli",
+            "VIP8888",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"],
+             "course3": ["teacher3a", "teacher3b"],
+             "course4": ["電力電子", "嵌入式系統", "自動控制"]
+            },
+            3
+        )
+        student4 = Student(
+            "Mike",
+            "A123456",
+            {"course1": ["teacher1a", "teacher1b"],
+             "course2": ["teacher2a", "teacher2b"],
+             "course3": ["teacher3a", "teacher3b"],
+             "course4": ["嵌入式系統", "自動控制", "電力電子"]
+            },
+            4
+        )
+        students = [student1, student2, student3, student4]
+
+        course1 = Course({
+            "id": "course1",
+            "name": "電子學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher1a": {"limit": 10, "priority": -1},
+                "teacher1b": {"limit": 10, "priority": -1}
+            }
+        })
+        course2 = Course({
+            "id": "course2",
+            "name": "電磁學(一)",
+            "type": "2",
+            "description": "",
+            "options": {
+                "teacher2a": {"limit": 1, "priority": -1},
+                "teacher2b": {"limit": 1, "priority": -1}
+            }
+        })
+        course3 = Course({
+            "id": "course3",
+            "name": "電子學實驗",
+            "type": "EE-Lab",
+            "description": "",
+            "options": {
+                "teacher3a": {"limit": 1, "priority": 0},
+                "teacher3b": {"limit": 2, "priority": 0}
+            }
+        })
+        course4 = Course({
+            "id": "course4",
+            "name": "十選二實驗",
+            "type": "Ten-Select-Two",
+            "description": "",
+            "options": {
+                "電力電子": {"limit": 1, "priority": 0},
+                "自動控制": {"limit": 1, "priority": 3},
+                "嵌入式系統": {"limit": 1, "priority": 0}
+            }
+        })
+        courses = [course1, course2, course3, course4]
+
+        results = Algorithm.distribute(courses, students)
+        
+        results = list_to_set(results)
+        self.assertEqual(len(results), 12)
+
 if __name__ == "__main__":
     unittest.main()
     print()
