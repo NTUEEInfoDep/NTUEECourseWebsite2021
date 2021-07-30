@@ -108,4 +108,4 @@ def distribute():
 
 
 if __name__ == "__main__":
-    app.run(port=PORT)
+    app.run(host="0.0.0.0", port=PORT)

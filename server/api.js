@@ -660,6 +660,7 @@ router.post(
 
 router.get(
   "/result.csv",
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const results = await model.Result.find({}).exec();
     const rows = [["studentID", "courseName", "optionName"]];
@@ -675,6 +676,7 @@ router.get(
 
 router.get(
   "/statistics.csv",
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const courses = await model.Course.find({}).exec();
     const students = await model.Student.find({}).exec();
