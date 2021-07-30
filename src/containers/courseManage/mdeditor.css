@@ -1,0 +1,23 @@
+.w-md-editor-toolbar {
+  background-color: "";
+}
+
+.w-md-editor-text-input {
+  background-color: "";
+}
+
+.wmde-markdown.wmde-markdown-color.w-md-editor-preview {
+  background-color: "";
+}
+
+.MuiButtonBase-root.MuiButton-root.MuiButton-outlined.openEditor {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.editor {
+  margin-bottom: 20px;
+  margin-top: 8px;
+}
+.priority {
+  margin-top: 0px;
+}
