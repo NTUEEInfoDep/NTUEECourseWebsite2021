@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(1),
     color: "#fff",
     boxShadow: "none",
-    backgroundColor: "rgb(0,0,0,0)",
+    backgroundColor: "rgb(25,34,49,.7)",
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,

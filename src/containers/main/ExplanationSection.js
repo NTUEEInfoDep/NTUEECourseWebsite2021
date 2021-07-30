@@ -89,7 +89,7 @@ export default function Explanation() {
 
   return (
     <Element name="explanation">
-      <div style={{ height: "55px" }} />
+      <div style={{ height: "100px" }} />
       {/* 讓網頁下滑 */}
       <div className={classes.root}>
         <Typography
