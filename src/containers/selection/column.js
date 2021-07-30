@@ -12,12 +12,8 @@ const useStyles = makeStyles({
     flexDirection: "column",
     marginTop: 2, //8
     textAlign: "center",
-    fontFamily: "Arial, serif",//"Gill Sans, sans-serif",
+    fontFamily: "Arial, serif", //"Gill Sans, sans-serif",
     fontWeight: 100,
-    // h2: {
-    //   margin: 0,
-    //   padding: "0 8px", //16px
-    // },
   },
   styledList: {
     backgroundColor: "#121212", // #ddd B4F8C8
@@ -34,13 +30,13 @@ const useStyles = makeStyles({
   },
 });
 const Column = (props) => {
-  const { columnId, title, column } = props;
+  const { title, column, droppableId } = props;
   const classes = useStyles();
   return (
-    <Droppable droppableId={title}>
+    <Droppable droppableId={droppableId}>
       {(provided) => (
         <div className={classes.styledColumn1}>
-          <Typography variant="h6">{title}</Typography>  
+          <Typography variant="h6">{title}</Typography>
           <List // h2(replace typography)
             className={classes.styledList}
             {...provided.droppableProps}
@@ -61,22 +57,8 @@ const Column = (props) => {
 
 Column.propTypes = {
   column: PropTypes.arrayOf(PropTypes.string).isRequired,
-  columnId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
+  droppableId: PropTypes.string.isRequired,
 };
 
 export default Column;
-// Column.propTypes = {
-//   column: PropTypes.shape({
-//     id: PropTypes.string.isRequired,
-//     title: PropTypes.string.isRequired,
-//     optionIds: PropTypes.arrayOf(PropTypes.string),
-//   }).isRequired,
-//   columnId: PropTypes.string.isRequired,
-//   // options: PropTypes.arrayOf(
-//   //   PropTypes.shape({
-//   //     id: PropTypes.string.isRequired,
-//   //     content: PropTypes.string.isRequired,
-//   //   })
-//   // ).isRequired,
-// };

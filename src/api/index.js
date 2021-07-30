@@ -41,8 +41,8 @@ export const StudentDataAPI = {
 export const SelectAPI = {
   getSelections: (courseID) => axios.get(`/api/selections/${courseID}`),
   putSelections: (courseID, data) =>
-    axios.put(`/api/selections/${courseID}`, [...data]),//, [...courseID.data.selected]),
+    axios.put(`/api/selections/${courseID}`, [...data]), //, [...courseID.data.selected]),
 };
-export const OpentimeAPI={
+export const OpentimeAPI = {
   getOpentime: () => axios.get(`/api/opentime`),
-}
+};

@@ -15,14 +15,17 @@ export default function Top() {
   //get start time and end time
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
-  useEffect(async () => {
-    try {
-      const res = await OpentimeAPI.getOpentime();
-      setStart(res.data.start);
-      setEnd(res.data.end);
-    } catch (err) {
-      console.error(err);
-    }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await OpentimeAPI.getOpentime();
+        setStart(res.data.start);
+        setEnd(res.data.end);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchData();
   }, []); // only run the first time
 
   //count left time
@@ -70,14 +73,6 @@ export default function Top() {
   const useStyles = makeStyles(() => ({
     root: {
       flexGrow: 1,
-      // backgroundColor: "#323232",
-      // opacity: ".95",
-      // backgroundSize: "contain",
-      // backgroundPosition: "50% 50%",
-      // backgroundRepeat: "no-repeat",
-      // backgroundImage:  `url(${BackgroundImg})`,
-      // display: "flex",
-      // flexDirection: "column",
       width: "100%",
       height: "90vh",
     },
@@ -112,7 +107,6 @@ export default function Top() {
         <Grid
           container
           direction="column"
-          justifyContent="center"
           style={{
             // boxShadow: "0 0 15px #f3d42e inset",
             padding: "10px",

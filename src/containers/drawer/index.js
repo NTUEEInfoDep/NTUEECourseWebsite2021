@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 // material_ui
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -131,6 +131,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Drawer = ({ children }) => {
   const { isLogin, authority, userID } = useSelector(selectSession);
+  const history = useHistory();
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -205,15 +206,18 @@ const Drawer = ({ children }) => {
             <KeyboardArrowUpIcon />
           </IconButton>
           <Typography variant="h5" className={classes.appBarTypography}>
-            NTUEE
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => history.push("/")}
+            >
+              NTUEE
+            </div>
           </Typography>
           <Typography variant="h6">{userName}</Typography>
           <IconButton
-            className={[
-              clsx(classes.iconButton, {
-                [classes.hide]: !isLogin,
-              }),
-            ]}
+            className={clsx(classes.iconButton, {
+              [classes.hide]: !isLogin,
+            })}
             onClick={() => dispatch(logout())}
           >
             <ExitToAppIcon />

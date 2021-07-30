@@ -42,7 +42,7 @@ const Members = styled.div`
     font-size: 11px;
     letter-spacing: 1.5px;
     line-height: 1.5;
-    flex-direction:column; 
+    flex-direction: column;
     // justify-content: space-between;
     /* align-items:center; */
     padding-left: 8px;

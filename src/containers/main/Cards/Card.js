@@ -7,27 +7,27 @@ import Typography from "@material-ui/core/Typography";
 const useStyles = makeStyles((theme) => ({
   title: {
     padding: "10px",
-    textAlign: "center"
+    textAlign: "center",
   },
   avatar: {
     margin: "0 15px",
-    color:'white',
+    color: "white",
     width: theme.spacing(4),
-    height: theme.spacing(4)
+    height: theme.spacing(4),
     // width:'10%',
   },
   gridStyle: {
     display: "flex",
     justifyContent: "center",
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
     // padding: "5px 0px"
   },
   subtitle: {
     // color: "white",
     marginBottom: "5px",
     textAlign: "center",
-    fontSize: "1.2rem"
+    fontSize: "1.2rem",
   },
   paragraph: {
     width: "100%",
@@ -38,18 +38,15 @@ const useStyles = makeStyles((theme) => ({
     opacity: ".8",
     lineHeight: "1.8",
     textIndent: "32px",
-    letterSpacing: "1px"
-  }
+    letterSpacing: "1px",
+  },
 }));
 
 export default function Card(props) {
   const classes = useStyles();
   const { message, title, icon } = props;
   return (
-    <Grid
-      container
-      style={{ padding: "10px" }} 
-    >
+    <Grid container style={{ padding: "10px" }}>
       <Grid item className={classes.gridStyle}>
         <Avatar component={icon} className={classes.avatar} />
         <Typography className={classes.subtitle}>{title}</Typography>

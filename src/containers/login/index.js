@@ -83,7 +83,6 @@ export default function Login() {
           values.account,
           values.password
         );
-        console.log(response);
         dispatch(setLogin(response.data));
       } catch (err) {
         console.error(err);

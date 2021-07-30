@@ -8,27 +8,27 @@ import Typography from "@material-ui/core/Typography";
 const useStyles = makeStyles((theme) => ({
   title: {
     padding: "10px",
-    textAlign: "center"
+    textAlign: "center",
   },
   avatar: {
     margin: "0 15px",
-    color:'white',
+    color: "white",
     width: theme.spacing(4),
-    height: theme.spacing(4)
+    height: theme.spacing(4),
     // width:'10%',
   },
   gridStyle: {
     display: "flex",
     justifyContent: "center",
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
     // padding: "25px 20px"
   },
   subtitle: {
     color: "white",
     fontSize: "1.2rem",
     // marginBottom: "5px",
-    textAlign: "center"
+    textAlign: "center",
   },
   paragraph: {
     width: "100%",
@@ -48,17 +48,14 @@ const useStyles = makeStyles((theme) => ({
     padding: "8px",
     opacity: ".8",
     lineHeight: "1.5",
-    letterSpacing: "1px"
-  }
+    letterSpacing: "1px",
+  },
 }));
 const message = `依照想選的實驗課程，排列志願序。根據系上規定，學生應修習不同類二門。詳細課程規定請參閱學術部公告。抽籤作業流程：`;
 export default function Card2() {
   const classes = useStyles();
   return (
-    <Grid
-      container
-      style={{ padding: "10px" }}
-    >
+    <Grid container style={{ padding: "10px" }}>
       <Grid item className={classes.gridStyle}>
         <Avatar component={BatteryCharging60Icon} className={classes.avatar} />
         <Typography className={classes.subtitle}>十選二實驗</Typography>
@@ -67,7 +64,7 @@ export default function Card2() {
         item
         style={{
           display: "flex",
-          flexDirection: "column"
+          flexDirection: "column",
         }}
       >
         <Typography className={classes.paragraph}>{message}</Typography>

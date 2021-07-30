@@ -11,13 +11,13 @@
 }
 
 .MuiButtonBase-root.MuiButton-root.MuiButton-outlined.openEditor {
-    margin-top: 10px;
-    margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
-.editor{
+.editor {
   margin-bottom: 20px;
   margin-top: 8px;
 }
-.priority{
+.priority {
   margin-top: 0px;
 }
