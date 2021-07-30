@@ -9,7 +9,7 @@ class Option:
         _name: (string)
             The name of this option, which could be the teacher's name or options in Ten-Select-Two
 
-        _limit: (int)
+        _real_limit: (int)
             The maximun number of the students that this options can have.
 
         _priority: (int)
@@ -24,6 +24,9 @@ class Option:
 
         _students: (dict)
             Store data of the students who has select this option.
+
+        _grade: (dict)
+            Store grade of the students
 
         _priority_list: (list)
             All students arrange according to the preference of this option, which was based on priority and random.
@@ -51,14 +54,25 @@ class Option:
                             -1:         The higher grade students will have higher priority.
                             1,2,3,4:    Students in this grade will have higher priority.
                             5:          Students with grade 3 and 4 have higher priority.
+                            6:          光電實驗 大四21 剩下無優先
+                            7:          電磁波實驗 大三12 剩下無優先
                 }
         '''
 
         self._name = name
-        self._limit = data["limit"]
+        self._real_limit = data["limit"]
         self._priority = data["priority"]
+        self._limit = data["limit"]
+
+        # in the first distribution, limit the maximun for assurance
+        if self._priority == 6:
+            self._limit = 21
+        if self._priority == 7:
+            self._limit = 12
+
         self._selected = list()
         self._students = dict()
+        self._grade = dict()
         self._priority_list = list()
         self._fix = 0
 
@@ -83,11 +97,16 @@ class Option:
         elif self._priority == 5:
             if grade == 3 or grade == 4:
                 priority -= 1
+        elif self._priority == 6 and grade == 4:
+            priority -= 1
+        elif self._priority == 7 and grade == 3:
+            priority -= 1
         elif grade == self._priority:
             priority -= 1
 
         # store information
         self._students[student_id] = priority
+        self._grade[student_id] = grade
 
     def make_priority_list(self):
         ''' Make priority list.
@@ -117,6 +136,12 @@ class Option:
             students = priority_group[heapq.heappop(priorities)]
             random.shuffle(students)
             self._priority_list.extend(students)
+
+    def update_priority_list_and_limit(self):
+        if self._priority == 6 or self._priority == 7:
+            self._priority_list = random.shuffle(self._priority_list)
+            self._limit = self._real_limit
+
 
     def select(self, student_id):
         ''' Deal with this student based on self._priority_list and modify data in self._selected.
@@ -207,7 +232,7 @@ class Option:
         ''' Add preselect data to self._selected and fix it.
 
         Args:
-            preselect: (string)
+            preselect: (list)
                 Students who have already got this options(數電實驗).
 
         '''
@@ -215,6 +240,7 @@ class Option:
         self._selected.extend(preselect)
         self._priority_list.extend(preselect)
         self.fix_index()
+
 
 
 class Course:
@@ -328,6 +354,11 @@ class Course:
 
         # every student select one option in an iteration
         for time in range(self.max_select):
+
+            # update priority_list (for assurance)
+            if time == 1:
+                for option in self._options:
+                    self._options[option].update_priority_list_and_limit()
 
             # fix the result of previous iterations or preselect data
             for name in self._options.keys():
