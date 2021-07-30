@@ -9,6 +9,10 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  FormControl,
+  MenuItem,
+  InputLabel,
+  Select,
   Hidden,
   Typography,
   Snackbar,
@@ -37,6 +41,9 @@ const genPassword = () => {
   }
   return result;
 };
+
+const gradeData = ["1", "2", "3", "4", "5", "6", "7"];
+const authorityData = ["0", "1", "2"];
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -437,14 +444,15 @@ export default function StudentData() {
       newErrors = { ...newErrors, grade: false };
       newErrorsMsg = { ...newErrorsMsg, grade: "" };
     }
-    if (!newStudent.authority) {
-      newErrors = { ...newErrors, authority: true };
-      newErrorsMsg = {
-        ...newErrorsMsg,
-        authority: "authority should not be empty",
-      };
-      error = true;
-    } else if (!/^[012]$/.test(newStudent.authority)) {
+    // if (!newStudent.authority) {
+    //   newErrors = { ...newErrors, authority: true };
+    //   newErrorsMsg = {
+    //     ...newErrorsMsg,
+    //     authority: "authority should not be empty",
+    //   };
+    //   error = true;
+    // } else
+    if (!/^[012]$/.test(newStudent.authority)) {
       newErrors = { ...newErrors, authority: true };
       newErrorsMsg = {
         ...newErrorsMsg,
@@ -549,6 +557,8 @@ export default function StudentData() {
             ...newStudent,
             id: newStudent.id.toUpperCase(),
             password,
+            grade: Number(newStudent.grade),
+            authority: Number(newStudent.authority),
           })
         );
         setNewStudent({
@@ -574,7 +584,7 @@ export default function StudentData() {
         StudentDataAPI.deleteStudentData([editId]);
       } catch (err) {
         showAlert("error", "Failed to Delete student data in Edit.");
-        handleCloseAdd();
+        handleCloseEdit();
         return;
       }
       // console.log("delete student data finish in edit");
@@ -599,6 +609,8 @@ export default function StudentData() {
               ...newStudent,
               id: newStudent.id.toUpperCase(),
               password,
+              grade: Number(newStudent.grade),
+              authority: Number(newStudent.authority),
             })
         );
         // console.log({
@@ -615,11 +627,11 @@ export default function StudentData() {
           grade: "",
           authority: "",
         });
-        handleCloseAdd();
+        handleCloseEdit();
         showAlert("success", "Edit student data success.");
       } catch (err) {
         showAlert("error", "Failed to post student data in Edit.");
-        handleCloseAdd();
+        handleCloseEdit();
       }
     }
   };
@@ -676,26 +688,37 @@ export default function StudentData() {
             onChange={onNameChange}
             helperText={errorsMsg.name}
           />
-          <TextField
-            id="grade"
-            label="grade"
-            type="text"
-            fullWidth
-            value={newStudent.grade}
-            error={errors.grade}
-            onChange={onGradeChange}
-            helperText={errorsMsg.grade}
-          />
-          <TextField
-            id="authority"
-            label="authority"
-            type="text"
-            fullWidth
-            value={newStudent.authority}
-            error={errors.authority}
-            onChange={onAuthorityChange}
-            helperText={errorsMsg.authority}
-          />
+
+          <FormControl fullWidth>
+            <InputLabel>grade</InputLabel>
+            <Select
+              fullWidth
+              value={newStudent.grade}
+              error={errors.grade}
+              onChange={onGradeChange}
+            >
+              {gradeData.map((e) => (
+                <MenuItem key={e} value={e}>
+                  {e}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel>authority</InputLabel>
+            <Select
+              fullWidth
+              value={newStudent.authority}
+              error={errors.authority}
+              onChange={onAuthorityChange}
+            >
+              {authorityData.map((e) => (
+                <MenuItem key={e} value={e}>
+                  {e}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={editId === "" ? handleCloseAdd : handleCloseEdit}>
