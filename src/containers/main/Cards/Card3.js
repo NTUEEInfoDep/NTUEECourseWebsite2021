@@ -22,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    marginTop: "10%",
   },
   subtitle: {
     color: "white",

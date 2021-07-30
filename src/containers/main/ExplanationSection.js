@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useMediaQuery } from "react-responsive";
 import { CarouselProvider, DotGroup, Slide, Slider } from "pure-react-carousel";
 import "pure-react-carousel/dist/react-carousel.es.css";
+import { Scrollbars } from "rc-scrollbars";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -117,43 +118,54 @@ export default function Explanation() {
           // dragEnabled={false}
         >
           <Slider>
-            <StyledSlide index={0}>
-              <Card
-                message={message}
-                title="系必修課程"
-                icon={BatteryAlertIcon}
-              />
+          <StyledSlide index={0}>
+              <Scrollbars>
+                <Card
+                  message={message}
+                  title="系必修課程"
+                  icon={BatteryAlertIcon}
+                />
+              </Scrollbars>
             </StyledSlide>
+
             <StyledSlide index={1}>
-              <Card
-                message={message2}
-                title="電電實驗"
-                icon={BatteryCharging20Icon}
-              />
+              <Scrollbars>
+                <Card
+                  message={message2}
+                  title="電電實驗"
+                  icon={BatteryCharging20Icon}
+                />
+              </Scrollbars>
             </StyledSlide>
             <StyledSlide index={2}>
-              <Card2 />
+              <Scrollbars>
+                <Card2 />
+              </Scrollbars>
             </StyledSlide>
 
             <StyledSlide index={3}>
-              <Card3
-                message={message4}
-                title={"數電實驗抽籤"}
-                icon={BatteryCharging80Icon}
-                note={
-                  "NOTE：人工篩選會完全透明公開，非黑箱作業。黑箱作業對學術部沒有任何好處，請知悉。"
-                }
-                step={"STEP1"}
-              />
+              <Scrollbars>
+                <Card3
+                  message={message4}
+                  title={"數電實驗抽籤"}
+                  icon={BatteryCharging80Icon}
+                  note={
+                    "NOTE：人工篩選會完全透明公開，非黑箱作業。黑箱作業對學術部沒有任何好處，請知悉。"
+                  }
+                  step={"STEP1"}
+                />
+              </Scrollbars>
             </StyledSlide>
             <StyledSlide index={4}>
-              <Card3
-                message={message5}
-                title={"九實驗志願抽籤"}
-                icon={BatteryChargingFullIcon}
-                note={"NOTE：已選上數電實驗的同學算已抽中一次。"}
-                step={"STEP2"}
-              />
+              <Scrollbars>
+                <Card3
+                  message={message5}
+                  title={"九實驗志願抽籤"}
+                  icon={BatteryChargingFullIcon}
+                  note={"NOTE：已選上數電實驗的同學算已抽中一次。"}
+                  step={"STEP2"}
+                />
+              </Scrollbars>
             </StyledSlide>
           </Slider>
           <StyledDotGroup />
