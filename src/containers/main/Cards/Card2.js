@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
   subtitle: {
     color: "white",
     fontSize: "1.2rem",
-    marginBottom: "5px",
+    // marginBottom: "5px",
     textAlign: "center"
   },
   paragraph: {
@@ -40,14 +40,14 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "1.8",
     textIndent: "32px",
     letterSpacing: "1px",
-    margin:'auto',//文字塊居中?
+    // margin:'auto',//文字塊居中?
   },
   text: {
     color: "white",
     fontSize: "16px",
     padding: "8px",
     opacity: ".8",
-    lineHeight: ".5",
+    lineHeight: "1.5",
     letterSpacing: "1px"
   }
 }));
