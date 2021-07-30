@@ -140,8 +140,13 @@ class Option:
             self._priority_list.extend(students)
 
     def update_priority_list_and_limit(self):
+        ''' Update priority list and update limit
+
+        Args:
+            None
+        '''
         if self._priority == 6 or self._priority == 7:
-            self._priority_list = random.shuffle(self._priority_list)
+            random.shuffle(self._priority_list)
             self._limit = self._real_limit
 
 
@@ -202,10 +207,10 @@ class Option:
                 self._selected.append(about_to_kick)
                 return student_id
             else:
-                idx = index
+                idx = self._fix + index
 
                 # find the proper index for this student to insert
-                for i in range(self._fix, index):
+                for i in range(self._fix, self._fix + index):
                     idx = i
                     if i >= len(self._selected):
                         break
@@ -509,6 +514,7 @@ class Algorithm:
                     result = {
                         "studentID": student,
                         "courseName": course._name,
+                        "courseID": course._id,
                         "optionName": option
                     }
                     results.append(result)
