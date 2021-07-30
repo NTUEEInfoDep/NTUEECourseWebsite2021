@@ -287,8 +287,8 @@ export default function StudentTable({
 
   const studentFilter = (e) => {
     return search
-      ? e.name.toLowerCase().startsWith(search.toLowerCase()) ||
-          e.id.toLowerCase().startsWith(search.toLowerCase())
+      ? e.name.toUpperCase().startsWith(search.toUpperCase()) ||
+          e.id.toUpperCase().startsWith(search.toUpperCase())
       : true;
   };
 

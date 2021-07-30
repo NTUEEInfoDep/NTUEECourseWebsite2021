@@ -114,75 +114,6 @@ export default function StudentData() {
     handleStudentDataReload();
   }, []);
 
-  const testRepeatId = (id) => {
-    return data.map((e) => e.id.toLowerCase()).includes(id.toLowerCase());
-  };
-
-  const handleUploadCsv = async (efile) => {
-    // console.log(efile);
-    if (efile) {
-      Papa.parse(efile, {
-        skipEmptyLines: true,
-        complete(results) {
-          let valid = true;
-          let repeat = false;
-          results.data.slice(1).forEach((student) => {
-            if (
-              !/^(b|r|d)\d{8}$/i.test(student[0]) ||
-              !student[1] ||
-              !/^\d+$/.test(student[2])
-            ) {
-              valid = false;
-              console.log(student);
-            }
-            if (testRepeatId(student[0])) {
-              repeat = true;
-              console.log(student);
-            }
-          });
-          if (valid && !repeat) {
-            const newData = results.data.slice(1).reduce((obj, cur) => {
-              return obj.concat([
-                {
-                  id: cur[0],
-                  name: cur[1],
-                  grade: Number(cur[2]),
-                  authority: 0,
-                },
-              ]);
-            }, []);
-            setNewStudentMultiple(newData);
-            setLoaded(true);
-            // console.log("Multiple student data loaded");
-            // console.log(newData);
-            setFilename(efile.name);
-            return;
-          }
-          if (!valid && !repeat) {
-            showAlert("error", "Invalid student data format.");
-          }
-          if (valid && repeat) {
-            showAlert("error", "Student UserId repeat.");
-          }
-          if (!valid && repeat) {
-            showAlert(
-              "error",
-              "Invalid student data format & Student UserId repeat."
-            );
-          }
-          setNewStudentMultiple({
-            id: "",
-            name: "",
-            grade: "",
-            authority: "",
-          });
-          setLoaded(false);
-          setFilename("");
-        },
-      });
-    }
-  };
-
   const handleOpenAddMultiple = () => {
     // console.log("handleOpenAddMultiple");
     setUploaded(false);
@@ -203,6 +134,7 @@ export default function StudentData() {
   };
 
   const handleOpenAdd = () => {
+    console.log(data);
     // console.log("handleOpenAdd");
     setNewStudent({
       id: "",
@@ -528,6 +460,75 @@ export default function StudentData() {
     return error;
   };
 
+  const testRepeatId = (id) => {
+    return data.map((e) => e.id.toUpperCase()).includes(id.toUpperCase());
+  };
+
+  const handleUploadCsv = async (efile) => {
+    // console.log(efile);
+    if (efile) {
+      Papa.parse(efile, {
+        skipEmptyLines: true,
+        complete(results) {
+          let valid = true;
+          let repeat = false;
+          results.data.slice(1).forEach((student) => {
+            if (
+              !/^(b|r|d)\d{8}$/i.test(student[0]) ||
+              !student[1] ||
+              !/^\d+$/.test(student[2])
+            ) {
+              valid = false;
+              console.log(student);
+            }
+            if (testRepeatId(student[0])) {
+              repeat = true;
+              console.log(student);
+            }
+          });
+          if (valid && !repeat) {
+            const newData = results.data.slice(1).reduce((obj, cur) => {
+              return obj.concat([
+                {
+                  id: cur[0].toUpperCase(),
+                  name: cur[1],
+                  grade: Number(cur[2]),
+                  authority: 0,
+                },
+              ]);
+            }, []);
+            setNewStudentMultiple(newData);
+            setLoaded(true);
+            // console.log("Multiple student data loaded");
+            console.log(newData);
+            setFilename(efile.name);
+            return;
+          }
+          if (!valid && !repeat) {
+            showAlert("error", "Invalid student data format.");
+          }
+          if (valid && repeat) {
+            showAlert("error", "Student UserId repeat.");
+          }
+          if (!valid && repeat) {
+            showAlert(
+              "error",
+              "Invalid student data format & Student UserId repeat."
+            );
+          }
+          setNewStudentMultiple({
+            id: "",
+            name: "",
+            grade: "",
+            authority: "",
+          });
+          setLoaded(false);
+          setFilename("");
+        },
+      });
+    }
+  };
+
   const handleAddStudent = async () => {
     const error = judgeNewStudent();
 
@@ -543,7 +544,13 @@ export default function StudentData() {
             authority: Number(newStudent.authority),
           },
         ]);
-        setData(data.concat({ ...newStudent, password }));
+        setData(
+          data.concat({
+            ...newStudent,
+            id: newStudent.id.toUpperCase(),
+            password,
+          })
+        );
         setNewStudent({
           id: "",
           name: "",
@@ -588,7 +595,11 @@ export default function StudentData() {
         setData(
           data
             .filter((e) => e.id !== editId)
-            .concat({ ...newStudent, password })
+            .concat({
+              ...newStudent,
+              id: newStudent.id.toUpperCase(),
+              password,
+            })
         );
         // console.log({
         //  userID: newStudent.id,
