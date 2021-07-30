@@ -584,7 +584,7 @@ export default function StudentData() {
         StudentDataAPI.deleteStudentData([editId]);
       } catch (err) {
         showAlert("error", "Failed to Delete student data in Edit.");
-        handleCloseAdd();
+        handleCloseEdit();
         return;
       }
       // console.log("delete student data finish in edit");
@@ -627,11 +627,11 @@ export default function StudentData() {
           grade: "",
           authority: "",
         });
-        handleCloseAdd();
+        handleCloseEdit();
         showAlert("success", "Edit student data success.");
       } catch (err) {
         showAlert("error", "Failed to post student data in Edit.");
-        handleCloseAdd();
+        handleCloseEdit();
       }
     }
   };
