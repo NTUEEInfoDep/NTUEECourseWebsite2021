@@ -3,6 +3,8 @@ import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 
 const useStyles = makeStyles({
   styledCourse: {
@@ -20,8 +22,9 @@ const useStyles = makeStyles({
     fontFamily: "Times, Times New Roman, serif",
     //opacity: 1.0,
     zIndex: 1,
+    webkitTransition: "backgroundColor .2s linear ",
 
-    ":hover": {
+    "&:hover": {
       backgroundColor: "gold",
       transition: "background-color .1s ease-in",
     },
@@ -30,17 +33,21 @@ const useStyles = makeStyles({
 const Course = (props) => {
   const { courseId, course, index } = props;
   const classes = useStyles();
+  // let hover = false;
   return (
     <Draggable draggableId={course} index={index}>
       {(provided) => (
         <div
-          className={classes.styledCourse}
+          //className={classes.styledCourse}//clsx(classes.styledCourse,{[classes.hover]: hover})}
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          {index + 1}
-          {course}
+          <ListItem className={classes.styledCourse} button>
+            <ListItemText primary={`${index + 1}. ${course}`}/>
+          </ListItem>
+          {/* {index + 1}
+          {course} */}
         </div>
       )}
     </Draggable>
