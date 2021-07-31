@@ -28,9 +28,16 @@
 //   }).isRequired,
 // };
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import { DragDropContext } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
 import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
+import Typography from '@material-ui/core/Typography';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import Link from '@material-ui/core/Link';
+import HomeIcon from '@material-ui/icons/Home';
+import ClassIcon from '@material-ui/icons/Class';
+import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
 // import initialData from "./initial-data";
 import Column from "./column";
 import { SelectAPI } from "../../api";
@@ -54,6 +61,14 @@ const useStyles = makeStyles((theme) => ({
       paddingRight: "0px",
     },
   },
+  link: {
+    display: 'flex',
+  },
+  icon: {
+    marginRight: theme.spacing(0.5),
+    width: 20,
+    height: 20,
+  },
 }));
 const Selection = () => {
   // const selected = courseName.selected;
@@ -61,6 +76,7 @@ const Selection = () => {
   // const handleSelectCourse = (selectedID) => {
   //   setSelectedCourse(courses.find(({ courseID }) => courseID === selectedID));
   // };
+  const history = useHistory();
   const theme = useTheme();
   const { courseId } = useParams();
   const [data, setData] = useState(null);
@@ -83,6 +99,14 @@ const Selection = () => {
       console.error(err);
     }
   }, [data]);
+  function handleHomeClick() {
+    history.push(``);
+    // event.preventDefault();
+    // console.info('You clicked a breadcrumb.');
+  }
+  function handleCoursesClick() {
+    history.push(`/courses`);
+  }
   // const { name, type, description, selected, unselected } = data;
   // return (
   //   <>
@@ -153,11 +177,35 @@ const Selection = () => {
 
   return (
     <>
+    {data? (  
+      <Breadcrumbs aria-label="breadcrumb">
+        <Link color="inherit" href="/" onClick={handleHomeClick} className={classes.link}>
+          <HomeIcon className={classes.icon} />
+          Main
+        </Link>
+        <Link
+          color="inherit"
+          href="/courses"
+          onClick={handleCoursesClick}
+          className={classes.link}
+        >
+          <ClassIcon className={classes.icon} />
+          Courses
+        </Link>
+        <Typography color="textPrimary" className={classes.link}>
+          <ViewCarouselIcon className={classes.icon} />
+          {data.name}
+        </Typography>
+      </Breadcrumbs>
+    ) : (
+      ""
+    )}
       {data ? (
         <div
           style={{
             width: "75%",
             padding:"10px",
+            marginTop: "16px",
             marginLeft: "auto",
             marginRight: "auto",
             marginBottom: "30px",
