@@ -9,6 +9,10 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  FormControl,
+  MenuItem,
+  InputLabel,
+  Select,
   Hidden,
   Typography,
   Snackbar,
@@ -37,6 +41,9 @@ const genPassword = () => {
   }
   return result;
 };
+
+const gradeData = ["1", "2", "3", "4", "5", "6", "7"];
+const authorityData = ["0", "1", "2"];
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -114,75 +121,6 @@ export default function StudentData() {
     handleStudentDataReload();
   }, []);
 
-  const testRepeatId = (id) => {
-    return data.map((e) => e.id.toLowerCase()).includes(id.toLowerCase());
-  };
-
-  const handleUploadCsv = async (efile) => {
-    // console.log(efile);
-    if (efile) {
-      Papa.parse(efile, {
-        skipEmptyLines: true,
-        complete(results) {
-          let valid = true;
-          let repeat = false;
-          results.data.slice(1).forEach((student) => {
-            if (
-              !/^(b|r|d)\d{8}$/i.test(student[0]) ||
-              !student[1] ||
-              !/^\d+$/.test(student[2])
-            ) {
-              valid = false;
-              console.log(student);
-            }
-            if (testRepeatId(student[0])) {
-              repeat = true;
-              console.log(student);
-            }
-          });
-          if (valid && !repeat) {
-            const newData = results.data.slice(1).reduce((obj, cur) => {
-              return obj.concat([
-                {
-                  id: cur[0],
-                  name: cur[1],
-                  grade: Number(cur[2]),
-                  authority: 0,
-                },
-              ]);
-            }, []);
-            setNewStudentMultiple(newData);
-            setLoaded(true);
-            // console.log("Multiple student data loaded");
-            // console.log(newData);
-            setFilename(efile.name);
-            return;
-          }
-          if (!valid && !repeat) {
-            showAlert("error", "Invalid student data format.");
-          }
-          if (valid && repeat) {
-            showAlert("error", "Student UserId repeat.");
-          }
-          if (!valid && repeat) {
-            showAlert(
-              "error",
-              "Invalid student data format & Student UserId repeat."
-            );
-          }
-          setNewStudentMultiple({
-            id: "",
-            name: "",
-            grade: "",
-            authority: "",
-          });
-          setLoaded(false);
-          setFilename("");
-        },
-      });
-    }
-  };
-
   const handleOpenAddMultiple = () => {
     // console.log("handleOpenAddMultiple");
     setUploaded(false);
@@ -203,6 +141,7 @@ export default function StudentData() {
   };
 
   const handleOpenAdd = () => {
+    console.log(data);
     // console.log("handleOpenAdd");
     setNewStudent({
       id: "",
@@ -477,7 +416,7 @@ export default function StudentData() {
       newErrors = { ...newErrors, id: true };
       newErrorsMsg = { ...newErrorsMsg, id: "id invalid format" };
       error = true;
-    } else if (testRepeatId(newStudent.id)) {
+    } else if (editId === "" && testRepeatId(newStudent.id)) {
       newErrors = { ...newErrors, id: true };
       newErrorsMsg = { ...newErrorsMsg, id: "repeat userId" };
       error = true;
@@ -505,14 +444,15 @@ export default function StudentData() {
       newErrors = { ...newErrors, grade: false };
       newErrorsMsg = { ...newErrorsMsg, grade: "" };
     }
-    if (!newStudent.authority) {
-      newErrors = { ...newErrors, authority: true };
-      newErrorsMsg = {
-        ...newErrorsMsg,
-        authority: "authority should not be empty",
-      };
-      error = true;
-    } else if (!/^[012]$/.test(newStudent.authority)) {
+    // if (!newStudent.authority) {
+    //   newErrors = { ...newErrors, authority: true };
+    //   newErrorsMsg = {
+    //     ...newErrorsMsg,
+    //     authority: "authority should not be empty",
+    //   };
+    //   error = true;
+    // } else
+    if (!/^[012]$/.test(newStudent.authority)) {
       newErrors = { ...newErrors, authority: true };
       newErrorsMsg = {
         ...newErrorsMsg,
@@ -526,6 +466,75 @@ export default function StudentData() {
     setErrors(newErrors);
     setErrorsMsg(newErrorsMsg);
     return error;
+  };
+
+  const testRepeatId = (id) => {
+    return data.map((e) => e.id.toUpperCase()).includes(id.toUpperCase());
+  };
+
+  const handleUploadCsv = async (efile) => {
+    // console.log(efile);
+    if (efile) {
+      Papa.parse(efile, {
+        skipEmptyLines: true,
+        complete(results) {
+          let valid = true;
+          let repeat = false;
+          results.data.slice(1).forEach((student) => {
+            if (
+              !/^(b|r|d)\d{8}$/i.test(student[0]) ||
+              !student[1] ||
+              !/^\d+$/.test(student[2])
+            ) {
+              valid = false;
+              console.log(student);
+            }
+            if (testRepeatId(student[0])) {
+              repeat = true;
+              console.log(student);
+            }
+          });
+          if (valid && !repeat) {
+            const newData = results.data.slice(1).reduce((obj, cur) => {
+              return obj.concat([
+                {
+                  id: cur[0].toUpperCase(),
+                  name: cur[1],
+                  grade: Number(cur[2]),
+                  authority: 0,
+                },
+              ]);
+            }, []);
+            setNewStudentMultiple(newData);
+            setLoaded(true);
+            // console.log("Multiple student data loaded");
+            console.log(newData);
+            setFilename(efile.name);
+            return;
+          }
+          if (!valid && !repeat) {
+            showAlert("error", "Invalid student data format.");
+          }
+          if (valid && repeat) {
+            showAlert("error", "Student UserId repeat.");
+          }
+          if (!valid && repeat) {
+            showAlert(
+              "error",
+              "Invalid student data format & Student UserId repeat."
+            );
+          }
+          setNewStudentMultiple({
+            id: "",
+            name: "",
+            grade: "",
+            authority: "",
+          });
+          setLoaded(false);
+          setFilename("");
+        },
+      });
+    }
   };
 
   const handleAddStudent = async () => {
@@ -543,7 +552,15 @@ export default function StudentData() {
             authority: Number(newStudent.authority),
           },
         ]);
-        setData(data.concat({ ...newStudent, password }));
+        setData(
+          data.concat({
+            ...newStudent,
+            id: newStudent.id.toUpperCase(),
+            password,
+            grade: Number(newStudent.grade),
+            authority: Number(newStudent.authority),
+          })
+        );
         setNewStudent({
           id: "",
           name: "",
@@ -567,7 +584,7 @@ export default function StudentData() {
         StudentDataAPI.deleteStudentData([editId]);
       } catch (err) {
         showAlert("error", "Failed to Delete student data in Edit.");
-        handleCloseAdd();
+        handleCloseEdit();
         return;
       }
       // console.log("delete student data finish in edit");
@@ -588,7 +605,13 @@ export default function StudentData() {
         setData(
           data
             .filter((e) => e.id !== editId)
-            .concat({ ...newStudent, password })
+            .concat({
+              ...newStudent,
+              id: newStudent.id.toUpperCase(),
+              password,
+              grade: Number(newStudent.grade),
+              authority: Number(newStudent.authority),
+            })
         );
         // console.log({
         //  userID: newStudent.id,
@@ -604,11 +627,11 @@ export default function StudentData() {
           grade: "",
           authority: "",
         });
-        handleCloseAdd();
+        handleCloseEdit();
         showAlert("success", "Edit student data success.");
       } catch (err) {
         showAlert("error", "Failed to post student data in Edit.");
-        handleCloseAdd();
+        handleCloseEdit();
       }
     }
   };
@@ -665,26 +688,37 @@ export default function StudentData() {
             onChange={onNameChange}
             helperText={errorsMsg.name}
           />
-          <TextField
-            id="grade"
-            label="grade"
-            type="text"
-            fullWidth
-            value={newStudent.grade}
-            error={errors.grade}
-            onChange={onGradeChange}
-            helperText={errorsMsg.grade}
-          />
-          <TextField
-            id="authority"
-            label="authority"
-            type="text"
-            fullWidth
-            value={newStudent.authority}
-            error={errors.authority}
-            onChange={onAuthorityChange}
-            helperText={errorsMsg.authority}
-          />
+
+          <FormControl fullWidth>
+            <InputLabel>grade</InputLabel>
+            <Select
+              fullWidth
+              value={newStudent.grade}
+              error={errors.grade}
+              onChange={onGradeChange}
+            >
+              {gradeData.map((e) => (
+                <MenuItem key={e} value={e}>
+                  {e}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel>authority</InputLabel>
+            <Select
+              fullWidth
+              value={newStudent.authority}
+              error={errors.authority}
+              onChange={onAuthorityChange}
+            >
+              {authorityData.map((e) => (
+                <MenuItem key={e} value={e}>
+                  {e}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={editId === "" ? handleCloseAdd : handleCloseEdit}>
@@ -927,6 +961,7 @@ export default function StudentData() {
             handleDelete={handleOpenDelete}
             selected={selected}
             setSelected={setSelected}
+            showAlert={showAlert}
           />
         </Grid>
         {/* <Hidden smDown>
@@ -936,7 +971,7 @@ export default function StudentData() {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={alert?.open}
-        autoHideDuration={6000}
+        autoHideDuration={5000}
         onClose={() => setAlert({ ...alert, open: false })}
       >
         <Alert variant="filled" severity={alert?.severity}>

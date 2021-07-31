@@ -38,11 +38,20 @@ export const StudentDataAPI = {
   postStudentData: (users) => axios.post(`/api/users`, users),
   deleteStudentData: (ids) => axios.delete(`/api/users`, { data: [...ids] }),
 };
+
 export const SelectAPI = {
   getSelections: (courseID) => axios.get(`/api/selections/${courseID}`),
   putSelections: (courseID, data) =>
-    axios.put(`/api/selections/${courseID}`, [...data]),//, [...courseID.data.selected]),
+    axios.put(`/api/selections/${courseID}`, [...data]), // , [...courseID.data.selected]),
 };
-export const OpentimeAPI={
+
+export const DistributeAPI = {
+  postDistribute: () => axios.post(`/api/distribute`),
+  putPreselect: (ids) => axios.put(`/api/preselect`, { data: [...ids] }),
+  getResult: () => axios.get(`/api/result.csv`),
+};
+
+export const OpentimeAPI = {
   getOpentime: () => axios.get(`/api/opentime`),
-}
+  putOpentime: (data) => axios.put(`/api/opentime`, { data }),
+};

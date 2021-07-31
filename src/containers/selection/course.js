@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     height: 45,
     boxShadow: "0 3px 5px 2px rgba(255, 105, 135, .3)",
     //textAlign: "center",
-    fontFamily: "Times, Times New Roman, serif",
+    // fontFamily: "Times, Times New Roman, serif",
     //opacity: 1.0,
     zIndex: 1,
     webkitTransition: "backgroundColor .2s linear ",
@@ -31,7 +31,7 @@ const useStyles = makeStyles({
   },
 });
 const Course = (props) => {
-  const { courseId, course, index } = props;
+  const { course, index } = props;
   const classes = useStyles();
   // let hover = false;
   return (
@@ -55,12 +55,7 @@ const Course = (props) => {
 };
 
 Course.propTypes = {
-  courseId: PropTypes.string.isRequired,
   course: PropTypes.string.isRequired,
-  // course: PropTypes.shape({
-  //   id: PropTypes.string.isRequired,
-  //   content: PropTypes.string.isRequired,
-  // }).isRequired,
   index: PropTypes.number.isRequired,
 };
 

@@ -7,26 +7,27 @@ import Typography from "@material-ui/core/Typography";
 const useStyles = makeStyles((theme) => ({
   title: {
     padding: "10px",
-    textAlign: "center"
+    textAlign: "center",
   },
   avatar: {
     margin: "0 15px",
     marginTop: "5%",
-    color:'white',
+    color: "white",
     width: theme.spacing(4),
-    height: theme.spacing(4)
+    height: theme.spacing(4),
     // width:'10%',
   },
   gridStyle: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    marginTop: "10%",
   },
   subtitle: {
     color: "white",
     marginBottom: "5px",
-    textAlign: "center"
+    textAlign: "center",
   },
   paragraph: {
     width: "100%",
@@ -37,8 +38,8 @@ const useStyles = makeStyles((theme) => ({
     opacity: ".8",
     lineHeight: "1.8",
     textIndent: "32px",
-    letterSpacing: "1px"
-  }
+    letterSpacing: "1px",
+  },
 }));
 
 export default function Card3(props) {
@@ -53,7 +54,7 @@ export default function Card3(props) {
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center"
+            justifyContent: "center",
           }}
         >
           <Typography variant="h6" className={classes.subtitle}>

@@ -1,32 +1,3 @@
-// import React from "react";
-// import PropTypes from "prop-types";
-
-// /**
-//  * This is Main Page
-//  */
-// export default function Selection({
-//   course: { id, name, type, description, options },
-// }) {
-//   return (
-//     <div>
-//       <h1>This is Course Selection Popup</h1>
-//       {id} {name} {type} {description}
-//       {options.map((option) => (
-//         <div key={option}>{option}</div>
-//       ))}
-//     </div>
-//   );
-// }
-
-// Selection.propTypes = {
-//   course: PropTypes.shape({
-//     id: PropTypes.string.isRequired,
-//     name: PropTypes.string.isRequired,
-//     type: PropTypes.string.isRequired,
-//     description: PropTypes.string.isRequired,
-//     options: PropTypes.arrayOf(PropTypes.string).isRequired,
-//   }).isRequired,
-// };
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { DragDropContext } from "react-beautiful-dnd";
@@ -50,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
   styledColumns: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    margin: "10vh auto",
+    margin: "5vh auto",
     width: "80%",
     height: "80vh",
     gap: "8px",
@@ -80,9 +51,7 @@ const Selection = () => {
   const theme = useTheme();
   const { courseId } = useParams();
   const [data, setData] = useState(null);
-  // const [columns, setColumns] = useState(initialData);
   const classes = useStyles();
-
   useEffect(async () => {
     try {
       const res = await SelectAPI.getSelections(courseId);
@@ -92,6 +61,7 @@ const Selection = () => {
     }
   }, []); // only run the first time
   useEffect(async () => {
+    if (!data) return;
     try {
       await SelectAPI.putSelections(courseId, data.selected);
       // setData(res.data);
@@ -156,162 +126,78 @@ const Selection = () => {
     }
     const newSelection = {
       selected: [...data.selected],
-      unselect: [...data.unselected],
+      unselected: [...data.unselected],
     };
     const [remove] = newSelection[source.droppableId].splice(source.index, 1);
     newSelection[destination.droppableId].splice(destination.index, 0, remove);
     setData((state) => ({
       ...state,
       selected: newSelection.selected,
-      unselected: newSelection.unselect,
+      unselected: newSelection.unselected,
     }));
-    // useEffect(async () => {
-    //   try {
-    //     await SelectAPI.putSelections(data.selected);
-    //     // setData(res.data);
-    //   } catch (err) {
-    //     console.error(err);
-    //   }
-    // }, [data]);
   };
 
   return (
     <>
-    {data? (  
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link color="inherit" href="/" onClick={handleHomeClick} className={classes.link}>
-          <HomeIcon className={classes.icon} />
-          Main
-        </Link>
-        <Link
-          color="inherit"
-          href="/courses"
-          onClick={handleCoursesClick}
-          className={classes.link}
-        >
-          <ClassIcon className={classes.icon} />
-          Courses
-        </Link>
-        <Typography color="textPrimary" className={classes.link}>
-          <ViewCarouselIcon className={classes.icon} />
-          {data.name}
-        </Typography>
-      </Breadcrumbs>
-    ) : (
-      ""
-    )}
-      {data ? (
-        <div
-          style={{
-            width: "75%",
-            padding:"10px",
-            marginTop: "16px",
-            marginLeft: "auto",
-            marginRight: "auto",
-            marginBottom: "30px",
-            border:"1px white solid",
-            borderRadius: "4px" 
-          }}
-        >
-          <h2 style={{marginTop:"0px"}}>Introduction</h2>
-          <MDEditor.Markdown source={data.description} />
-        </div>
+      {data? (  
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link color="inherit" href="/" onClick={handleHomeClick} className={classes.link}>
+            <HomeIcon className={classes.icon} />
+            Main
+          </Link>
+          <Link
+            color="inherit"
+            href="/courses"
+            onClick={handleCoursesClick}
+            className={classes.link}
+          >
+            <ClassIcon className={classes.icon} />
+            Courses
+          </Link>
+          <Typography color="textPrimary" className={classes.link}>
+            <ViewCarouselIcon className={classes.icon} />
+            {data.name}
+          </Typography>
+        </Breadcrumbs>
       ) : (
         ""
       )}
+      {data && data.description && (
+        <div
+          style={{
+            width: "90%",
+            padding: "10px",
+            marginTop: "15px",
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginBottom: "10px",
+            border: "1px white solid",
+            borderRadius: "4px",
+          }}
+        >
+          <h2 style={{ marginTop: "0px" }}>Introduction</h2>
+          <MDEditor.Markdown source={data.description} />
+        </div>
+      )}
       {data ? (
-        <ThemeProvider theme={theme}>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <div className={classes.styledColumns}>
-              <Column key="selected" title="selected" column={data.selected} />
-              <Column
-                key="unselect"
-                title="unselect"
-                column={data.unselected}
-              />
-            </div>
-          </DragDropContext>
-        </ThemeProvider>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className={classes.styledColumns}>
+            <Column
+              title="已選課程"
+              droppableId="selected"
+              column={data.selected}
+            />
+            <Column
+              title="未選課程"
+              droppableId="unselected"
+              column={data.unselected}
+            />
+          </div>
+        </DragDropContext>
       ) : (
-        Loading
+        <Loading />
       )}
     </>
   );
 };
 export default Selection;
-// const onDragEnd = (result) => {
-//   const { destination, source, draggableId } = result;
-
-//   if (!destination) {
-//     return;
-//   }
-
-//   if (
-//     destination.droppableId === source.droppableId &&
-//     destination.index === source.index
-//   ) {
-//     return;
-//   }
-
-//   const startcolumn = columns[source.droppableId];
-//   const endcolumn = columns[destination.droppableId];
-
-//   if (startcolumn === endcolumn) {
-//     const newOptionIds = Array.from(startcolumn.optionIds);
-//     newOptionIds.splice(source.index, 1);
-//     newOptionIds.splice(destination.index, 0, draggableId);
-
-//     const newColumn = {
-//       ...startcolumn,
-//       optionIds: newOptionIds,
-//     };
-//     if (source.droppableId === 0) {
-//       setColumns((state) => [newColumn, ...state[1]]);
-//     } else {
-//       setColumns((state) => [...state[0], newColumn]);
-//     }
-//   } else {
-//     const newOptionIds = Array.from(startcolumn.optionIds);
-//     newOptionIds.splice(source.index, 1);
-
-//     const newStartCol = {
-//       ...startcolumn,
-//       optionIds: newOptionIds,
-//     };
-//     const newEnd = Array.from(endcolumn.optionIds);
-//     newEnd.splice(destination.index, 0, newOptionIds[source.index]);
-//     const newEndCol = {
-//       ...endcolumn,
-//       optionIds: newEnd,
-//     };
-//     if (source.droppableId === 0) {
-//       setColumns(() => [newStartCol, newEndCol]);
-//     } else {
-//       setColumns(() => [newEndCol, newStartCol]);
-//     }
-//   }
-// };
-// return (
-//   <>
-//     {data ? (
-//       <DragDropContext onDragEnd={onDragEnd}>
-//         <div className={classes.styledColumns}>
-//           {columns.map((column) => {
-//             // const column = columns.columnId;
-//             // const options = column.optionIds; // .map((courseId) => courses[courseId]);
-//             return (
-//               <Column
-//                 key={column.id}
-//                 column={column}
-//                 options={column.optionIds}
-//               />
-//             );
-//           })}
-//         </div>
-//       </DragDropContext>
-//     ) : (
-//       Loading
-//     )}
-//   </>
-// );
-// };

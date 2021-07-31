@@ -255,6 +255,12 @@ const useStyles = makeStyles((theme) => ({
   icon: {
     padding: 0,
   },
+  copy: {
+    borderRadius: "10px",
+    backgroundColor: "#424242",
+    color: "#ffffff",
+    boxShadow: "0px 0px 0px 0px rgba(0,0,0,0.3)",
+  },
 }));
 
 export default function StudentTable({
@@ -263,6 +269,7 @@ export default function StudentTable({
   handleDelete,
   selected,
   setSelected,
+  showAlert,
 }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
@@ -280,8 +287,8 @@ export default function StudentTable({
 
   const studentFilter = (e) => {
     return search
-      ? e.name.toLowerCase().startsWith(search.toLowerCase()) ||
-          e.id.toLowerCase().startsWith(search.toLowerCase())
+      ? e.name.toUpperCase().startsWith(search.toUpperCase()) ||
+          e.id.toUpperCase().startsWith(search.toUpperCase())
       : true;
   };
 
@@ -455,7 +462,15 @@ export default function StudentTable({
                       >
                         {row.password ? (
                           <CopyToClipboard text={row.password}>
-                            <button type="button">{row.password}</button>
+                            <button
+                              type="button"
+                              className={classes.copy}
+                              onClick={() => {
+                                showAlert("info", "Copy password.");
+                              }}
+                            >
+                              {row.password}
+                            </button>
                           </CopyToClipboard>
                         ) : (
                           <></>

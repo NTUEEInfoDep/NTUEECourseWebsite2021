@@ -92,7 +92,6 @@ export default function Courses() {
       .then((res) => setCourses(res.data))
       .catch(() => {});
   }, []);
-
   // select grade
   const [selectedGrade, setSelectedGrade] = useState("1");
   const handleSelectGrade = (event, value) => {
@@ -133,7 +132,12 @@ export default function Courses() {
           variant="scrollable"
         >
           {grades.map(({ id, text }) => (
-            <Tab key={id} value={id} label={text} style={{padding:"0px 0px 0px 0px", width:"20%"}}/>
+            <Tab
+              key={id}
+              value={id}
+              label={text}
+              style={{ padding: "0px 0px 0px 0px", width: "20%" }}
+            />
           ))}
         </Tabs>
       </div>

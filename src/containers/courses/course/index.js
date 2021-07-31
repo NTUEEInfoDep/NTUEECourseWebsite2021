@@ -8,6 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 const useStyles = makeStyles({
   root: {
     margin: "1rem",
+    cursor: "pointer",
   },
   title: {
     fontSize: "1.2rem",

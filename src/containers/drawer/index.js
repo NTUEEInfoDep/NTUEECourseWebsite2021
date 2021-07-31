@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 // material_ui
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -21,15 +21,14 @@ import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import HomeIcon from "@material-ui/icons/Home"; //Main
-import ExitToAppIcon from "@material-ui/icons/ExitToApp"; //Login, Logout
-import ClassIcon from "@material-ui/icons/Class"; //Courses
-import PeopleIcon from "@material-ui/icons/People"; //Student Data
-import CloudUploadIcon from "@material-ui/icons/CloudUpload"; //Course Manage
-// slices
-import { selectSession } from "../../slices/sessionSlice";
-//logout
-import { logout } from "../../slices/sessionSlice";
+import HomeIcon from "@material-ui/icons/Home"; // Main
+import ExitToAppIcon from "@material-ui/icons/ExitToApp"; // Login, Logout
+import ClassIcon from "@material-ui/icons/Class"; // Courses
+import PeopleIcon from "@material-ui/icons/People"; // Student Data
+import CloudUploadIcon from "@material-ui/icons/CloudUpload"; // Course Manage
+import ShuffleIcon from "@material-ui/icons/Shuffle"; // Distribute
+// slices, logout
+import { selectSession, logout } from "../../slices/sessionSlice";
 
 const drawerWidth = 200;
 const maxPhoneWidth = 700;
@@ -131,6 +130,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Drawer = ({ children }) => {
   const { isLogin, authority, userID } = useSelector(selectSession);
+  const history = useHistory();
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -150,22 +150,41 @@ const Drawer = ({ children }) => {
         { text: "Courses", to: "/courses", icon: <ClassIcon /> },
         { text: "Login", to: "/login", icon: <ExitToAppIcon /> },
       ]
-    : authority === 1 || authority === 2
-    ? [
-        { text: "Main", to: "/", icon: <HomeIcon /> },
-        { text: "Courses", to: "/courses", icon: <ClassIcon /> },
-        {
-          text: "Student Data",
-          to: "/studentdata",
-          icon: <PeopleIcon />,
-        },
-        {
-          text: "Course Manage",
-          to: "/course-manage",
-          icon: <CloudUploadIcon />,
-        },
-      ]
-    : [
+    : {
+        1: [
+          { text: "Main", to: "/", icon: <HomeIcon /> },
+          { text: "Courses", to: "/courses", icon: <ClassIcon /> },
+          {
+            text: "Student Data",
+            to: "/studentdata",
+            icon: <PeopleIcon />,
+          },
+          {
+            text: "Course Manage",
+            to: "/course-manage",
+            icon: <CloudUploadIcon />,
+          },
+        ],
+        2: [
+          { text: "Main", to: "/", icon: <HomeIcon /> },
+          { text: "Courses", to: "/courses", icon: <ClassIcon /> },
+          {
+            text: "Student Data",
+            to: "/studentdata",
+            icon: <PeopleIcon />,
+          },
+          {
+            text: "Course Manage",
+            to: "/course-manage",
+            icon: <CloudUploadIcon />,
+          },
+          {
+            text: "Distribute",
+            to: "/distribute",
+            icon: <ShuffleIcon />,
+          },
+        ],
+      }[authority] || [
         { text: "Main", to: "/", icon: <HomeIcon /> },
         { text: "Courses", to: "/courses", icon: <ClassIcon /> },
       ];
@@ -205,15 +224,19 @@ const Drawer = ({ children }) => {
             <KeyboardArrowUpIcon />
           </IconButton>
           <Typography variant="h5" className={classes.appBarTypography}>
-            NTUEE
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => history.push("/")}
+              aria-hidden="true"
+            >
+              NTUEE
+            </div>
           </Typography>
           <Typography variant="h6">{userName}</Typography>
           <IconButton
-            className={[
-              clsx(classes.iconButton, {
-                [classes.hide]: !isLogin,
-              }),
-            ]}
+            className={clsx(classes.iconButton, {
+              [classes.hide]: !isLogin,
+            })}
             onClick={() => dispatch(logout())}
           >
             <ExitToAppIcon />
