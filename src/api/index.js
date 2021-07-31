@@ -1,6 +1,10 @@
 import axios from "axios";
 import qs from "qs";
 
+const errorHandling = (error) => {
+  if (error.response.status === 403) window.location.reload("/");
+};
+
 export const SessionAPI = {
   getSession: () => axios.get(`/api/session`),
   postSession: (userID, password) =>
@@ -20,38 +24,61 @@ export const SessionAPI = {
 };
 
 export const CourseAPI = {
-  getCourses: () => axios.get(`/api/courses?name&type&description&options`),
-  postCourse: (course) => axios.post(`/api/course`, [course]),
-  deleteCourse: (id) => axios.delete(`/api/course`, { data: [id] }),
-  putCourse: (course) => axios.put(`/api/course`, [course]),
+  getCourses: () =>
+    axios
+      .get(`/api/courses?name&type&description&options`)
+      .catch((error) => errorHandling(error)),
+  postCourse: (course) =>
+    axios.post(`/api/course`, [course]).catch((error) => errorHandling(error)),
+  deleteCourse: (id) =>
+    axios
+      .delete(`/api/course`, { data: [id] })
+      .catch((error) => errorHandling(error)),
+  putCourse: (course) =>
+    axios.put(`/api/course`, [course]).catch((error) => errorHandling(error)),
 };
 
 export const StudentDataAPI = {
   getStudentData: () =>
-    axios.get(`/api/users`, {
-      params: {
-        name: 1,
-        grade: 1,
-        authority: 1,
-      },
-    }),
-  postStudentData: (users) => axios.post(`/api/users`, users),
-  deleteStudentData: (ids) => axios.delete(`/api/users`, { data: [...ids] }),
+    axios
+      .get(`/api/users`, {
+        params: {
+          name: 1,
+          grade: 1,
+          authority: 1,
+        },
+      })
+      .catch((error) => errorHandling(error)),
+  postStudentData: (users) =>
+    axios.post(`/api/users`, users).catch((error) => errorHandling(error)),
+  deleteStudentData: (ids) =>
+    axios
+      .delete(`/api/users`, { data: [...ids] })
+      .catch((error) => errorHandling(error)),
 };
 
 export const SelectAPI = {
-  getSelections: (courseID) => axios.get(`/api/selections/${courseID}`),
+  getSelections: (courseID) =>
+    axios
+      .get(`/api/selections/${courseID}`)
+      .catch((error) => errorHandling(error)),
   putSelections: (courseID, data) =>
-    axios.put(`/api/selections/${courseID}`, [...data]), // , [...courseID.data.selected]),
+    axios
+      .put(`/api/selections/${courseID}`, [...data])
+      .catch((error) => errorHandling(error)), // , [...courseID.data.selected]),
 };
 
 export const DistributeAPI = {
   postDistribute: () => axios.post(`/api/distribute`),
-  putPreselect: (ids) => axios.put(`/api/preselect`, { data: [...ids] }),
+  putPreselect: (ids) =>
+    axios
+      .put(`/api/preselect`, { data: [...ids] })
+      .catch((error) => errorHandling(error)),
   getResult: () => axios.get(`/api/result.csv`),
 };
 
 export const OpentimeAPI = {
   getOpentime: () => axios.get(`/api/opentime`),
-  putOpentime: (data) => axios.put(`/api/opentime`, { data }),
+  putOpentime: (data) =>
+    axios.put(`/api/opentime`, { data }).catch((error) => errorHandling(error)),
 };
