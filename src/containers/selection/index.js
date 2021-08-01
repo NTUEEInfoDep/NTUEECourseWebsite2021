@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import { DragDropContext } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
+import Typography from '@material-ui/core/Typography';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import Link from '@material-ui/core/Link';
+import HomeIcon from '@material-ui/icons/Home';
+import ClassIcon from '@material-ui/icons/Class';
+import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
+// import initialData from "./initial-data";
 import Column from "./column";
 import { SelectAPI } from "../../api";
 import Loading from "../../components/loading";
@@ -24,8 +32,23 @@ const useStyles = makeStyles((theme) => ({
       paddingRight: "0px",
     },
   },
+  link: {
+    display: 'flex',
+  },
+  icon: {
+    marginRight: theme.spacing(0.5),
+    width: 20,
+    height: 20,
+  },
 }));
 const Selection = () => {
+  // const selected = courseName.selected;
+  // const unselected = courseName.unselected;
+  // const handleSelectCourse = (selectedID) => {
+  //   setSelectedCourse(courses.find(({ courseID }) => courseID === selectedID));
+  // };
+  const history = useHistory();
+  const theme = useTheme();
   const { courseId } = useParams();
   const [data, setData] = useState(null);
   const classes = useStyles();
@@ -46,6 +69,47 @@ const Selection = () => {
       console.error(err);
     }
   }, [data]);
+  function handleHomeClick() {
+    history.push(``);
+    // event.preventDefault();
+    // console.info('You clicked a breadcrumb.');
+  }
+  function handleCoursesClick() {
+    history.push(`/courses`);
+  }
+  // const { name, type, description, selected, unselected } = data;
+  // return (
+  //   <>
+  //     {data ? (
+  //       <div>
+  //         <h1>Thisa is course Selection page</h1>
+  //         {courseId}
+  //         {data.description}
+  //         {data.name}
+  //         {data.selected}
+  //         {}
+  //       </div>
+  //     ) : (
+  //       Loading
+  //     )}
+  //   </>
+  // );
+
+  // function handleSelection(course) {
+  //   setColumns((state) => [
+  //     {
+  //       ...state[0],
+  //       // optionIds: state.courses.find(({ id }) => id === selectedID)
+  //       //   .optionIds,
+  //     },
+  //     {
+  //       ...state[1],
+  //       optionIds: course.unselected,
+  //     },
+  //   ]);
+  // }
+  // // console.log(data);
+  // handleSelection(data);
 
   const onDragEnd = (result) => {
     const { destination, source } = result;
@@ -75,11 +139,35 @@ const Selection = () => {
 
   return (
     <>
+      {data? (  
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link color="inherit" href="/" onClick={handleHomeClick} className={classes.link}>
+            <HomeIcon className={classes.icon} />
+            Main
+          </Link>
+          <Link
+            color="inherit"
+            href="/courses"
+            onClick={handleCoursesClick}
+            className={classes.link}
+          >
+            <ClassIcon className={classes.icon} />
+            Courses
+          </Link>
+          <Typography color="textPrimary" className={classes.link}>
+            <ViewCarouselIcon className={classes.icon} />
+            {data.name}
+          </Typography>
+        </Breadcrumbs>
+      ) : (
+        ""
+      )}
       {data && data.description && (
         <div
           style={{
             width: "90%",
             padding: "10px",
+            marginTop: "15px",
             marginLeft: "auto",
             marginRight: "auto",
             marginBottom: "10px",

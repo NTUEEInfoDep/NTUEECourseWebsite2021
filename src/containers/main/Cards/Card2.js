@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
     // width:'10%',
   },
   gridStyle: {
+    marginTop: "20%",
     display: "flex",
     justifyContent: "center",
     flexDirection: "row",
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   subtitle: {
     color: "white",
     fontSize: "1.2rem",
-    // marginBottom: "5px",
+    marginBottom: "5%",
     textAlign: "center",
   },
   paragraph: {

@@ -74,7 +74,9 @@ const priorityData = [
   { id: 2, text: "大二" },
   { id: 3, text: "大三" },
   { id: 4, text: "大四" },
-  { id: 5, text: "大三大四" },
+  { id: 5, text: "大三、大四" },
+  { id: 6, text: "大四21人(光電實驗)" },
+  { id: 7, text: "大三12人(電磁波實驗)" },
   { id: -1, text: "高年級" },
 ];
 

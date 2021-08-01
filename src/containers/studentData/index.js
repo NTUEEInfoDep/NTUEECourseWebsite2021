@@ -78,6 +78,7 @@ export default function StudentData() {
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [deleteIds, setDeleteIds] = React.useState([]);
   const [regenerateOpen, setRegenerateOpen] = React.useState(false);
+  const [downloadOpen, setDownloadOpen] = React.useState(false);
   const [invalidRegenerate, setInvalidRegenerate] = React.useState(false);
   const [alert, setAlert] = React.useState({});
   const [errors, setErrors] = React.useState({
@@ -141,7 +142,7 @@ export default function StudentData() {
   };
 
   const handleOpenAdd = () => {
-    console.log(data);
+    // console.log(data);
     // console.log("handleOpenAdd");
     setNewStudent({
       id: "",
@@ -263,6 +264,14 @@ export default function StudentData() {
     setRegenerateOpen(false);
   };
 
+  const handleOpenDownload = () => {
+    setDownloadOpen(true);
+  };
+
+  const handleCloseDownload = () => {
+    setDownloadOpen(false);
+  };
+
   const onIdChange = (e) => {
     setNewStudent({
       ...newStudent,
@@ -291,6 +300,75 @@ export default function StudentData() {
     });
   };
 
+  const testRepeatId = (id) => {
+    return data.map((e) => e.id.toUpperCase()).includes(id.toUpperCase());
+  };
+
+  const handleUploadCsv = async (efile) => {
+    // console.log(efile);
+    if (efile) {
+      Papa.parse(efile, {
+        skipEmptyLines: true,
+        complete(results) {
+          let valid = true;
+          let repeat = false;
+          results.data.slice(1).forEach((student) => {
+            if (
+              !/^(b|r|d)\d{8}$/i.test(student[0]) ||
+              !student[1] ||
+              !/^\d+$/.test(student[2])
+            ) {
+              valid = false;
+              // console.log(student);
+            }
+            if (testRepeatId(student[0])) {
+              repeat = true;
+              // console.log(student);
+            }
+          });
+          if (valid && !repeat) {
+            const newData = results.data.slice(1).reduce((obj, cur) => {
+              return obj.concat([
+                {
+                  id: cur[0].toUpperCase(),
+                  name: cur[1],
+                  grade: Number(cur[2]),
+                  authority: 0,
+                },
+              ]);
+            }, []);
+            setNewStudentMultiple(newData);
+            setLoaded(true);
+            // console.log("Multiple student data loaded");
+            // console.log(newData);
+            setFilename(efile.name);
+            return;
+          }
+          if (!valid && !repeat) {
+            showAlert("error", "Invalid student data format.");
+          }
+          if (valid && repeat) {
+            showAlert("error", "Student UserId repeat.");
+          }
+          if (!valid && repeat) {
+            showAlert(
+              "error",
+              "Invalid student data format & Student UserId repeat."
+            );
+          }
+          setNewStudentMultiple({
+            id: "",
+            name: "",
+            grade: "",
+            authority: "",
+          });
+          setLoaded(false);
+          setFilename("");
+        },
+      });
+    }
+  };
+
   const handleAddMultipleStudents = async () => {
     // console.log("handleAddMultipleStudents");
     if (loaded) {
@@ -298,6 +376,7 @@ export default function StudentData() {
         const password = genPassword();
         return { ...student, password };
       });
+      // console.log(newData);
       // console.log("start post datas");
       try {
         await StudentDataAPI.postStudentData(
@@ -325,8 +404,16 @@ export default function StudentData() {
         });
 
         setLoaded(false);
-
-        setCsv(Papa.unparse(newData));
+        const csvData = [];
+        newData.forEach((e) => {
+          csvData.push({
+            userID: e.id,
+            name: e.name,
+            grade: e.grade,
+            password: e.password,
+          });
+        });
+        setCsv(Papa.unparse(csvData));
         showAlert("success", "Add multiple student data complete.");
       } catch (err) {
         showAlert("error", "Failed to Add multiple student data.");
@@ -352,7 +439,28 @@ export default function StudentData() {
 
   const handleDownloadPassword = () => {
     // console.log("download password");
-    download("datas.csv", csv);
+    if (
+      data.filter((e) => selected.includes(e.id)).filter((e) => !e.password)
+        .length === 0
+    ) {
+      // console.log(data.filter((e) => selected.includes(e.id)));
+      const csvData = [];
+      // console.log(data);
+      data
+        .slice(1)
+        .filter((e) => selected.includes(e.id))
+        .forEach((e) => {
+          csvData.push({
+            userID: e.id,
+            name: e.name,
+            grade: e.grade,
+            password: e.password,
+          });
+        });
+      download("datas.csv", Papa.unparse(csvData));
+    } else {
+      handleOpenDownload();
+    }
   };
 
   const handleDownload = () => {
@@ -398,7 +506,7 @@ export default function StudentData() {
     showAlert("success", "Generate password complete.");
     // console.log("post student data finish in regeneration");
     setData(data.filter((e) => !selected.includes(e.id)).concat(newData));
-    setCsv(Papa.unparse(newData));
+    // setCsv(Papa.unparse(newData));
     handleCloseRegenerate();
     setSelected([]);
   };
@@ -466,75 +574,6 @@ export default function StudentData() {
     setErrors(newErrors);
     setErrorsMsg(newErrorsMsg);
     return error;
-  };
-
-  const testRepeatId = (id) => {
-    return data.map((e) => e.id.toUpperCase()).includes(id.toUpperCase());
-  };
-
-  const handleUploadCsv = async (efile) => {
-    // console.log(efile);
-    if (efile) {
-      Papa.parse(efile, {
-        skipEmptyLines: true,
-        complete(results) {
-          let valid = true;
-          let repeat = false;
-          results.data.slice(1).forEach((student) => {
-            if (
-              !/^(b|r|d)\d{8}$/i.test(student[0]) ||
-              !student[1] ||
-              !/^\d+$/.test(student[2])
-            ) {
-              valid = false;
-              console.log(student);
-            }
-            if (testRepeatId(student[0])) {
-              repeat = true;
-              console.log(student);
-            }
-          });
-          if (valid && !repeat) {
-            const newData = results.data.slice(1).reduce((obj, cur) => {
-              return obj.concat([
-                {
-                  id: cur[0].toUpperCase(),
-                  name: cur[1],
-                  grade: Number(cur[2]),
-                  authority: 0,
-                },
-              ]);
-            }, []);
-            setNewStudentMultiple(newData);
-            setLoaded(true);
-            // console.log("Multiple student data loaded");
-            console.log(newData);
-            setFilename(efile.name);
-            return;
-          }
-          if (!valid && !repeat) {
-            showAlert("error", "Invalid student data format.");
-          }
-          if (valid && repeat) {
-            showAlert("error", "Student UserId repeat.");
-          }
-          if (!valid && repeat) {
-            showAlert(
-              "error",
-              "Invalid student data format & Student UserId repeat."
-            );
-          }
-          setNewStudentMultiple({
-            id: "",
-            name: "",
-            grade: "",
-            authority: "",
-          });
-          setLoaded(false);
-          setFilename("");
-        },
-      });
-    }
   };
 
   const handleAddStudent = async () => {
@@ -899,6 +938,38 @@ export default function StudentData() {
           )}
         </DialogActions>
       </Dialog>
+      <Dialog
+        aria-labelledby="simple-dialog-title"
+        disableBackdropClick
+        open={downloadOpen}
+        onClose={handleCloseDownload}
+      >
+        <DialogTitle id="simple-dialog-title">
+          These student are invalid to download password
+        </DialogTitle>
+        <DialogContent>
+          {data
+            .filter((e) => selected.includes(e.id))
+            .filter((e) => !e.password)
+            .map((e) => (
+              <Typography key={e.id}>
+                {`id: ${e.id}, 
+              name: ${e.name},
+              grade: ${e.grade},
+              authority: ${e.authority}`}
+              </Typography>
+            ))}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseDownload}
+            variant="contained"
+            color="primary"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Grid
         container
         spacing={1}
@@ -929,7 +1000,7 @@ export default function StudentData() {
                 color="primary"
                 onClick={handleOpenAddMultiple}
               >
-                Add Multiple Students
+                Add Students (csv)
               </Button>
             </Grid>
             <Grid item>
@@ -937,7 +1008,7 @@ export default function StudentData() {
                 variant="outlined"
                 color="primary"
                 onClick={handleDownloadPassword}
-                disabled={csv === ""}
+                disabled={selected.length === 0}
               >
                 Download Password
               </Button>
