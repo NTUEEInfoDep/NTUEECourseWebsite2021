@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
+import usagegif from "./NTUEE-usage.gif";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,8 +57,8 @@ export default function Usage() {
           <Grid item>
             <img
               className={classes.img}
-              alt="complex"
-              src="https://raw.githubusercontent.com/NTUEEInfoDep/NTUEECourseWebsite2020/master/assets/instruction_take3.gif"
+              alt="HowToUse"
+              src={usagegif}
             />
           </Grid>
         </Grid>

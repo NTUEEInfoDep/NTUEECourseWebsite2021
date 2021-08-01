@@ -883,7 +883,7 @@ export default function StudentData() {
       >
         {invalidRegenerate ? (
           <DialogTitle id="simple-dialog-title">
-            These student are invalid to regenerate password?
+            These student are invalid to regenerate password:
           </DialogTitle>
         ) : (
           <DialogTitle id="simple-dialog-title">

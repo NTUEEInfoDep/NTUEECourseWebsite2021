@@ -5,7 +5,6 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import DownArrow from "./downarrow.js";
-import BackgroundImg from "./NTUEE-logo4.png";
 import moment from "moment";
 import { OpentimeAPI } from "../../api";
 /**
