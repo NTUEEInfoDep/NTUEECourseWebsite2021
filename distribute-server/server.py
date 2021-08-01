@@ -100,8 +100,8 @@ def distribute():
     preselects = genPreselect(raw_preselects)
 
     results = Algorithm.distribute(courses, students, preselects)
-    if results:
-        db.results.insert_many(results)
+    db.results.delete_many({})
+    db.results.insert_many(results)
     client.close()
     return ""
 
