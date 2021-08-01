@@ -57,7 +57,7 @@ export default function Footer() {
       <Members>
         <p>朱哲廣 吳詩昀 張創渝 陳宏恩 陳冠霖 陳亮渝  </p>
         <p>陳威侑 陳駿瑋 黃宥翔 黃筱穎 游耿睿 楊宗賢 </p>
-        <p>楊博宇 楊新慧 劉奇聖 蔡仲廷 賴群貿 </p>
+        <p>楊博宇 楊新慧 鄧旭辰 劉奇聖 蔡仲廷 賴群貿  </p>
       </Members>
     </FooterContainer>
   );
