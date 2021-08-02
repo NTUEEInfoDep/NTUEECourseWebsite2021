@@ -693,7 +693,7 @@ router.get(
         "fifth",
       ],
     ];
-    courses.forEach(async (course) => {
+    for (let course of courses) {
       const numbers = { Zero: 0, One: 0, Two: 0 };
       const choices = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0 };
       const selections = await model.Selection.find({
@@ -754,7 +754,7 @@ router.get(
         choices.fourth,
         choices.fifth,
       ]);
-    });
+    }
     const output = await csvStringifyPromise(rows);
     res.setHeader("content-type", "application/csv");
     res.setHeader("content-disposition", "attachment; filename=statistics.csv");
