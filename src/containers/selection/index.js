@@ -3,12 +3,12 @@ import { useHistory } from "react-router";
 import { DragDropContext } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
 import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
-import Typography from '@material-ui/core/Typography';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
-import HomeIcon from '@material-ui/icons/Home';
-import ClassIcon from '@material-ui/icons/Class';
-import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
+import Typography from "@material-ui/core/Typography";
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+import Link from "@material-ui/core/Link";
+import HomeIcon from "@material-ui/icons/Home";
+import ClassIcon from "@material-ui/icons/Class";
+import ViewCarouselIcon from "@material-ui/icons/ViewCarousel";
 // import initialData from "./initial-data";
 import Column from "./column";
 import { SelectAPI } from "../../api";
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   link: {
-    display: 'flex',
+    display: "flex",
   },
   icon: {
     marginRight: theme.spacing(0.5),
@@ -139,15 +139,22 @@ const Selection = () => {
 
   return (
     <>
-      {data? (  
+      {data ? (
         <Breadcrumbs aria-label="breadcrumb">
-          <Link color="inherit" href="/" onClick={handleHomeClick} className={classes.link}>
+          <Link
+            component="button"
+            color="inherit"
+            // href="/"
+            onClick={handleHomeClick}
+            className={classes.link}
+          >
             <HomeIcon className={classes.icon} />
             Main
           </Link>
           <Link
+            component="button"
             color="inherit"
-            href="/courses"
+            // href="/courses"
             onClick={handleCoursesClick}
             className={classes.link}
           >

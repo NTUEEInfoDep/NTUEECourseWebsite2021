@@ -75,6 +75,7 @@ export const DistributeAPI = {
       .put(`/api/preselect`, { data: [...ids] })
       .catch((error) => errorHandling(error)),
   getResult: () => axios.get(`/api/result.csv`),
+  getStatistics: () => axios.get(`/api/statistics.csv`),
 };
 
 export const OpentimeAPI = {
