@@ -707,6 +707,7 @@ router.post(
 
 router.get(
   "/result.csv",
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const results = await model.Result.find({}).exec();
     const rows = [["studentID", "courseName", "optionName"]];
@@ -722,84 +723,59 @@ router.get(
 
 router.get(
   "/statistics.csv",
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const courses = await model.Course.find({}).exec();
     const students = await model.Student.find({}).exec();
+    const allSelections = await model.Selection.find({}).exec();
+    const allResults = await model.Result.find({}).exec();
+
     const rows = [
       [
         "courseName",
-        "Zero",
-        "One",
-        "Two",
-        "first",
-        "second",
-        "third",
-        "fourth",
-        "fifth",
+        "中0個",
+        "中1個",
+        "中2個",
+        "第1志願",
+        "第2志願",
+        "第3志願",
+        "第4志願",
+        "第5志願",
+        "第6志願",
+        "第7志願",
+        "第8志願",
+        "第9志願",
+        "第10志願",
       ],
     ];
-    for (let course of courses) {
-      const numbers = { Zero: 0, One: 0, Two: 0 };
-      const choices = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0 };
-      const selections = await model.Selection.find({
-        courseID: course.id,
-      }).exec();
-      const results = await model.Result.find({
-        courseName: course.name,
-      }).exec();
+    courses.forEach((course) => {
+      const numbers = [0, 0, 0];
+      const choices = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      let count = 0;
+      const selections = allSelections.filter(
+        (selection) => selection.courseID === course.id
+      );
+      const results = allResults.filter(
+        (result) => result.courseName === course.name
+      );
+
       students.forEach((student) => {
-        const result = results.filter((re) => {
-          re.studentID = student.userID;
-        });
-        const selection = selections.filter((sel) => {
-          sel.userID = student.userID;
-        });
-        switch (result.length) {
-          case 0:
-            numbers["Zero"] += 1;
-            break;
-          case 1:
-            numbers["One"] += 1;
-            break;
-          default:
-            numbers["Two"] += 1;
-            break;
-        }
+        const result = results.filter((re) => re.studentID === student.userID);
+        const selection = selections.filter(
+          (sel) => sel.userID === student.userID
+        );
+        if (selection.length > 0) count += 1;
+        numbers[result.length] += 1;
         result.forEach((re) => {
-          const order = selection.find((sel) => {
-            sel.name = re.optionName;
-          }).ranking;
-          switch (order) {
-            case 1:
-              choices["first"] += 1;
-              break;
-            case 2:
-              choices["second"] += 1;
-              break;
-            case 3:
-              choice["third"] += 1;
-              break;
-            case 4:
-              choice["fourth"] += 1;
-              break;
-            default:
-              choice["fifth"] += 1;
-              break;
-          }
+          const order = selection.find(
+            (sel) => sel.name === re.optionName
+          ).ranking;
+          choices[order - 1] += 1;
         });
       });
-      rows.push([
-        course.name,
-        numbers.Zero,
-        numbers.One,
-        numbers.Two,
-        choices.first,
-        choices.second,
-        choices.third,
-        choices.fourth,
-        choices.fifth,
-      ]);
-    }
+      numbers[0] = count - numbers[1] + numbers[2];
+      rows.push([course.name, ...numbers, ...choices]);
+    });
     const output = await csvStringifyPromise(rows);
     res.setHeader("content-type", "application/csv");
     res.setHeader("content-disposition", "attachment; filename=statistics.csv");
