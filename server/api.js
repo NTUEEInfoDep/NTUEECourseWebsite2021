@@ -385,6 +385,51 @@ router
       );
       res.status(204).end();
     })
+  )
+  .put(
+    express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_ADMIN),
+    asyncHandler(async (req, res, next) => {
+      const modifiedData = req.body;
+      const modifiedData_new = [];
+      if (!modifiedData || !Array.isArray(modifiedData)) {
+        res.status(400).end();
+        return;
+      }
+      // if the element in addData is not a valid Course type, remove it from addData
+      modifiedData.forEach((data) => {
+        if (typeof data.userID === "string") {
+          modifiedData_new.push(data);
+        }
+      });
+      await Promise.all(
+        modifiedData_new.map(async (data) => {
+          const { userID } = data;
+          const { authority } = data;
+          const { grade } = data;
+          const { password } = data;
+          const { name } = data;
+          const salt = await bcrypt.genSalt(10);
+          const hash = await bcrypt.hash(password, salt);
+          password = hash;
+          const student = await model.Student.findOne({ userID }).exec();
+          if (student) {
+            await model.Student.updateOne(
+              {
+                userID,
+              },
+              {
+                authority,
+                grade,
+                password,
+                name,
+              }
+            );
+          }
+        })
+      );
+      res.status(204).end();
+    })
   );
 
 router
