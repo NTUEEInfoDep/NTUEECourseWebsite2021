@@ -362,7 +362,14 @@ export default function CourseManage() {
             {course.options.map((option, _index) => (
               <Chip
                 key={option.name}
-                label={option.name}
+                label={
+                  option.name +
+                    " ; " +
+                    option.limit +
+                    "人 ; " +
+                    priorityData.find(({ id: ID }) => ID === option.priority)
+                      ?.text ?? ""
+                }
                 variant="outlined"
                 color={option === newOption ? "secondary" : "default"}
                 onDelete={() => handleCourseDelOption(_index)}
