@@ -36,7 +36,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Distribute() {
   const classes = useStyles();
-  const blobLinkRef = useRef();
+  const resultBlobLinkRef = useRef();
+  const statisticsBlobLinkRef = useRef();
 
   const [blobURL, setBlobURL] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -50,13 +51,32 @@ export default function Distribute() {
             new Blob([data], { type: "application/csv" })
           )
         );
-        blobLinkRef.current.click();
+        resultBlobLinkRef.current.click();
       })
       .catch(() =>
         setAlert({
           open: true,
           severity: "error",
-          msg: "Cannon download distribution result.",
+          msg: "Cannot download distribution result.",
+        })
+      );
+  };
+
+  const handleGetStatistics = () => {
+    DistributeAPI.getStatistics()
+      .then(({ data }) => {
+        setBlobURL(
+          window.URL.createObjectURL(
+            new Blob([data], { type: "application/csv" })
+          )
+        );
+        statisticsBlobLinkRef.current.click();
+      })
+      .catch(() =>
+        setAlert({
+          open: true,
+          severity: "error",
+          msg: "Cannot download distribution statistics.",
         })
       );
   };
@@ -96,6 +116,15 @@ export default function Distribute() {
             onClick={handleGetDistribution}
           >
             Download distribution result
+          </Button>
+          <Button
+            fullWidth
+            variant="outlined"
+            color="primary"
+            className={classes.button}
+            onClick={handleGetStatistics}
+          >
+            Download distribution statistics
           </Button>
           <Button
             fullWidth
@@ -142,9 +171,17 @@ export default function Distribute() {
         </Alert>
       </Snackbar>
       <a
-        ref={blobLinkRef}
+        ref={resultBlobLinkRef}
         href={blobURL}
         download="result.csv"
+        style={{ display: "none" }}
+      >
+        {" "}
+      </a>
+      <a
+        ref={statisticsBlobLinkRef}
+        href={blobURL}
+        download="statistics.csv"
         style={{ display: "none" }}
       >
         {" "}

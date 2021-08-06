@@ -22,6 +22,12 @@ services:
       dockerfile: ./dev-support/backend/Dockerfile
     ports:
       - "8000:8000"
+    environment:
+      - DISTRIBUTE_SERVER_HOST=distribute-server
+      - DISTRIBUTE_SERVER_PORT=8001
+    links:
+      - "distribute-server"
+
   mongodb:
     image: mongo
     ports:

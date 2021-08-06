@@ -11,5 +11,6 @@ RUN pip install -r requirements.txt
 COPY ["./distribute-server/*.py", "./"]
 
 ENV FLASK_ENV development
+ENV MONGO_HOST mongodb
 # startup command
 CMD ["python", "server.py"]

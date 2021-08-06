@@ -385,6 +385,51 @@ router
       );
       res.status(204).end();
     })
+  )
+  .put(
+    express.json({ strict: false }),
+    permissionRequired(constants.AUTHORITY_ADMIN),
+    asyncHandler(async (req, res, next) => {
+      const modifiedData = req.body;
+      const modifiedData_new = [];
+      if (!modifiedData || !Array.isArray(modifiedData)) {
+        res.status(400).end();
+        return;
+      }
+      // if the element in addData is not a valid Course type, remove it from addData
+      modifiedData.forEach((data) => {
+        if (typeof data.userID === "string") {
+          modifiedData_new.push(data);
+        }
+      });
+      await Promise.all(
+        modifiedData_new.map(async (data) => {
+          const { userID } = data;
+          const { authority } = data;
+          const { grade } = data;
+          const { password } = data;
+          const { name } = data;
+          const salt = await bcrypt.genSalt(10);
+          const hash = await bcrypt.hash(password, salt);
+          password = hash;
+          const student = await model.Student.findOne({ userID }).exec();
+          if (student) {
+            await model.Student.updateOne(
+              {
+                userID,
+              },
+              {
+                authority,
+                grade,
+                password,
+                name,
+              }
+            );
+          }
+        })
+      );
+      res.status(204).end();
+    })
   );
 
 router
@@ -660,6 +705,7 @@ router.post(
 
 router.get(
   "/result.csv",
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const results = await model.Result.find({}).exec();
     const rows = [["studentID", "courseName", "optionName"]];
@@ -669,6 +715,68 @@ router.get(
     const output = await csvStringifyPromise(rows);
     res.setHeader("content-type", "application/csv");
     res.setHeader("content-disposition", "attachment; filename=result.csv");
+    res.status(200).send(output);
+  })
+);
+
+router.get(
+  "/statistics.csv",
+  permissionRequired(constants.AUTHORITY_ADMIN),
+  asyncHandler(async (req, res, next) => {
+    const courses = await model.Course.find({}).exec();
+    const students = await model.Student.find({}).exec();
+    const allSelections = await model.Selection.find({}).exec();
+    const allResults = await model.Result.find({}).exec();
+
+    const rows = [
+      [
+        "courseName",
+        "中0個",
+        "中1個",
+        "中2個",
+        "第1志願",
+        "第2志願",
+        "第3志願",
+        "第4志願",
+        "第5志願",
+        "第6志願",
+        "第7志願",
+        "第8志願",
+        "第9志願",
+        "第10志願",
+      ],
+    ];
+    courses.forEach((course) => {
+      const numbers = [0, 0, 0];
+      const choices = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      let count = 0;
+      const selections = allSelections.filter(
+        (selection) => selection.courseID === course.id
+      );
+      const results = allResults.filter(
+        (result) => result.courseName === course.name
+      );
+
+      students.forEach((student) => {
+        const result = results.filter((re) => re.studentID === student.userID);
+        const selection = selections.filter(
+          (sel) => sel.userID === student.userID
+        );
+        if (selection.length > 0) count += 1;
+        numbers[result.length] += 1;
+        result.forEach((re) => {
+          const order = selection.find(
+            (sel) => sel.name === re.optionName
+          ).ranking;
+          choices[order - 1] += 1;
+        });
+      });
+      numbers[0] = count - numbers[1] + numbers[2];
+      rows.push([course.name, ...numbers, ...choices]);
+    });
+    const output = await csvStringifyPromise(rows);
+    res.setHeader("content-type", "application/csv");
+    res.setHeader("content-disposition", "attachment; filename=statistics.csv");
     res.status(200).send(output);
   })
 );
