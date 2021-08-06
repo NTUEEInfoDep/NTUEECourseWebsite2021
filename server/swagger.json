@@ -542,6 +542,75 @@
             "$ref": "#/components/responses/503"
           }
         }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "update students",
+        "description": "Change the content of the student of designated userIDs",
+        "requestBody": {
+          "description": "<h2>authority</h2> <b>2:</b> Admin<br> <b>1:</b> Maintainer<br> <b>0:</b> User",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "userID": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "authority": {
+                      "type": "number"
+                    },
+                    "grade": {
+                      "type": "number"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": [
+                {
+                  "userID": "b787",
+                  "grade": 2,
+                  "password": "1111",
+                  "name": "A",
+                  "authority": 2
+                },
+                {
+                  "userID": "b1338",
+                  "grade": 3,
+                  "password": "1111",
+                  "name": "B",
+                  "authority": 1
+                }
+              ]
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "No input, format error"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        }
       }
     },
     "/password": {

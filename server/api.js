@@ -306,7 +306,7 @@ router
   )
   .post(
     express.json({ extended: false }),
-    permissionRequired(constants.AUTHORITY_MAINTAINER),
+    permissionRequired(constants.AUTHORITY_ADMIN),
     asyncHandler(async (req, res, next) => {
       const studentsRaw = req.body;
       const students = [];
@@ -361,7 +361,7 @@ router
   )
   .delete(
     express.json({ strict: false }),
-    permissionRequired(constants.AUTHORITY_MAINTAINER),
+    permissionRequired(constants.AUTHORITY_ADMIN),
     asyncHandler(async (req, res, next) => {
       const deleteData = req.body;
       const deleteData_new = [];
@@ -404,14 +404,16 @@ router
       });
       await Promise.all(
         modifiedData_new.map(async (data) => {
-          const { userID } = data;
+          let { userID } = data;
           const { authority } = data;
           const { grade } = data;
-          const { password } = data;
+          let { password } = data;
           const { name } = data;
           const salt = await bcrypt.genSalt(10);
           const hash = await bcrypt.hash(password, salt);
+          console.log(hash);
           password = hash;
+          userID = userID.toUpperCase();
           const student = await model.Student.findOne({ userID }).exec();
           if (student) {
             await model.Student.updateOne(
