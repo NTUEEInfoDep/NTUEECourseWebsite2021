@@ -676,7 +676,7 @@ router.get(
 
 router.get(
   "/statistics.csv",
-  // permissionRequired(constants.AUTHORITY_ADMIN),
+  permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const courses = await model.Course.find({}).exec();
     const students = await model.Student.find({}).exec();
