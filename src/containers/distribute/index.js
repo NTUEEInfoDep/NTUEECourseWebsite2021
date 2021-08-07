@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import clsx from "clsx";
 
 // material-ui
 import {
@@ -6,19 +7,19 @@ import {
   CssBaseline,
   Typography,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
+  CircularProgress,
+  Fade,
   Snackbar,
   Step,
   Stepper,
-  StepLabel,
   StepContent,
+  StepButton,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import { makeStyles } from "@material-ui/core/styles";
+import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import CallSplitIcon from "@material-ui/icons/CallSplit";
+import GetAppIcon from "@material-ui/icons/GetApp";
 
 // api
 import { DistributeAPI } from "../../api";
@@ -27,20 +28,45 @@ import { DistributeAPI } from "../../api";
 import Papa from "papaparse";
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "100%",
+    marginTop: theme.spacing(3),
+    padding: theme.spacing(4),
+    backgroundColor: "rgba(0, 0, 0, 0)",
+  },
   paper: {
     marginTop: theme.spacing(8),
     padding: theme.spacing(4),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    borderRadius: "5%",
+    backgroundColor: "rgba(0, 0, 0, .7)",
+    borderRadius: "3%",
+  },
+  stepButton: {
+    padding: "10px",
+    marginLeft: "-10px",
+    borderRadius: "50%",
+    border: "1px solid",
   },
   button: {
-    margin: theme.spacing(4, 0, 0),
+    marginRight: theme.spacing(1),
   },
   input: {
     display: "none",
+  },
+  actionsContainer: {
+    marginBottom: theme.spacing(2),
+    flex: "0 0 auto",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  active: {
+    borderRadius: "50%",
+    backgroundImage:
+      "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
+    boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
   },
 }));
 
@@ -48,14 +74,14 @@ export default function Distribute() {
   const classes = useStyles();
   const resultBlobLinkRef = useRef();
   const statisticsBlobLinkRef = useRef();
-
+  const [activeStep, setActiveStep] = useState(0);
   const [blobURL, setBlobURL] = useState("");
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [preselectUploadOpen, setPreselectUploadOpen] = useState(false);
   const [preselectUploaded, setPreselectUploaded] = useState(false);
   const [preselectLoaded, setPreselectLoaded] = useState(false);
   const [preselectFilename, setPreselectFilename] = useState("");
   const [preselectData, setPreselectData] = useState([]);
+  const [lastDristributeTime, setLastDistributeTime] = useState("");
+  const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({});
 
   const handleGetDistribution = () => {
@@ -98,13 +124,16 @@ export default function Distribute() {
 
   const handleRunDistribution = () => {
     DistributeAPI.postDistribute()
-      .then(() =>
+      .then(() => {
+        setLoading(true);
         setAlert({
           open: true,
           severity: "success",
           msg: "Course distribution operation succeeded. Distribution result is available.",
-        })
-      )
+        });
+        setLastDistributeTime(Date().toLocaleString());
+        handleNext();
+      })
       .catch(() =>
         setAlert({
           open: true,
@@ -112,15 +141,7 @@ export default function Distribute() {
           msg: "Course distribution operation failed.",
         })
       )
-      .finally(() => setConfirmOpen(false));
-  };
-
-  const handleOpenPreselectUpload = () => {
-    setPreselectFilename("");
-    setPreselectUploadOpen(true);
-  };
-  const handleClosePreselectUpload = () => {
-    setPreselectUploadOpen(false);
+      .finally(() => setLoading(false));
   };
   const handleUploadCsv = async (efile) => {
     if (efile) {
@@ -176,145 +197,214 @@ export default function Distribute() {
     setPreselectData([]);
     setPreselectFilename("");
   };
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
   return (
     <div>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="md">
         <CssBaseline />
         <div className={classes.paper}>
-          <Typography component="h1" variant="h5">
+          <Typography component="h1" variant="h4">
             <div>Distribute</div>
           </Typography>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            className={classes.button}
-            onClick={handleOpenPreselectUpload}
+          <Stepper
+            className={classes.root}
+            nonLinear
+            activeStep={activeStep}
+            orientation="vertical"
           >
-            Upload Preselect
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            className={classes.button}
-            onClick={() => setConfirmOpen(true)}
-          >
-            Run distribution algorithm
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            className={classes.button}
-            onClick={handleGetDistribution}
-          >
-            Download distribution result
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            className={classes.button}
-            onClick={handleGetStatistics}
-          >
-            Download distribution statistics
-          </Button>
+            <Step key="upload">
+              <StepButton
+                icon={
+                  <CloudUploadIcon
+                    className={clsx(classes.stepButton, {
+                      [classes.active]: activeStep === 0,
+                    })}
+                  />
+                }
+                onClick={() => setActiveStep(0)}
+              >
+                <Typography component="h3" variant="h5">
+                  1. Upload Preselect
+                </Typography>
+              </StepButton>
+              <StepContent>
+                <Typography>
+                  Please upload a cvs file with all the STUDENT IDs that are
+                  preselected for "DC Lab".
+                </Typography>
+                <Typography>
+                  ( Format example: "B00000001,B00000002,B00000003" )
+                </Typography>
+                <br />
+                <Typography>
+                  {preselectUploaded && preselectData.length
+                    ? "Current preselect data:"
+                    : ""}
+                </Typography>
+                {preselectUploaded
+                  ? preselectData.map((id) => (
+                      <Typography key={id}>{id}</Typography>
+                    ))
+                  : ""}
+                <br />
+                {preselectUploaded ? (
+                  ""
+                ) : (
+                  <label htmlFor="contained-button-file">
+                    <input
+                      accept=".csv"
+                      className={classes.input}
+                      id="contained-button-file"
+                      type="file"
+                      onChange={(e) => handleUploadCsv(e.target.files[0])}
+                    />
+                    <Button variant="outlined" color="primary" component="span">
+                      Select csv file
+                    </Button>
+                  </label>
+                )}
+                {preselectLoaded && !preselectUploaded
+                  ? " " + preselectFilename
+                  : ""}
+                <div className={classes.actionsContainer}>
+                  {preselectUploaded ? (
+                    <>
+                      <Button
+                        className={classes.button}
+                        onClick={handleResetPreselectUpload}
+                      >
+                        Select Another File
+                      </Button>
+                      <Button
+                        onClick={handleNext}
+                        variant="contained"
+                        color="primary"
+                      >
+                        Done
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button onClick={handleNext} className={classes.button}>
+                        Skip
+                      </Button>
+                      {preselectLoaded ? (
+                        <Button
+                          onClick={handlePreselectUpload}
+                          variant="contained"
+                          color="primary"
+                        >
+                          Upload
+                        </Button>
+                      ) : (
+                        <> </>
+                      )}
+                    </>
+                  )}
+                </div>
+              </StepContent>
+            </Step>
+            <Step key="run">
+              <StepButton
+                icon={
+                  <CallSplitIcon
+                    className={clsx(classes.stepButton, {
+                      [classes.active]: activeStep === 1,
+                    })}
+                  />
+                }
+                onClick={() => setActiveStep(1)}
+              >
+                <Typography component="h3" variant="h5">
+                  2. Run Distribution
+                </Typography>
+              </StepButton>
+              <StepContent>
+                <Typography>
+                  Please make sure all student data and course data are correct.
+                  The previous distribution result will be OVERWRITTEN. Are you
+                  sure to run Distribution Algorithm?
+                </Typography>
+                {loading ? (
+                  <div className={classes.actionsContainer}>
+                    <Fade
+                      in={loading}
+                      style={{
+                        transitionDelay: 0,
+                      }}
+                      unmountOnExit
+                    >
+                      <CircularProgress />
+                    </Fade>
+                  </div>
+                ) : (
+                  <div className={classes.actionsContainer}>
+                    <Button className={classes.button} onClick={handleBack}>
+                      Back
+                    </Button>
+                    <Button
+                      onClick={handleRunDistribution}
+                      variant="contained"
+                      color="secondary"
+                    >
+                      Run
+                    </Button>
+                  </div>
+                )}
+              </StepContent>
+            </Step>
+            <Step key="download">
+              <StepButton
+                icon={
+                  <GetAppIcon
+                    className={clsx(classes.stepButton, {
+                      [classes.active]: activeStep === 2,
+                    })}
+                  />
+                }
+                onClick={() => setActiveStep(2)}
+              >
+                <Typography component="h3" variant="h5">
+                  3. Download Results
+                </Typography>
+              </StepButton>
+              <StepContent>
+                {lastDristributeTime ? (
+                  <Typography>
+                    Last distribution: {lastDristributeTime}
+                  </Typography>
+                ) : (
+                  ""
+                )}
+                <br />
+                <div className={classes.actionsContainer}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    className={classes.button}
+                    onClick={handleGetDistribution}
+                  >
+                    Download distribution result
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    className={classes.button}
+                    onClick={handleGetStatistics}
+                  >
+                    Download distribution statistics
+                  </Button>
+                </div>
+              </StepContent>
+            </Step>
+          </Stepper>
         </div>
       </Container>
-      <Dialog
-        open={preselectUploadOpen}
-        onClose={() => setPreselectUploadOpen(false)}
-      >
-        <DialogTitle>Upload Preselect</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please upload a cvs file with all the STUDENT IDs that are
-            preselected for "DC Lab". (Format example:
-            "B00000001,B00000002,B00000003")
-          </DialogContentText>
-          <Typography>
-            {preselectUploaded && preselectData.length
-              ? "Current preselect data:"
-              : ""}
-          </Typography>
-          {preselectUploaded
-            ? preselectData.map((id) => <Typography key={id}>{id}</Typography>)
-            : ""}
-          <br />
-          {preselectUploaded ? (
-            ""
-          ) : (
-            <label htmlFor="contained-button-file">
-              <input
-                accept=".csv"
-                className={classes.input}
-                id="contained-button-file"
-                type="file"
-                onChange={(e) => handleUploadCsv(e.target.files[0])}
-              />
-              <Button variant="outlined" color="primary" component="span">
-                Select csv file
-              </Button>
-            </label>
-          )}
-          {preselectLoaded && !preselectUploaded ? " " + preselectFilename : ""}
-          <DialogActions>
-            {preselectUploaded ? (
-              <>
-                <Button onClick={handleResetPreselectUpload}>
-                  Select Another File
-                </Button>
-                <Button
-                  onClick={handleClosePreselectUpload}
-                  variant="contained"
-                  color="primary"
-                >
-                  Done
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button onClick={handleClosePreselectUpload}>Cancel</Button>
-                {preselectLoaded ? (
-                  <Button
-                    onClick={handlePreselectUpload}
-                    variant="contained"
-                    color="primary"
-                  >
-                    Upload
-                  </Button>
-                ) : (
-                  <> </>
-                )}
-              </>
-            )}
-          </DialogActions>
-        </DialogContent>
-      </Dialog>
-      <Dialog
-        maxWidth="md"
-        fullWidth
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-      >
-        <DialogTitle>Run Course Distribution Algorithm?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            The previous result will be OVERWRITTEN.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleRunDistribution}
-            variant="contained"
-            color="secondary"
-          >
-            Run
-          </Button>
-        </DialogActions>
-      </Dialog>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={alert?.open}
