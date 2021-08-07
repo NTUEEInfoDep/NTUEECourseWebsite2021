@@ -71,9 +71,7 @@ export const SelectAPI = {
 export const DistributeAPI = {
   postDistribute: () => axios.post(`/api/distribute`),
   putPreselect: (ids) =>
-    axios
-      .put(`/api/preselect`, { data: [...ids] })
-      .catch((error) => errorHandling(error)),
+    axios.put(`/api/preselect`, ids).catch((error) => errorHandling(error)),
   getResult: () => axios.get(`/api/result.csv`),
   getStatistics: () => axios.get(`/api/statistics.csv`),
 };
