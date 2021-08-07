@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { selectSession } from "../../slices/sessionSlice";
 import { Element, scroller } from "react-scroll";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -6,6 +8,7 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import DownArrow from "./downarrow.js";
 import moment from "moment";
+import PickTime from "./SetTimeButton.js";
 import { OpentimeAPI } from "../../api";
 /**
  * This is Main Page
@@ -25,8 +28,10 @@ export default function Top() {
       }
     };
     fetchData();
-  }, []); // only run the first time
+  }, [start,end]); // [] only run the first time
 
+  const { authority } = useSelector(selectSession);
+  // console.log(authority)
   //count left time
   const [leftDays, setLeftDays] = useState("00");
   const [leftHours, setLeftHours] = useState("00");
@@ -99,10 +104,10 @@ export default function Top() {
     scroller.scrollTo("explanation", { smooth: true, duration: 1500 });
   };
   const classes = useStyles();
-
   return (
     <Element name="title">
       <div className={classes.root}>
+        {authority===2 && <PickTime startTime={start} endTime={end} handleSetStart={setStart} handleSetEnd={setEnd}/>}
         <Grid
           container
           direction="column"
@@ -135,10 +140,10 @@ export default function Top() {
                 Pre-selection
               </Typography>
               <Typography gutterBottom variant="h6" className={classes.time}>
-                開始: {moment(start * 1000).format("YYYY-MM-DD HH:mm:ss")}
+                開始: {moment(start * 1000).format("YYYY-MM-DD HH:mm")}
               </Typography>
               <Typography gutterBottom variant="h6" className={classes.time}>
-                結束: {moment(end * 1000).format("YYYY-MM-DD HH:mm:ss")}
+                結束: {moment(end * 1000).format("YYYY-MM-DD HH:mm")}
               </Typography>
               <Typography gutterBottom variant="h6" className={classes.time}>
                 剩餘: {leftDays}天{leftHours}小時{leftMinutes}分{leftSeconds}秒
