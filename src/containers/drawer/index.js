@@ -29,6 +29,8 @@ import CloudUploadIcon from "@material-ui/icons/CloudUpload"; // Course Manage
 import ShuffleIcon from "@material-ui/icons/Shuffle"; // Distribute
 // slices, logout
 import { selectSession, logout } from "../../slices/sessionSlice";
+//route
+import { Redirect } from "react-router";
 
 const drawerWidth = 200;
 const maxPhoneWidth = 700;
@@ -147,7 +149,6 @@ const Drawer = ({ children }) => {
   const itemList = !isLogin
     ? [
         { text: "Main", to: "/", icon: <HomeIcon /> },
-        { text: "Courses", to: "/courses", icon: <ClassIcon /> },
         { text: "Login", to: "/login", icon: <ExitToAppIcon /> },
       ]
     : {
@@ -230,6 +231,20 @@ const Drawer = ({ children }) => {
               aria-hidden="true"
             >
               NTUEE
+            </div>
+          </Typography>
+          <Typography
+            variant="h6"
+            className={clsx({
+              [classes.hide]: isLogin,
+            })}
+          >
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => history.push("/login")}
+              aria-hidden="true"
+            >
+              LOGIN
             </div>
           </Typography>
           <Typography variant="h6">{userName}</Typography>

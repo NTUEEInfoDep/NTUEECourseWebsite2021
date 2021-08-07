@@ -78,6 +78,6 @@ export const DistributeAPI = {
 
 export const OpentimeAPI = {
   getOpentime: () => axios.get(`/api/opentime`),
-  putOpentime: (data) =>
-    axios.put(`/api/opentime`, { data }).catch((error) => errorHandling(error)),
+  putOpentime: (start,end) =>
+    axios.put(`/api/opentime`, { start,end }).catch((error) => errorHandling(error)),
 };
