@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 
 // material-ui
@@ -7,22 +7,33 @@ import {
   CssBaseline,
   Typography,
   Button,
+  Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Fade,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Snackbar,
   Step,
   Stepper,
   StepContent,
   StepButton,
+  TextField,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import { makeStyles } from "@material-ui/core/styles";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import CallSplitIcon from "@material-ui/icons/CallSplit";
 import GetAppIcon from "@material-ui/icons/GetApp";
+import { Add } from "@material-ui/icons";
 
 // api
-import { DistributeAPI } from "../../api";
+import { DistributeAPI, CourseAPI, StudentDataAPI } from "../../api";
 
 // upload csv
 import Papa from "papaparse";
@@ -69,17 +80,30 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
   },
 }));
-
+const columns = [
+  { field: "id", headerName: "ID", width: 90 },
+  {
+    field: "Name",
+    headerName: "Name",
+    width: 150,
+  },
+];
 export default function Distribute() {
   const classes = useStyles();
   const resultBlobLinkRef = useRef();
   const statisticsBlobLinkRef = useRef();
+  const [courses, setCourses] = useState([]);
+  const [students, setStudents] = useState([]);
   const [activeStep, setActiveStep] = useState(0);
   const [blobURL, setBlobURL] = useState("");
   const [preselectUploaded, setPreselectUploaded] = useState(false);
   const [preselectLoaded, setPreselectLoaded] = useState(false);
   const [preselectFilename, setPreselectFilename] = useState("");
   const [preselectData, setPreselectData] = useState([]);
+  const [specifyData, setSpecifyData] = useState([]);
+  const [addSpecifyOpened, setAddSpecifyOpened] = useState(false);
+  const [addSpecifyCourse, setAddSpecifyCourse] = useState("");
+  const [studentInput, setStudentInput] = useState("");
   const [lastDristributeTime, setLastDistributeTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({});
@@ -123,9 +147,9 @@ export default function Distribute() {
   };
 
   const handleRunDistribution = () => {
-    DistributeAPI.postDistribute()
+    setLoading(true);
+    DistributeAPI.postDistribute(specifyData)
       .then(() => {
-        setLoading(true);
         setAlert({
           open: true,
           severity: "success",
@@ -144,17 +168,24 @@ export default function Distribute() {
       .finally(() => setLoading(false));
   };
   const handleUploadCsv = async (efile) => {
+    const data = students.map((s) => s.id);
+    let nonExist = [];
     if (efile) {
       Papa.parse(efile, {
         skipEmptyLines: true,
         complete(results) {
           let valid = true;
+          let exist = true;
           results.data[0].forEach((student) => {
             if (!/^(b|r|d)\d{8}$/i.test(student)) {
               valid = false;
             }
+            if (!data.includes(student.toUpperCase())) {
+              exist = false;
+              nonExist.push(student);
+            }
           });
-          if (valid) {
+          if (valid && exist) {
             setPreselectData(results.data[0]);
             setPreselectLoaded(true);
             setPreselectFilename(efile.name);
@@ -165,6 +196,13 @@ export default function Distribute() {
               open: true,
               severity: "error",
               msg: "Invalid student data format.",
+            });
+          }
+          if (!exist) {
+            setAlert({
+              open: true,
+              severity: "error",
+              msg: `No student data: ${nonExist.join(", ")}`,
             });
           }
         },
@@ -203,6 +241,92 @@ export default function Distribute() {
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
+  const handleOpenAddSpecify = () => {
+    setAddSpecifyOpened(true);
+  };
+  const handleCloseAddSpecify = () => {
+    setAddSpecifyOpened(false);
+    setAddSpecifyCourse("");
+    setStudentInput("");
+  };
+  const handleAddSpecifyStudents = () => {
+    const data = students.map((s) => s.id);
+    const valueArray = studentInput.replace(/\s/g, "").toUpperCase().split(",");
+    let nonExist = [];
+    let valid = true;
+    let exist = true;
+    setStudentInput("");
+    valueArray.forEach((student) => {
+      if (!/^(b|r|d)\d{8}$/i.test(student)) {
+        valid = false;
+      }
+      if (!data.includes(student)) {
+        nonExist.push(student);
+        exist = false;
+      }
+    });
+    if (valid && exist) {
+      handleAddSpecify(valueArray);
+      return;
+    }
+    if (!valid) {
+      setAlert({
+        open: true,
+        severity: "error",
+        msg: "Invalid student data format.",
+      });
+    }
+    if (!exist) {
+      setAlert({
+        open: true,
+        severity: "error",
+        msg: `No student data: ${nonExist.join(", ")}`,
+      });
+    }
+  };
+  const handleAddSpecify = (student) => {
+    // console.log({ course_id: addSpecifyCourse, students: addSpecifyStudents });
+    setSpecifyData([
+      ...specifyData,
+      {
+        course_id: addSpecifyCourse,
+        students: student,
+      },
+    ]);
+    handleCloseAddSpecify();
+  };
+  const handleDeleteSpecify = (index) => {
+    setSpecifyData([
+      ...specifyData.slice(0, index),
+      ...specifyData.slice(index + 1),
+    ]);
+  };
+  const handleCoursesReload = async () => {
+    try {
+      setCourses((await CourseAPI.getCourses()).data);
+    } catch (err) {
+      setAlert({
+        open: true,
+        severity: "error",
+        msg: "Failed to load courses.",
+      });
+    }
+  };
+  const handleStudentDataReload = async () => {
+    try {
+      setStudents((await StudentDataAPI.getStudentData()).data);
+    } catch (err) {
+      setAlert({
+        open: true,
+        severity: "error",
+        msg: "Failed to load student data.",
+      });
+    }
+  };
+  useEffect(() => {
+    handleCoursesReload();
+    handleStudentDataReload();
+  }, []);
   return (
     <div>
       <Container component="main" maxWidth="md">
@@ -326,10 +450,42 @@ export default function Distribute() {
               </StepButton>
               <StepContent>
                 <Typography>
-                  Please make sure all student data and course data are correct.
-                  The previous distribution result will be OVERWRITTEN. Are you
-                  sure to run Distribution Algorithm?
+                  The previous distribution result will be OVERWRITTEN. Please
+                  make sure all student data and course data are correct.
                 </Typography>
+                <Typography style={{ color: "#d32f2f" }}>
+                  If specifying certain students for certain course is needed,
+                  press "ADD" to fill in more details.
+                </Typography>
+                <br />
+                <div>
+                  <Typography style={{ fontSize: "20px", marginBottom: "5px" }}>
+                    Specified Data
+                  </Typography>
+                  {specifyData.map((item, index) => (
+                    <Chip
+                      key={item.course_id}
+                      label={`${item.course_id}(${item.students.length})`}
+                      variant="outlined"
+                      onDelete={() => handleDeleteSpecify(index)}
+                      style={{ margin: "5px" }}
+                    />
+                  ))}
+                  <Button
+                    startIcon={<Add />}
+                    variant="outlined"
+                    size="small"
+                    onClick={handleOpenAddSpecify}
+                  >
+                    Add
+                  </Button>
+                </div>
+
+                {preselectUploaded
+                  ? preselectData.map((id) => (
+                      <Typography key={id}>{id}</Typography>
+                    ))
+                  : ""}
                 {loading ? (
                   <div className={classes.actionsContainer}>
                     <Fade
@@ -350,7 +506,7 @@ export default function Distribute() {
                     <Button
                       onClick={handleRunDistribution}
                       variant="contained"
-                      color="secondary"
+                      color="primary"
                     >
                       Run
                     </Button>
@@ -405,6 +561,52 @@ export default function Distribute() {
           </Stepper>
         </div>
       </Container>
+      <Dialog
+        maxWidth="sm"
+        fullWidth
+        disableBackdropClick
+        open={addSpecifyOpened}
+        onClose={() => setAddSpecifyOpened(false)}
+      >
+        <DialogTitle>Add Specification</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth>
+            <InputLabel>Course ID</InputLabel>
+            <Select
+              fullWidth
+              value={addSpecifyCourse}
+              onChange={(e) => setAddSpecifyCourse(e.target.value)}
+            >
+              {courses.map((course) => (
+                <MenuItem key={course.id} value={course.id}>
+                  {course.id}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Typography>Student</Typography>
+          <TextField
+            id="id"
+            label="Add Student ID (ex: b00000000,b11111111)"
+            type="text"
+            fullWidth
+            value={studentInput}
+            onChange={(e) => setStudentInput(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button className={classes.button} onClick={handleCloseAddSpecify}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddSpecifyStudents}
+          >
+            Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={alert?.open}
