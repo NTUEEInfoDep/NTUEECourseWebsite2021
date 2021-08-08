@@ -717,6 +717,29 @@ router.post(
   })
 );
 
+router.post(
+  "/test_distribute",
+  express.json({ strict: false }),
+  permissionRequired(constants.AUTHORITY_ADMIN),
+  asyncHandler(async (req, res, next) => {
+    const resp = await fetch(
+      `http://${DISTRIBUTE_SERVER_HOST}:${DISTRIBUTE_SERVER_PORT}/test_distribute`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(req.body),
+      }
+    );
+    if (resp.ok) {
+      res.status(204).end();
+    } else {
+      res.status(400).end();
+    }
+  })
+);
+
 router.get(
   "/result.csv",
   permissionRequired(constants.AUTHORITY_ADMIN),

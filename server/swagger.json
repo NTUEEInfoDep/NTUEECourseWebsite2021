@@ -928,6 +928,59 @@
         }
       }
     },
+    "/test_distribute": {
+      "post": {
+        "tags": ["Distribution"],
+        "summary": "分發(測試)",
+        "description": "Run distribution algorithm(test). <br>If request body is empty, it will run the original distribution; otherwise, it will run the distribution with specific students given by request body.",
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "course_id": {
+                      "type": "string"
+                    },
+                    "students": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": [
+                {
+                  "course_id": "Ten-Select-Two",
+                  "students": ["B00000000", "B11111111"]
+                },
+                {
+                  "course_id": "Electronics-one",
+                  "students": ["B00000000", "B11111111"]
+                }
+              ]
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "distribute server error"
+          },
+          "403": {
+            "description": "permission deny"
+          }
+        }
+      }
+    },
     "/authority": {
       "put": {
         "tags": ["Management"],
