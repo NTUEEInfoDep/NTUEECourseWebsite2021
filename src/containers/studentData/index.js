@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
+import { useSelector } from "react-redux";
 
 import Grid from "@material-ui/core/Grid";
 import {
@@ -24,6 +25,7 @@ import Container from "@material-ui/core/Container";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import Papa from "papaparse";
+import { selectSession } from "../../slices/sessionSlice";
 
 import StudentTable from "./StudentTable";
 
@@ -105,6 +107,7 @@ export default function StudentData() {
     grade: "",
     authority: "",
   });
+  const { authority } = useSelector(selectSession);
 
   const showAlert = (severity, msg) => {
     setAlert({ open: true, severity, msg });
@@ -990,6 +993,7 @@ export default function StudentData() {
                 variant="contained"
                 color="primary"
                 onClick={handleOpenAdd}
+                disabled={authority !== 2}
               >
                 Add Single Student
               </Button>
@@ -999,6 +1003,7 @@ export default function StudentData() {
                 variant="contained"
                 color="primary"
                 onClick={handleOpenAddMultiple}
+                disabled={authority !== 2}
               >
                 Add Students (csv)
               </Button>
@@ -1008,7 +1013,7 @@ export default function StudentData() {
                 variant="outlined"
                 color="primary"
                 onClick={handleDownloadPassword}
-                disabled={selected.length === 0}
+                disabled={selected.length === 0 || authority !== 2}
               >
                 Download Password
               </Button>
@@ -1018,7 +1023,7 @@ export default function StudentData() {
                 variant="contained"
                 color="primary"
                 onClick={handleOpenRegenerate}
-                disabled={selected.length === 0}
+                disabled={selected.length === 0 || authority !== 2}
               >
                 Generate Password
               </Button>
@@ -1033,6 +1038,7 @@ export default function StudentData() {
             selected={selected}
             setSelected={setSelected}
             showAlert={showAlert}
+            authority={authority}
           />
         </Grid>
         {/* <Hidden smDown>

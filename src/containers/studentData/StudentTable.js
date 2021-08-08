@@ -90,13 +90,14 @@ function EnhancedTableHead(props) {
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
-            className={classes.headCell}
+            className={(classes.headCell, classes.grade)}
             key={headCell.id}
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "default"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
+              className={classes.sortlabel}
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
@@ -148,8 +149,15 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { rootClasses, numSelected, search, setSearch, handleDelete, setPage } =
-    props;
+  const {
+    rootClasses,
+    numSelected,
+    search,
+    setSearch,
+    handleDelete,
+    setPage,
+    authority,
+  } = props;
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -193,8 +201,12 @@ const EnhancedTableToolbar = (props) => {
         }}
       />
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton aria-label="delete" onClick={() => handleDelete()}>
+        <Tooltip title="Delete" placement="bottom">
+          <IconButton
+            aria-label="delete"
+            onClick={() => handleDelete()}
+            disabled={authority !== 2}
+          >
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -232,9 +244,11 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 500,
     padding: 0,
   },
-  headCell: {
-    backgroundColor: "#424242",
+  sortlabel: {
+    margin: 0,
   },
+  headCell: {},
+  grade: {},
   visuallyHidden: {
     border: 0,
     clip: "rect(0 0 0 0)",
@@ -270,6 +284,7 @@ export default function StudentTable({
   selected,
   setSelected,
   showAlert,
+  authority,
 }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
@@ -356,6 +371,7 @@ export default function StudentTable({
           handleDelete={() => {
             handleDelete(selected);
           }}
+          authority={authority}
         />
         <TableContainer className={classes.container}>
           <Table
@@ -480,14 +496,14 @@ export default function StudentTable({
                         <IconButton
                           onClick={() => handleEdit(row.id)}
                           className={classes.icon}
-                          disabled={selected.length !== 0}
+                          disabled={selected.length !== 0 || authority !== 2}
                         >
                           <EditIcon />
                         </IconButton>
                         <IconButton
                           onClick={() => handleDelete([row.id])}
                           className={classes.icon}
-                          disabled={selected.length !== 0}
+                          disabled={selected.length !== 0 || authority !== 2}
                         >
                           <DeleteIcon />
                         </IconButton>

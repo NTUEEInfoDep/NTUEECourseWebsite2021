@@ -7,6 +7,7 @@ import { Redirect } from "react-router";
 import PublicRoute from "./components/routes/publicRoute";
 import PrivateRoute from "./components/routes/privateRoute";
 import LoginRoute from "./components/routes/loginRoute";
+import MainRoute from "./components/routes/mainRoute";
 // containers
 import Drawer from "./containers/drawer";
 import Main from "./containers/main";
@@ -32,9 +33,9 @@ const Routes = () => {
     <Loading />
   ) : (
     <Switch>
-      <PublicRoute exact path="/">
+      <MainRoute exact path="/">
         <Main />
-      </PublicRoute>
+      </MainRoute>
       <PublicRoute exact path="/courses">
         <Courses />
       </PublicRoute>
