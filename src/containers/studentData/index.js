@@ -14,7 +14,6 @@ import {
   MenuItem,
   InputLabel,
   Select,
-  Hidden,
   Typography,
   Snackbar,
 } from "@material-ui/core";
@@ -22,14 +21,12 @@ import {
 import { Alert } from "@material-ui/lab";
 
 import Container from "@material-ui/core/Container";
-import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import Papa from "papaparse";
 import { selectSession } from "../../slices/sessionSlice";
 
 import StudentTable from "./StudentTable";
 
-import { StudentDataAPI } from "../../api";
+import { StudentDataAPI, PasswordAPI } from "../../api";
 
 const characters =
   "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789"; // no O, o, 0
@@ -45,7 +42,7 @@ const genPassword = () => {
 };
 
 const gradeData = ["1", "2", "3", "4", "5", "6", "7"];
-const authorityData = ["0", "1", "2"];
+const authorityData = ["0", "1"];
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -473,45 +470,30 @@ export default function StudentData() {
 
   const handleGeneratePassword = async () => {
     // console.log("generate password");
-    const newData = data
-      .filter((e) => selected.includes(e.id))
-      .map((student) => {
+    const passwords = [];
+    const updateData = data.map((e) => {
+      if (selected.includes(e.id)) {
         const password = genPassword();
-        return { ...student, password };
-      });
-    // console.log(`delete in regenerate: `);
-    // console.log(selected);
+        const student = e;
+        student.password = password;
+        passwords.push({
+          userID: e.id,
+          new_password: password,
+        });
+        return student;
+      }
+      return e;
+    });
     try {
-      await StudentDataAPI.deleteStudentData(selected);
-    } catch (err) {
-      showAlert("error", "Failed to Delete student data in generate password.");
+      await PasswordAPI.putPassword(passwords);
+      showAlert("success", "Generate password complete.");
+      setData(updateData);
       handleCloseRegenerate();
-      return;
-    }
-    // console.log("delete student data finish in regenerate");
-    try {
-      await StudentDataAPI.postStudentData(
-        newData.map((student) => {
-          return {
-            userID: student.id,
-            grade: Number(student.grade),
-            password: student.password,
-            name: student.name,
-            authority: Number(student.authority),
-          };
-        })
-      );
+      setSelected([]);
     } catch (err) {
-      showAlert("error", "Failed to Post student data when generate password.");
+      showAlert("error", "Failed to regenerate password.");
       handleCloseRegenerate();
-      return;
     }
-    showAlert("success", "Generate password complete.");
-    // console.log("post student data finish in regeneration");
-    setData(data.filter((e) => !selected.includes(e.id)).concat(newData));
-    // setCsv(Papa.unparse(newData));
-    handleCloseRegenerate();
-    setSelected([]);
   };
 
   const judgeNewStudent = () => {
@@ -621,48 +603,28 @@ export default function StudentData() {
   const handleEditStudent = async () => {
     const error = judgeNewStudent();
     if (!error) {
-      const password = genPassword();
       try {
-        StudentDataAPI.deleteStudentData([editId]);
-      } catch (err) {
-        showAlert("error", "Failed to Delete student data in Edit.");
-        handleCloseEdit();
-        return;
-      }
-      // console.log("delete student data finish in edit");
-
-      try {
-        await StudentDataAPI.postStudentData([
+        await StudentDataAPI.putStudentData([
           {
             userID: newStudent.id,
-            grade: Number(newStudent.grade),
-            password,
             name: newStudent.name,
+            grade: Number(newStudent.grade),
             authority: Number(newStudent.authority),
           },
         ]);
-        // console.log("post student data finish in edit");
-        // console.log(`student id: ${newStudent.id}`);
-        // console.log(`password id: ${password}`);
         setData(
-          data
-            .filter((e) => e.id !== editId)
-            .concat({
-              ...newStudent,
-              id: newStudent.id.toUpperCase(),
-              password,
-              grade: Number(newStudent.grade),
-              authority: Number(newStudent.authority),
-            })
+          data.map((e) => {
+            if (e.id === newStudent.id) {
+              return {
+                id: newStudent.id,
+                name: newStudent.name,
+                grade: Number(newStudent.grade),
+                authority: Number(newStudent.authority),
+              };
+            }
+            return e;
+          })
         );
-        // console.log({
-        //  userID: newStudent.id,
-        //  grade: Number(newStudent.grade),
-        //  password,
-        //  name: newStudent.name,
-        //  authority: Number(newStudent.authority),
-        // });
-
         setNewStudent({
           id: "",
           name: "",
@@ -672,8 +634,8 @@ export default function StudentData() {
         handleCloseEdit();
         showAlert("success", "Edit student data success.");
       } catch (err) {
-        showAlert("error", "Failed to post student data in Edit.");
         handleCloseEdit();
+        showAlert("error", "Failed to Edit student data.");
       }
     }
   };
@@ -719,6 +681,7 @@ export default function StudentData() {
             error={errors.id}
             onChange={onIdChange}
             helperText={errorsMsg.id}
+            disabled={editId !== ""}
           />
           <TextField
             id="name"

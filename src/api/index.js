@@ -55,6 +55,15 @@ export const StudentDataAPI = {
     axios
       .delete(`/api/users`, { data: [...ids] })
       .catch((error) => errorHandling(error)),
+  putStudentData: (user) =>
+    axios.put(`/api/users`, user).catch((error) => errorHandling(error)),
+};
+
+export const PasswordAPI = {
+  putPassword: (passwords) =>
+    axios
+      .put(`/api/password`, passwords)
+      .catch((error) => errorHandling(error)),
 };
 
 export const SelectAPI = {
@@ -78,6 +87,8 @@ export const DistributeAPI = {
 
 export const OpentimeAPI = {
   getOpentime: () => axios.get(`/api/opentime`),
-  putOpentime: (start,end) =>
-    axios.put(`/api/opentime`, { start,end }).catch((error) => errorHandling(error)),
+  putOpentime: (start, end) =>
+    axios
+      .put(`/api/opentime`, { start, end })
+      .catch((error) => errorHandling(error)),
 };
