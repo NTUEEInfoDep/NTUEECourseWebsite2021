@@ -410,23 +410,35 @@ router
           let { password } = data;
           const { name } = data;
           const salt = await bcrypt.genSalt(10);
-          const hash = await bcrypt.hash(password, salt);
-          console.log(hash);
-          password = hash;
           userID = userID.toUpperCase();
           const student = await model.Student.findOne({ userID }).exec();
           if (student) {
-            await model.Student.updateOne(
-              {
-                userID,
-              },
-              {
-                authority,
-                grade,
-                password,
-                name,
-              }
-            );
+            if (password) {
+              const hash = await bcrypt.hash(password, salt);
+              password = hash;
+              await model.Student.updateOne(
+                {
+                  userID,
+                },
+                {
+                  authority,
+                  grade,
+                  password,
+                  name,
+                }
+              );
+            } else {
+              await model.Student.updateOne(
+                {
+                  userID,
+                },
+                {
+                  authority,
+                  grade,
+                  name,
+                }
+              );
+            }
           }
         })
       );
