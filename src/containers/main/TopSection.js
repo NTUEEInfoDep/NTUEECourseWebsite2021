@@ -31,17 +31,19 @@ export default function Top() {
   }, [start,end]); // [] only run the first time
 
   const { authority } = useSelector(selectSession);
-  // console.log(authority)
   //count left time
   const [leftDays, setLeftDays] = useState("00");
   const [leftHours, setLeftHours] = useState("00");
   const [leftMinutes, setLeftMinutes] = useState("00");
   const [leftSeconds, setLeftSeconds] = useState("00");
+  
+  let timer = useRef();
+  
 
-  let interval = useRef();
+  // let interval = useRef();
   const countDown = () => {
-    // const countDate=new Date("Aug 11 ,2021 23:59:59").getTime();
-    interval = setInterval(() => {
+    //intervalId
+      timer = setInterval(() => {
       const now = new Date().getTime();
       const gap = end * 1000 - now;
 
@@ -56,7 +58,8 @@ export default function Top() {
       const textSecond = Math.floor((gap % minute) / second);
 
       if (gap < 0) {
-        clearInterval(interval.current);
+        alert("Time's up! You cannot preselect courses any more!")
+        clearInterval(timer);
       } else {
         setLeftDays(textDay);
         setLeftHours(textHour);
@@ -64,13 +67,13 @@ export default function Top() {
         setLeftSeconds(textSecond);
       }
     }, 1000);
-  };
+    };
   useEffect(() => {
     countDown();
     return () => {
-      clearInterval(interval.current);
+      if (timer) clearInterval(timer);
     };
-  });
+  },[end]);
 
   var moment = require("moment");
 
@@ -107,7 +110,7 @@ export default function Top() {
   return (
     <Element name="title">
       <div className={classes.root}>
-        {authority===2 && <PickTime startTime={start} endTime={end} handleSetStart={setStart} handleSetEnd={setEnd}/>}
+        {authority===2 && <PickTime handleSetStart={setStart} handleSetEnd={setEnd}/>}
         <Grid
           container
           direction="column"
@@ -140,10 +143,10 @@ export default function Top() {
                 Pre-selection
               </Typography>
               <Typography gutterBottom variant="h6" className={classes.time}>
-                開始: {moment(start * 1000).format("YYYY-MM-DD HH:mm")}
+                開始: {moment(start * 1000).format("YYYY-MM-DD HH:mm:ss")}
               </Typography>
               <Typography gutterBottom variant="h6" className={classes.time}>
-                結束: {moment(end * 1000).format("YYYY-MM-DD HH:mm")}
+                結束: {moment(end * 1000).format("YYYY-MM-DD HH:mm:ss")}
               </Typography>
               <Typography gutterBottom variant="h6" className={classes.time}>
                 剩餘: {leftDays}天{leftHours}小時{leftMinutes}分{leftSeconds}秒
