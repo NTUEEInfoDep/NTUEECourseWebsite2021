@@ -1,35 +1,36 @@
 import React from "react";
+import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Avatar from "@material-ui/core/Avatar";
-import BatteryCharging60Icon from "@material-ui/icons/BatteryCharging60";
+import BatteryCharging80Icon from "@material-ui/icons/BatteryCharging60";
 import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
   title: {
     padding: "10px",
-    textAlign: "center",
+    textAlign: "center"
   },
   avatar: {
     margin: "0 15px",
-    color: "white",
     width: theme.spacing(4),
     height: theme.spacing(4),
+    color: "white",
     // width:'10%',
   },
   gridStyle: {
-    marginTop: "10%",
     display: "flex",
     justifyContent: "center",
     flexDirection: "row",
     alignItems: "center",
+    marginTop: "10%"
     // padding: "25px 20px"
   },
   subtitle: {
-    color: "white",
     fontSize: "1.2rem",
+    color: "white",
     marginBottom: "5%",
-    textAlign: "center",
+    textAlign: "center"
   },
   paragraph: {
     width: "100%",
@@ -40,8 +41,7 @@ const useStyles = makeStyles((theme) => ({
     opacity: ".8",
     lineHeight: "1.8",
     textIndent: "32px",
-    letterSpacing: "1px",
-    // margin:'auto',//文字塊居中?
+    letterSpacing: "1px"
   },
   text: {
     color: "white",
@@ -49,28 +49,37 @@ const useStyles = makeStyles((theme) => ({
     padding: "8px",
     opacity: ".8",
     lineHeight: "1.5",
-    letterSpacing: "1px",
-  },
+    letterSpacing: "1px"
+  }
 }));
-const message = `選擇有興趣的實驗，設置志願序。可設置＂0～9個志願序＂，所有志願序都有可能選上。唯獨數電實驗另開Google表單，３人組隊報名，不設志願序。所有學生至多選上２門實驗，包含數電實驗。根據系上規定，學生應於修業年限內修習不同類二門。詳細實驗規定請參閱學術部公告。抽籤作業流程：`;
-export default function Card2() {
+const message = `為有意願修自動控制實驗的學生必須填寫。`;
+export default function Card4() {
   const classes = useStyles();
   return (
-    <Grid container style={{ padding: "10px" }}>
+    <Grid
+      container
+      style={{ padding: "10px" }}
+    >
       <Grid item className={classes.gridStyle}>
-        <Avatar component={BatteryCharging60Icon} className={classes.avatar} />
-        <Typography className={classes.subtitle}>十選二實驗</Typography>
+        <Avatar component={BatteryCharging80Icon} className={classes.avatar} />
+        <Typography className={classes.subtitle}>
+          自動控制實驗先修調查
+        </Typography>
       </Grid>
       <Grid
         item
         style={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "column"
         }}
       >
         <Typography className={classes.paragraph}>{message}</Typography>
-        <Typography className={classes.text}>步驟一：數電實驗抽籤</Typography>
-        <Typography className={classes.text}>步驟二：九實驗志願抽籤</Typography>
+        <Typography className={classes.text}>
+          * 先修課程：與控制相關的課程(不局限於本系所開授的控制系統)
+        </Typography>
+        <Typography className={classes.text}>
+          * 以Google表單的方式進行調查，需填寫修課學期、開課系所、課程名稱。
+        </Typography>
       </Grid>
     </Grid>
   );

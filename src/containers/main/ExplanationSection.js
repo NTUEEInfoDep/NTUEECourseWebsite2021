@@ -10,12 +10,14 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import BatteryAlertIcon from "@material-ui/icons/BatteryAlert";
 import BatteryCharging20Icon from "@material-ui/icons/BatteryCharging20";
-import BatteryCharging80Icon from "@material-ui/icons/BatteryCharging80";
-import BatteryChargingFullIcon from "@material-ui/icons/BatteryChargingFull";
+import BatteryCharging60Icon from "@material-ui/icons/BatteryCharging60";
 
 import Card from "./Cards/Card";
 import Card2 from "./Cards/Card2";
 import Card3 from "./Cards/Card3";
+import Card4 from "./Cards/Card4";
+import Card5 from "./Cards/Card5";
+import Card6 from "./Cards/Card6";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -81,10 +83,10 @@ const StyledDotGroup = styled(DotGroup)`
     margin-bottom: 3%;
   }
 `;
-const message = `先取所有人之第一志願，若某選項太熱門而超過限額，則從＂高年級先錄取＂，同年級超額的部分抽籤至限額。下個階段，未抽中的人取下個順位並重複前述機制，直到所有人都抽出。後續事宜交由加簽處理。 `;
-const message2 = `先取所有人之第一志願，若某選項太熱門而超過限額，則＂抽籤＂至限額，同年級超額的部分抽籤至限額。下個階段，未抽中的人取下個順位並重複前述機制，直到所有人都抽出。後續事宜交由加簽處理。 `;
+const message = `選擇課程後，對所有教授設置志願序。全部為高年級優先，後續事宜交由加簽處理。 `;
+const message2 = `對所有時段設置志願序。無特定年級優先，後續事宜交由開學後的實驗meeting處理。 `;
 const message4 = `通常是全部選上，若遇到需要抽籤情況，抽籤方式爲＂隨機＋人工篩選＂。人工篩選：若學術部判定隨機抽籤的結果會引起爭議時，我們會考慮年級、十選二修課紀錄等等情節，手動調整並將修課機會合理地讓給未來較無機會再修習的人。`;
-const message5 = `先抽出保障名額，之後尚未被抽中兩次的人取出第一志願,若超額 則抽籤至限額,之後取下個志願序重複執行,直到執行完所有志願序。`;
+const message5 = `依據實驗年及保障而有所改變，若優先順序與年級相關，則會先依年級分類，再利用random去排序同年級的優先順序。演算法會先以每人選＂只能選上一門課＂為前提先做一次分發，分發完再利用剩下的空位再分發一次。此外，已選上＂數電實驗＂的同學算＂已抽中一次＂，因此抽籤時不會參加到十選二的第一次分發。＂光電實驗＂及＂電磁波實驗＂設有＂年級保障名額＂。演算法利用十選二實驗有兩次分發的特性，第一次分發會先把該課程選項的人數上限設為保障名額人數，保障年級優先進行分發，第二次分發再＂開放剩餘名額＂，且調成無年級優先進行分發。（而若選該課的保障年級學生很少，可能就不會到達保障名額人數。）`;
 export default function Explanation() {
   const classes = useStyles();
   const isMobile = useMediaQuery({ query: "(max-width: 480px,)" }); //只是控制頁數和上面的選擇器無關
@@ -113,7 +115,7 @@ export default function Explanation() {
         <StyledCarouselProvider
           naturalSlideWidth={isMobile ? 190 : 350}
           naturalSlideHeight={isMobile ? 250 : 400}
-          totalSlides={5}
+          totalSlides={8}
           visibleSlides={1}
           // dragEnabled={false}
         >
@@ -148,7 +150,7 @@ export default function Explanation() {
                 <Card3
                   message={message4}
                   title={"數電實驗抽籤"}
-                  icon={BatteryCharging80Icon}
+                  icon={BatteryCharging60Icon}
                   note={
                     "NOTE：人工篩選會完全透明公開，非黑箱作業。黑箱作業對學術部沒有任何好處，請知悉。"
                   }
@@ -161,10 +163,25 @@ export default function Explanation() {
                 <Card3
                   message={message5}
                   title={"九實驗志願抽籤"}
-                  icon={BatteryChargingFullIcon}
-                  note={"NOTE：已選上數電實驗的同學算已抽中一次。"}
+                  icon={BatteryCharging60Icon}
+                  note={"NOTE：第一／第二次分發表示演算法內部運作過程，與第一／第二階段選課不同。"}
                   step={"STEP2"}
                 />
+              </Scrollbars>
+            </StyledSlide>
+            <StyledSlide index={5}>
+              <Scrollbars>
+                <Card4/>
+              </Scrollbars>
+            </StyledSlide>
+            <StyledSlide index={6}>
+              <Scrollbars>
+                <Card5/>
+              </Scrollbars>
+            </StyledSlide>
+            <StyledSlide index={7}>
+              <Scrollbars>
+                <Card6/>
               </Scrollbars>
             </StyledSlide>
           </Slider>
