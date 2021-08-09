@@ -718,12 +718,12 @@ router.post(
 );
 
 router.post(
-  "/test_distribute",
+  "/specific_distribute",
   express.json({ strict: false }),
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const resp = await fetch(
-      `http://${DISTRIBUTE_SERVER_HOST}:${DISTRIBUTE_SERVER_PORT}/test_distribute`,
+      `http://${DISTRIBUTE_SERVER_HOST}:${DISTRIBUTE_SERVER_PORT}/specific_distribute`,
       {
         headers: {
           "Content-Type": "application/json",

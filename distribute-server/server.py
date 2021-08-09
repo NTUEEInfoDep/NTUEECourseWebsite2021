@@ -134,8 +134,8 @@ def distribute():
     client.close()
     return ""
 
-@app.route("/test_distribute", methods=["POST"])
-def test_distribute():
+@app.route("/specific_distribute", methods=["POST"])
+def specific_distribute():
     client = MongoClient(MONGO_HOST, MONGO_PORT)
     db = client[MONGO_DBNAME]
     raw_selection = db["selections"]

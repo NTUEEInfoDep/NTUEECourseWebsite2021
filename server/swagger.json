@@ -928,10 +928,10 @@
         }
       }
     },
-    "/test_distribute": {
+    "/specific_distribute": {
       "post": {
         "tags": ["Distribution"],
-        "summary": "分發(測試)",
+        "summary": "分發(有範圍的)",
         "description": "Run distribution algorithm(test). <br>If request body is empty, it will run the original distribution; otherwise, it will run the distribution with specific students given by request body.",
         "requestBody": {
           "description": "",
