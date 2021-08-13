@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(0,0,0,.7)",
     // boxShadow: "0 0 15px #f3d42e inset",
     maxWidth: 900,
-    width: "80%",
+    width: "90%",
     borderRadius: "3%",
   },
   img: {
