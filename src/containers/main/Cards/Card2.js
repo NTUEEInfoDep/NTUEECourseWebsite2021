@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     letterSpacing: "1px",
   },
 }));
-const message = `選擇有興趣的實驗，設置志願序。可設置＂0～9個志願序＂，所有志願序都有可能選上。唯獨數電實驗另開Google表單，３人組隊報名，不設志願序。所有學生至多選上２門實驗，包含數電實驗。根據系上規定，學生應於修業年限內修習不同類二門。詳細實驗規定請參閱學術部公告。抽籤作業流程：`;
+const message = `選擇有興趣的實驗，並設置志願序。可設置0~9個志願序 (不含數電實驗)，所有志願序都有可能選上。數電實驗另開Google表單，3人組隊報名。表單開放時間與預選系統相同。所有學生至多選上2門實驗，包含數電實驗。根據系上規定，學生應於修業年限內修習不同類二門。詳細實驗規定請參閱學術部公告。抽籤作業流程：`;
 export default function Card2() {
   const classes = useStyles();
   return (
@@ -69,8 +69,31 @@ export default function Card2() {
         }}
       >
         <Typography className={classes.paragraph}>{message}</Typography>
-        <Typography className={classes.text}>步驟一：數電實驗抽籤</Typography>
-        <Typography className={classes.text}>步驟二：九實驗志願抽籤</Typography>
+        <Typography className={classes.text} style={{ paddingLeft: "25px" }}>
+          步驟一：數電實驗抽籤
+        </Typography>
+        <Typography className={classes.text} style={{ paddingLeft: "25px" }}>
+          步驟二：九實驗志願抽籤
+        </Typography>
+        <br />
+        <Typography className={classes.text}>
+          十選二實驗規定:{" "}
+          <a
+            href={"https://reurl.cc/4azzd2"}
+            style={{ overflow: "hidden", color: "#b2ebf2" }}
+          >
+            {"https://reurl.cc/4azzd2"}
+          </a>
+        </Typography>
+        <Typography className={classes.text}>
+          課程表:{" "}
+          <a
+            href={"https://reurl.cc/0jqqKY"}
+            style={{ overflow: "hidden", color: "#b2ebf2" }}
+          >
+            {"https://reurl.cc/0jqqKY"}
+          </a>
+        </Typography>
       </Grid>
     </Grid>
   );

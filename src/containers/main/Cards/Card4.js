@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 const useStyles = makeStyles((theme) => ({
   title: {
     padding: "10px",
-    textAlign: "center"
+    textAlign: "center",
   },
   avatar: {
     margin: "0 15px",
@@ -23,14 +23,14 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     flexDirection: "row",
     alignItems: "center",
-    marginTop: "10%"
+    marginTop: "10%",
     // padding: "25px 20px"
   },
   subtitle: {
     fontSize: "1.2rem",
     color: "white",
     marginBottom: "5%",
-    textAlign: "center"
+    textAlign: "center",
   },
   paragraph: {
     width: "100%",
@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
     opacity: ".8",
     lineHeight: "1.8",
     textIndent: "32px",
-    letterSpacing: "1px"
+    letterSpacing: "1px",
   },
   text: {
     color: "white",
@@ -49,17 +49,14 @@ const useStyles = makeStyles((theme) => ({
     padding: "8px",
     opacity: ".8",
     lineHeight: "1.5",
-    letterSpacing: "1px"
-  }
+    letterSpacing: "1px",
+  },
 }));
-const message = `為有意願修自動控制實驗的學生必須填寫。`;
+const message = `唯有意願修自動控制實驗的學生必須填寫。`;
 export default function Card4() {
   const classes = useStyles();
   return (
-    <Grid
-      container
-      style={{ padding: "10px" }}
-    >
+    <Grid container style={{ padding: "10px" }}>
       <Grid item className={classes.gridStyle}>
         <Avatar component={BatteryCharging80Icon} className={classes.avatar} />
         <Typography className={classes.subtitle}>
@@ -70,15 +67,24 @@ export default function Card4() {
         item
         style={{
           display: "flex",
-          flexDirection: "column"
+          flexDirection: "column",
         }}
       >
         <Typography className={classes.paragraph}>{message}</Typography>
         <Typography className={classes.text}>
-          * 先修課程：與控制相關的課程(不局限於本系所開授的控制系統)
+          * 先修課程：與控制相關的課程（不局限於本系所開授的控制系統）
         </Typography>
         <Typography className={classes.text}>
           * 以Google表單的方式進行調查，需填寫修課學期、開課系所、課程名稱。
+        </Typography>
+        <Typography className={classes.text}>
+          Google表單:{" "}
+          <a
+            href={"https://forms.gle/xQ5BPh6A3KaQF8NU8"}
+            style={{ overflow: "hidden", color: "#b2ebf2" }}
+          >
+            {"https://forms.gle/xQ5BPh6A3KaQF8NU8"}
+          </a>
         </Typography>
       </Grid>
     </Grid>

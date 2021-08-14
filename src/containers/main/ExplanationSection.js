@@ -85,8 +85,8 @@ const StyledDotGroup = styled(DotGroup)`
 `;
 const message = `選擇課程後，對所有教授設置志願序。全部為高年級優先，後續事宜交由加簽處理。 `;
 const message2 = `對所有時段設置志願序。無特定年級優先，後續事宜交由開學後的實驗meeting處理。 `;
-const message4 = `通常是全部選上，若遇到需要抽籤情況，抽籤方式爲＂隨機＋人工篩選＂。人工篩選：若學術部判定隨機抽籤的結果會引起爭議時，我們會考慮年級、十選二修課紀錄等等情節，手動調整並將修課機會合理地讓給未來較無機會再修習的人。`;
-const message5 = `依據實驗年及保障而有所改變，若優先順序與年級相關，則會先依年級分類，再利用random去排序同年級的優先順序。演算法會先以每人選＂只能選上一門課＂為前提先做一次分發，分發完再利用剩下的空位再分發一次。此外，已選上＂數電實驗＂的同學算＂已抽中一次＂，因此抽籤時不會參加到十選二的第一次分發。＂光電實驗＂及＂電磁波實驗＂設有＂年級保障名額＂。演算法利用十選二實驗有兩次分發的特性，第一次分發會先把該課程選項的人數上限設為保障名額人數，保障年級優先進行分發，第二次分發再＂開放剩餘名額＂，且調成無年級優先進行分發。（而若選該課的保障年級學生很少，可能就不會到達保障名額人數。）`;
+const message4 = `通常是全部選上，若遇到需要抽籤情況，抽籤方式為 "隨機+人工篩選" 。人工篩選：若學術部判定隨機抽籤的結果會引起爭議時，我們會考慮年級、十選二修課紀錄等等情節，手動調整並將修課機會合理地讓給未來較無機會再修習的人。`;
+const message5 = `依據實驗年級保障而有所改變，若優先順序與年級相關，則會先依年級分類，再利用random去排序同年級的優先順序。演算法會先以每人選只能選上一門課為前提先做第一次分發，分發完再利用剩下的空位再分發一次。此外，已選上數電實驗的同學算已抽中一次，因此抽籤時不會參加到十選二的第一次分發。光電實驗及電磁波實驗設有年級保障名額。演算法利用十選二實驗有兩次分發的特性，第一次分發先把該課程選項的人數上限設為保障名額人數，保障年級為優先進行分發，第二次分發再開放剩餘名額，並調成無年級優先進行分發，即可保障該年級人數能盡可能到達保障人數。（但如果選該課的保障年級學生人數很少，可能就不會到達保障名額人數）`;
 export default function Explanation() {
   const classes = useStyles();
   const isMobile = useMediaQuery({ query: "(max-width: 480px,)" }); //只是控制頁數和上面的選擇器無關
@@ -120,7 +120,7 @@ export default function Explanation() {
           // dragEnabled={false}
         >
           <Slider>
-          <StyledSlide index={0}>
+            <StyledSlide index={0}>
               <Scrollbars>
                 <Card
                   message={message}
@@ -154,6 +154,7 @@ export default function Explanation() {
                   note={
                     "NOTE：人工篩選會完全透明公開，非黑箱作業。黑箱作業對學術部沒有任何好處，請知悉。"
                   }
+                  link={"https://forms.gle/GBHURqUTTd8dQxv28"}
                   step={"STEP1"}
                 />
               </Scrollbars>
@@ -164,24 +165,26 @@ export default function Explanation() {
                   message={message5}
                   title={"九實驗志願抽籤"}
                   icon={BatteryCharging60Icon}
-                  note={"NOTE：第一／第二次分發表示演算法內部運作過程，與第一／第二階段選課不同。"}
+                  note={
+                    "NOTE：請注意，第一 / 第二次分發表示演算法內部運作過程，與第一 / 第二階段選課不同。"
+                  }
                   step={"STEP2"}
                 />
               </Scrollbars>
             </StyledSlide>
             <StyledSlide index={5}>
               <Scrollbars>
-                <Card4/>
+                <Card4 />
               </Scrollbars>
             </StyledSlide>
             <StyledSlide index={6}>
               <Scrollbars>
-                <Card5/>
+                <Card5 />
               </Scrollbars>
             </StyledSlide>
             <StyledSlide index={7}>
               <Scrollbars>
-                <Card6/>
+                <Card6 />
               </Scrollbars>
             </StyledSlide>
           </Slider>

@@ -3,18 +3,18 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Avatar from "@material-ui/core/Avatar";
-import AssistantPhotoIcon from '@material-ui/icons/AssistantPhoto';
+import AssistantPhotoIcon from "@material-ui/icons/AssistantPhoto";
 import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
   title: {
     padding: "10px",
-    textAlign: "center"
+    textAlign: "center",
   },
   avatar: {
     margin: "0 15px",
     width: theme.spacing(4),
-    height: theme.spacing(4)
+    height: theme.spacing(4),
     // width:'10%',
   },
   gridStyle: {
@@ -22,14 +22,14 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     flexDirection: "row",
     alignItems: "center",
-    marginTop: "10%"
+    marginTop: "10%",
     // padding: "25px 20px"
   },
   subtitle: {
     color: "white",
     fontSize: "1.2rem",
     marginBottom: "5%",
-    textAlign: "center"
+    textAlign: "center",
   },
   paragraph: {
     width: "100%",
@@ -40,24 +40,21 @@ const useStyles = makeStyles((theme) => ({
     opacity: ".8",
     lineHeight: "1.8",
     textIndent: "32px",
-    letterSpacing: "1px"
+    letterSpacing: "1px",
   },
   text: {
     fontSize: "16px",
     padding: "5%",
     opacity: ".8",
     lineHeight: "２",
-    letterSpacing: "1.2px"
-  }
+    letterSpacing: "1.2px",
+  },
 }));
 const message = `今年的演算法採用與指考分發演算法相似的Stable Marriage Problem，即學生與課程選項都有各自的志願。課程志願產生流程：`;
 export default function Card6() {
   const classes = useStyles();
   return (
-    <Grid
-      container
-      style={{ padding: "10px" }}
-    >
+    <Grid container style={{ padding: "10px" }}>
       <Grid item className={classes.gridStyle}>
         <Avatar component={AssistantPhotoIcon} className={classes.avatar} />
         <Typography className={classes.subtitle}>補充</Typography>
@@ -66,25 +63,27 @@ export default function Card6() {
         item
         style={{
           display: "flex",
-          flexDirection: "column"
+          flexDirection: "column",
         }}
       >
         <Typography className={classes.paragraph}>{message}</Typography>
         <div style={{ margin: "3% 5% 3% 5%" }}>
           <Typography className={classes.text}>
-            １．每個人的起始優先度是０
+            １. 每個人的起始優先度是 0
           </Typography>
           <Typography className={classes.text}>
-            ２．如果遇到有高年級優先的客，根據你是Ｘ年級優先度加Ｘ（４年級以上算４年級）
+            ２. 如果遇到有高年級優先的課，根據你是 X 年級優先度加 X (4
+            年級以上算 4 年級)
           </Typography>
           <Typography className={classes.text}>
-            ３．如果你是大Ｘ優先而且你是大Ｘ，則優先度加１如果你是大Ｘ優先而且你是大Ｘ，則優先度加１
+            ３. 如果是大 X 優先而且你是大 X，則您的優先度加 1。
           </Typography>
           <Typography className={classes.text}>
-            ４．依上述規則產生該課程／實驗的優先度列表，若有一群學生的優先度相同則用random隨機排序
+            ４.
+            依上述規則產生該課程/實驗的優先度列表，若有一群學生的優先度相同則用random隨機排序。
           </Typography>
           <Typography className={classes.text}>
-            ５．依照Stable Marriage Problem的方式進行分發
+            ５. 依照Stable Marriage Problem的方式進行分發。
           </Typography>
         </div>
       </Grid>

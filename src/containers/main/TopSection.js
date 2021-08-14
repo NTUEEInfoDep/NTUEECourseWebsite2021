@@ -86,7 +86,7 @@ export default function Top() {
       flexGrow: 1,
       width: "100%",
       height: "100vh",
-      overflow:"auto",
+      overflow: "auto",
     },
     paper: {
       background: "rgb(0,0,0,.0)",
@@ -94,9 +94,7 @@ export default function Top() {
     },
     text: {
       margin: "auto",
-
       textAlign: "start",
-      textDecoration: "underline",
       width: "80%",
     },
     time: {
@@ -142,10 +140,9 @@ export default function Top() {
                 NTUEE
               </Typography>
               <Typography
-                gutterBottom
-                variant="h4"
+                variant="h3"
                 className={classes.text}
-                style={{ marginBottom: "20px" }}
+                style={{ marginBottom: "18px" }}
               >
                 Pre-selection
               </Typography>

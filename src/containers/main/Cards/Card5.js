@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 const useStyles = makeStyles((theme) => ({
   title: {
     padding: "10px",
-    textAlign: "center"
+    textAlign: "center",
   },
   avatar: {
     margin: "0 15px",
@@ -23,13 +23,13 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     flexDirection: "row",
     alignItems: "center",
-    marginTop: "10%"
+    marginTop: "10%",
     // padding: "25px 20px"
   },
   subtitle: {
     fontSize: "1.2rem",
     marginBottom: "5%",
-    textAlign: "center"
+    textAlign: "center",
   },
   paragraph: {
     width: "100%",
@@ -40,65 +40,58 @@ const useStyles = makeStyles((theme) => ({
     opacity: ".8",
     lineHeight: "1.8",
     textIndent: "32px",
-    letterSpacing: "1px"
+    letterSpacing: "1px",
   },
   text: {
     color: "white",
     fontSize: "16px",
-    padding: "3%",
     opacity: ".8",
     lineHeight: "1.5",
-    letterSpacing: "1px"
-  }
+    letterSpacing: "1px",
+  },
 }));
 const message = `針對已選上實驗課的同學，進行時段分配。`;
 export default function Card5() {
   const classes = useStyles();
   return (
-    <Grid
-      container
-      style={{ padding: "10px" }}
-    >
+    <Grid container style={{ padding: "10px" }}>
       <Grid item className={classes.gridStyle}>
-        <Avatar component={BatteryChargingFullIcon} className={classes.avatar} />
+        <Avatar
+          component={BatteryChargingFullIcon}
+          className={classes.avatar}
+        />
         <Typography className={classes.subtitle}>電磁波＆半導體時段</Typography>
       </Grid>
       <Grid
         item
         style={{
           display: "flex",
-          flexDirection: "column"
+          flexDirection: "column",
         }}
       >
         <Typography className={classes.paragraph}>{message}</Typography>
         <div style={{ margin: "3% 13% 3% 13%" }}>
           <Typography className={classes.text}>
-            * 電磁波：兩個時段各12人。
+            電磁波：兩個時段各12人。
           </Typography>
           <Typography className={classes.text} style={{ textIndent: "12px" }}>
-            １．星期二 18:30～21:00
+            １. 星期二 18:30～21:00
           </Typography>
           <Typography className={classes.text} style={{ textIndent: "12px" }}>
-            ２．星期三 18:30～21:00
+            ２. 星期三 18:30～21:00
           </Typography>
         </div>
         <div style={{ margin: "3% 13% 3% 15%" }}>
           <Typography className={classes.text}>
-            * 半導體：兩個時段各5～7人。
+            半導體：兩個時段各5～7人。
           </Typography>
           <Typography className={classes.text} style={{ textIndent: "12px" }}>
-            １．星期一 18:00～21:00
+            １. 星期一 18:00～21:00
           </Typography>
           <Typography className={classes.text} style={{ textIndent: "12px" }}>
-            ２．星期二 18:00～21:00
+            ２. 星期二 18:00～21:00
           </Typography>
         </div>
-        <Typography
-          className={classes.text}
-          style={{ lineHeight: "2", textIndent: "20px" }}
-        >
-          * 以Google表單的方式調查修課同學的時段偏好，再由學術部人工分配時段。
-        </Typography>
       </Grid>
     </Grid>
   );

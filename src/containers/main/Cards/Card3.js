@@ -40,11 +40,19 @@ const useStyles = makeStyles((theme) => ({
     textIndent: "32px",
     letterSpacing: "1px",
   },
+  text: {
+    color: "white",
+    fontSize: "16px",
+    padding: "8px",
+    opacity: ".8",
+    lineHeight: "1.5",
+    letterSpacing: "1px",
+  },
 }));
 
 export default function Card3(props) {
   const classes = useStyles();
-  const { message, title, icon, note, step } = props;
+  const { message, title, icon, note, step, link } = props;
   return (
     <Grid container style={{ padding: "10px" }}>
       <Grid item className={classes.gridStyle}>
@@ -71,6 +79,16 @@ export default function Card3(props) {
       <Grid item>
         <Typography className={classes.paragraph}>{message}</Typography>
         <Typography className={classes.paragraph}>{note}</Typography>
+        {link ? (
+          <Typography className={classes.text}>
+            Google表單:{" "}
+            <a href={link} style={{ overflow: "hidden", color: "#b2ebf2" }}>
+              {link}
+            </a>
+          </Typography>
+        ) : (
+          <></>
+        )}
       </Grid>
     </Grid>
   );
