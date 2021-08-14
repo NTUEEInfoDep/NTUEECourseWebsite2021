@@ -45,13 +45,20 @@ module.exports = (outputFile) => {
       {},
       { _id: 0, __v: 0, password: 0 }
     ).exec();
-    fs.writeFileSync(selectionsOutputPath, JSON.stringify(students));
-    console.log("Student selections export finished!");
+    fs.writeFileSync(studentsOutputPath, JSON.stringify(students));
+    console.log("Student export finished!");
 
     const courses = await model.Course.find({}, { _id: 0, __v: 0 }).exec();
     fs.writeFileSync(coursesOutputPath, JSON.stringify(courses));
-
     console.log("Course export finished!");
+
+    const selections = await model.Selection.find(
+      {},
+      { _id: 0, __v: 0, password: 0 }
+    ).exec();
+    fs.writeFileSync(selectionsOutputPath, JSON.stringify(selections));
+    console.log("Selections export finished!");
+
     // Disconnect
     await mongoose.disconnect();
   });
