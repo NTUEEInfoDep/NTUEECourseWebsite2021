@@ -2,6 +2,7 @@
 
 const resetMongo = require("./mongo/reset");
 const exportSelections = require("./mongo/export");
+const admin = require("./mongo/admin");
 
 // ========================================
 
@@ -18,17 +19,25 @@ require("yargs") // eslint-disable-line
   .command(
     "export",
     "Export student selections to server/database/private-data/ folder.",
+    () => {},
+    (argv) => {
+      exportSelections(argv.f);
+    }
+  )
+  .command(
+    "admin",
+    "Modify admin password",
     (yargs) => {
-      yargs.option("f", {
-        alias: "file",
+      yargs.option("p", {
+        alias: "password",
         demandOption: true,
-        default: "selections.json",
-        describe: "The output filename.",
+        default: "1111",
+        describe: "Modify default vlaue to change new Password",
         type: "string",
       });
     },
     (argv) => {
-      exportSelections(argv.f);
+      admin(argv.password);
     }
   )
   .command(

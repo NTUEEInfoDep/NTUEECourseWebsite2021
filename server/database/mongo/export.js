@@ -8,10 +8,27 @@ const model = require("./model");
 
 // ========================================
 
-const { MONGO_HOST, MONGO_DBNAME } = process.env;
-
 module.exports = (outputFile) => {
-  const outputPath = path.resolve(__dirname, "../private-data", outputFile);
+  if (process.env.NODE_ENV === "development") {
+    console.log("NODE_ENV = development");
+    require("dotenv").config();
+  }
+  const { MONGO_HOST, MONGO_DBNAME } = process.env;
+  const selectionsOutputPath = path.resolve(
+    __dirname,
+    "../private-data",
+    "selections.json"
+  );
+  const coursesOutputPath = path.resolve(
+    __dirname,
+    "../private-data",
+    "courses.json"
+  );
+  const studentsOutputPath = path.resolve(
+    __dirname,
+    "../private-data",
+    "students.json"
+  );
   mongoose.connect(`mongodb://${MONGO_HOST}/${MONGO_DBNAME}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -28,9 +45,13 @@ module.exports = (outputFile) => {
       {},
       { _id: 0, __v: 0, password: 0 }
     ).exec();
-    fs.writeFileSync(outputPath, JSON.stringify(students));
+    fs.writeFileSync(selectionsOutputPath, JSON.stringify(students));
     console.log("Student selections export finished!");
 
+    const courses = await model.Course.find({}, { _id: 0, __v: 0 }).exec();
+    fs.writeFileSync(coursesOutputPath, JSON.stringify(courses));
+
+    console.log("Course export finished!");
     // Disconnect
     await mongoose.disconnect();
   });
