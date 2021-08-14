@@ -1219,6 +1219,26 @@
           }
         }
       }
+    },
+    "/statistics.csv": {
+      "get": {
+        "tags": ["Distribution"],
+        "summary": "generate distrubution result",
+        "description": "get distribution result (csv)<br><h2>要先跑 /distribute.</h2> Need Authority: Admin",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/csv": {
+                "schema": {
+                  "type": "string",
+                  "example": "studentID,courseName,optionName\nB00000000,電路學,老師A\nB11111111,機率與統計,老師H"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
