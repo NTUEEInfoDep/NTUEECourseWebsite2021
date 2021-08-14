@@ -17,6 +17,7 @@ export default function Top() {
   //get start time and end time
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
+  const [showLeft, setShowLeft] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -28,7 +29,7 @@ export default function Top() {
       }
     };
     fetchData();
-  }, [start,end]); // [] only run the first time
+  }, [start, end]); // [] only run the first time
 
   const { authority } = useSelector(selectSession);
   //count left time
@@ -36,16 +37,19 @@ export default function Top() {
   const [leftHours, setLeftHours] = useState("00");
   const [leftMinutes, setLeftMinutes] = useState("00");
   const [leftSeconds, setLeftSeconds] = useState("00");
-  
+
   let timer = useRef();
-  
 
   // let interval = useRef();
   const countDown = () => {
     //intervalId
-      timer = setInterval(() => {
+    timer = setInterval(() => {
       const now = new Date().getTime();
       const gap = end * 1000 - now;
+      if (now - start * 1000 < 0) {
+        setShowLeft(false);
+        return;
+      }
 
       const second = 1000;
       const minute = second * 60;
@@ -56,9 +60,9 @@ export default function Top() {
       const textHour = Math.floor((gap % day) / hour);
       const textMinute = Math.floor((gap % hour) / minute);
       const textSecond = Math.floor((gap % minute) / second);
-
-      if (gap < 0) {
-        alert("Time's up! You cannot preselect courses any more!")
+      setShowLeft(true);
+      if (gap < 0 && authority == 0) {
+        alert("Time's up! You cannot preselect courses any more!");
         clearInterval(timer);
       } else {
         setLeftDays(textDay);
@@ -67,13 +71,13 @@ export default function Top() {
         setLeftSeconds(textSecond);
       }
     }, 1000);
-    };
+  };
   useEffect(() => {
     countDown();
     return () => {
       if (timer) clearInterval(timer);
     };
-  },[end]);
+  }, [end]);
 
   var moment = require("moment");
 
@@ -110,7 +114,9 @@ export default function Top() {
   return (
     <Element name="title">
       <div className={classes.root}>
-        {authority===2 && <PickTime handleSetStart={setStart} handleSetEnd={setEnd}/>}
+        {authority === 2 && (
+          <PickTime handleSetStart={setStart} handleSetEnd={setEnd} />
+        )}
         <Grid
           container
           direction="column"
@@ -148,9 +154,14 @@ export default function Top() {
               <Typography gutterBottom variant="h6" className={classes.time}>
                 結束: {moment(end * 1000).format("YYYY-MM-DD HH:mm:ss")}
               </Typography>
-              <Typography gutterBottom variant="h6" className={classes.time}>
-                剩餘: {leftDays}天{leftHours}小時{leftMinutes}分{leftSeconds}秒
-              </Typography>
+              {showLeft ? (
+                <Typography gutterBottom variant="h6" className={classes.time}>
+                  剩餘: {leftDays}天{leftHours}小時{leftMinutes}分{leftSeconds}
+                  秒
+                </Typography>
+              ) : (
+                <></>
+              )}
             </Grid>
           </Paper>
         </Grid>

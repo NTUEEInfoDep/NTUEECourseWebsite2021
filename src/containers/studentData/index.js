@@ -76,6 +76,7 @@ export default function StudentData() {
   const [selected, setSelected] = React.useState([]);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [deleteIds, setDeleteIds] = React.useState([]);
+  const [invalidDelete, setInvalidDelete] = React.useState(false);
   const [regenerateOpen, setRegenerateOpen] = React.useState(false);
   const [downloadOpen, setDownloadOpen] = React.useState(false);
   const [invalidRegenerate, setInvalidRegenerate] = React.useState(false);
@@ -239,7 +240,15 @@ export default function StudentData() {
   };
 
   const handleOpenDelete = (ids) => {
-    setDeleteIds(ids);
+    if (
+      data.filter((e) => ids.includes(e.id)).filter((e) => e.authority === 2)
+        .length !== 0
+    ) {
+      setInvalidDelete(true);
+    } else {
+      setInvalidDelete(false);
+      setDeleteIds(ids);
+    }
     setDeleteOpen(true);
   };
 
@@ -744,35 +753,55 @@ export default function StudentData() {
         open={deleteOpen}
         onClose={handleCloseDelete}
       >
-        <DialogTitle id="simple-dialog-title">
-          Are you sure to delete {deleteIds.length} students?
-        </DialogTitle>
+        {invalidDelete ? (
+          <DialogTitle id="simple-dialog-title">
+            Students with authority 2 are invalid to delete
+          </DialogTitle>
+        ) : (
+          <DialogTitle id="simple-dialog-title">
+            Are you sure to delete {deleteIds.length} students?
+          </DialogTitle>
+        )}
         <DialogContent>
-          {deleteOpen ? (
-            data
-              .filter((e) => deleteIds.includes(e.id))
-              .map((e) => e.id)
-              .map((id) => (
-                <Typography key={id}>
-                  {`id: ${data.find((e) => e.id === id).id}, 
+          {invalidDelete
+            ? data
+                .filter((e) => selected.includes(e.id))
+                .filter((e) => e.authority === 2)
+                .map((e) => (
+                  <Typography key={e.id}>
+                    {`id: ${e.id}, 
+              name: ${e.name},
+              grade: ${e.grade},
+              authority: ${e.authority}`}
+                  </Typography>
+                ))
+            : data
+                .filter((e) => deleteIds.includes(e.id))
+                .map((e) => e.id)
+                .map((id) => (
+                  <Typography key={id}>
+                    {`id: ${data.find((e) => e.id === id).id}, 
               name: ${data.find((e) => e.id === id).name},
               grade: ${data.find((e) => e.id === id).grade},
               authority: ${data.find((e) => e.id === id).authority}`}
-                </Typography>
-              ))
-          ) : (
-            <></>
-          )}
+                  </Typography>
+                ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDelete}>Cancel</Button>
-          <Button
-            onClick={handleDeleteStudent}
-            variant="contained"
-            color="primary"
-          >
-            Delete
-          </Button>
+          {invalidDelete ? (
+            <Button onClick={handleCloseDelete}>Done</Button>
+          ) : (
+            <>
+              <Button onClick={handleCloseDelete}>Cancel</Button>
+              <Button
+                onClick={handleDeleteStudent}
+                variant="contained"
+                color="primary"
+              >
+                Delete
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
       <Dialog
