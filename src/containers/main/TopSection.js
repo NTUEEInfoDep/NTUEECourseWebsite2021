@@ -85,7 +85,8 @@ export default function Top() {
     root: {
       flexGrow: 1,
       width: "100%",
-      height: "90vh",
+      height: "100vh",
+      overflow:"auto",
     },
     paper: {
       background: "rgb(0,0,0,.0)",
