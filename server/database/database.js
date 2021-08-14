@@ -3,6 +3,7 @@
 const resetMongo = require("./mongo/reset");
 const exportSelections = require("./mongo/export");
 const admin = require("./mongo/admin");
+const clean = require("./mongo/clean");
 
 // ========================================
 
@@ -38,6 +39,14 @@ require("yargs") // eslint-disable-line
     },
     (argv) => {
       admin(argv.password);
+    }
+  )
+  .command(
+    "clean",
+    "Clean selections db",
+    () => {},
+    (argv) => {
+      clean();
     }
   )
   .command(
