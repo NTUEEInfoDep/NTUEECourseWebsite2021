@@ -42,7 +42,7 @@
       "get": {
         "tags": ["Session"],
         "summary": "get current login",
-        "description": "get current userID and authority",
+        "description": "get current userID and authority. Need Authority: User",
         "responses": {
           "200": {
             "description": "Success",
@@ -72,7 +72,7 @@
       "post": {
         "tags": ["Session"],
         "summary": "log in",
-        "description": "log in",
+        "description": "log in. Need Authority: None",
         "requestBody": {
           "required": true,
           "content": {
@@ -124,7 +124,7 @@
       },
       "delete": {
         "tags": ["Session"],
-        "summary": "log out",
+        "summary": "log out. Need Authority: None",
         "description": "delete session",
         "responses": {
           "204": {
@@ -135,7 +135,7 @@
     },
     "/opentime": {
       "get": {
-        "description": "Get open time",
+        "description": "Get open time. Need Authority: None",
         "responses": {
           "200": {
             "description": "Success",
@@ -161,7 +161,7 @@
       },
       "put": {
         "tags": ["Management"],
-        "summary": "update open time",
+        "summary": "update open time. Need Authority: Admin",
         "description": "Change open time",
         "requestBody": {
           "description": "Enter **Unix timestamp**",
@@ -204,7 +204,7 @@
       "get": {
         "tags": ["Course"],
         "summary": "get a list of courses with selected attributes",
-        "description": "Get a list of all courses with selected attributes. <br/>Use query parameters to specify the attributes you want (id is default. Name, type, description and options are optional). <br/>For example, if you wanna get id, name and type, the request will be like \"http://localhost:8000/api/courses?name=1&type=1\"",
+        "description": "Get a list of all courses with selected attributes. <br/>Use query parameters to specify the attributes you want (id is default. Name, type, description and options are optional). <br/>For example, if you wanna get id, name and type, the request will be like \"http://localhost:8000/api/courses?name=1&type=1. Need Authority: User",
         "parameters": [
           {
             "name": "name",
@@ -313,7 +313,7 @@
       "get": {
         "tags": ["User"],
         "summary": "get a list of users with selected attributes",
-        "description": "Get a list of all users with optional attributes. <br/>Use query parameters to specify the attributes you want (id is default. Name, grade, authority are optional). <br/>For example, if you wanna get id, authority, and grade, the request will be like \"http://localhost:8000/api/users?grade=1&authority=1\"",
+        "description": "Get a list of all users with optional attributes. <br/>Use query parameters to specify the attributes you want (id is default. Name, grade, authority are optional). <br/>For example, if you wanna get id, authority, and grade, the request will be like \"http://localhost:8000/api/users?grade=1&authority=1. Need Authority: Maintainer",
         "parameters": [
           {
             "name": "name",
@@ -445,7 +445,7 @@
         }
       },
       "post": {
-        "description": "Add new users",
+        "description": "Add new users. Need Authority: Admin",
         "tags": ["User"],
         "summary": "add users",
         "requestBody": {
@@ -513,7 +513,7 @@
       "delete": {
         "tags": ["User"],
         "summary": "delete certain users",
-        "description": "Delete particular users with a list specifying their ids",
+        "description": "Delete particular users with a list specifying their ids. Need Authority: Admin",
         "requestBody": {
           "required": true,
           "content": {
@@ -546,7 +546,7 @@
       "put": {
         "tags": ["User"],
         "summary": "update students",
-        "description": "Change the content of the student of designated userIDs",
+        "description": "Change the content of the student of designated userIDs. Need Authority: Admin",
         "requestBody": {
           "description": "<h2>authority</h2> <b>2:</b> Admin<br> <b>1:</b> Maintainer<br> <b>0:</b> User",
           "required": true,
@@ -617,7 +617,7 @@
       "put": {
         "tags": ["Management"],
         "summary": "change password",
-        "description": "admin changes certain users' password",
+        "description": "admin changes certain users' password. Need Authority: Admin",
         "requestBody": {
           "required": true,
           "content": {
@@ -672,7 +672,7 @@
       "post": {
         "tags": ["Course"],
         "summary": "add courses",
-        "description": "Add new course",
+        "description": "Add new course. Need Authority: Maintainer",
         "requestBody": {
           "description": "<h2>type</h2> <b>\"1\", \"2\", \"3\", \"4\":</b> 一,二,三,四年級必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗<br><b>\"EE-Lab\":</b> 電電實驗<br><h2>limit</h2>人數上限<br><h2>priority</h2><b>0:</b> 優先序與年級無關<br><b>-1:</b> 高年級優先<br><b>1,2,3,4:</b> 此年級優先<br><b>5:</b> 3,4年級優先<br><h2>以下為兩個課程範例, priority 只有 ten-select-two 會用到，必修及EE-lab無需.description 目前為必要",
           "required": true,
@@ -772,7 +772,7 @@
       "delete": {
         "tags": ["Course"],
         "summary": "delete courses",
-        "description": "Delete courses by **course ID**",
+        "description": "Delete courses by **course ID**. Need Authority: Maintainer",
         "requestBody": {
           "description": "<h2>a list of courseID (string)</h2>",
           "required": true,
@@ -809,7 +809,7 @@
       "put": {
         "tags": ["Course"],
         "summary": "update courses",
-        "description": "Change the content of the course of designated ids",
+        "description": "Change the content of the course of designated ids. Need Authority: Maintainer",
         "requestBody": {
           "description": "<h2>type</h2> <b>\"1\", \"2\", \"3\", \"4\":</b> 一,二,三,四年級必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗<br><b>\"EE-Lab\":</b> 電電實驗<br><h2>limit</h2>人數上限<br><h2>priority</h2><b>0:</b> 優先序與年級無關<br><b>-1:</b> 高年級優先<br><b>1,2,3,4:</b> 此年級優先<br><b>5:</b> 3,4年級優先<br><h2>由 id 指定要更改的課程, update 該課程的剩餘所有項目</h2>",
           "required": true,
@@ -914,7 +914,7 @@
       "post": {
         "tags": ["Distribution"],
         "summary": "分發",
-        "description": "Run distribution algorithm",
+        "description": "Run distribution algorithm. Need Authority: Admin",
         "responses": {
           "201": {
             "description": "Success"
@@ -932,7 +932,7 @@
       "post": {
         "tags": ["Distribution"],
         "summary": "分發(有範圍的)",
-        "description": "Run distribution algorithm(test). <br>If request body is empty, it will run the original distribution; otherwise, it will run the distribution with specific students given by request body.",
+        "description": "Run distribution algorithm(test). <br>If request body is empty, it will run the original distribution; otherwise, it will run the distribution with specific students given by request body. Need Authority: Admin",
         "requestBody": {
           "description": "",
           "required": false,
@@ -985,7 +985,7 @@
       "put": {
         "tags": ["Management"],
         "summary": "update authority",
-        "description": "Change someone's authority",
+        "description": "Change someone's authority. Need Authority: Admin",
         "requestBody": {
           "description": "<h2>authority</h2> <b>2:</b> Admin<br> <b>1:</b> Maintainer<br> <b>0:</b> User",
           "required": true,
@@ -1040,7 +1040,7 @@
       "get": {
         "tags": ["Selection"],
         "summary": "get a user's selection on certain course",
-        "description": "Show the course selection status of a user according to current session",
+        "description": "Show the course selection status of a user according to current session. Need Authority: User",
         "parameters": [
           {
             "name": "courseID",
@@ -1114,7 +1114,7 @@
       "put": {
         "tags": ["Selection"],
         "summary": "select courses",
-        "description": "select course using path parameter and req body<br><h2>Update the selection of a course </h2>",
+        "description": "select course using path parameter and req body<br><h2>Update the selection of a course. </h2> Need Authority: User",
         "parameters": [
           {
             "name": "courseID",
@@ -1165,7 +1165,7 @@
       "put": {
         "tags": ["Distribution"],
         "summary": "數電實驗預選",
-        "description": "update preselect",
+        "description": "update preselect. Need Authority: Admin",
         "requestBody": {
           "description": "send a list of userIDs that are preselected in 數電實驗",
           "required": true,
@@ -1204,7 +1204,27 @@
       "get": {
         "tags": ["Distribution"],
         "summary": "generate distrubution result",
-        "description": "get distribution result (csv)<br><h2>要先跑 /distribute</h2>",
+        "description": "get distribution result (csv)<br><h2>要先跑 /distribute.</h2> Need Authority: Admin",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/csv": {
+                "schema": {
+                  "type": "string",
+                  "example": "studentID,courseName,optionName\nB00000000,電路學,老師A\nB11111111,機率與統計,老師H"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics.csv": {
+      "get": {
+        "tags": ["Distribution"],
+        "summary": "generate distrubution result",
+        "description": "get distribution result (csv)<br><h2>要先跑 /distribute.</h2> Need Authority: Admin",
         "responses": {
           "200": {
             "description": "Success",
