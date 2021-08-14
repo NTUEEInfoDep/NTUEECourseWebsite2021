@@ -65,7 +65,7 @@ module.exports = (outputFile) => {
       { _id: 0, __v: 0 }
     ).exec();
     fs.writeFileSync(preSelectionsOutputPath, JSON.stringify(preSelections));
-    console.log("Selections export finished!");
+    console.log("PreSelections export finished!");
 
     // Disconnect
     await mongoose.disconnect();
