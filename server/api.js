@@ -802,10 +802,12 @@ router.get(
         if (selection.length > 0) count += 1;
         numbers[result.length] += 1;
         result.forEach((re) => {
-          const order = selection.find(
-            (sel) => sel.name === re.optionName
-          ).ranking;
-          choices[order - 1] += 1;
+          if (re.optionName !== "數電實驗") {
+            const order = selection.find(
+              (sel) => sel.name === re.optionName
+            ).ranking;
+            choices[order - 1] += 1;
+          }
         });
       });
       numbers[0] = count - numbers[1] + numbers[2];
