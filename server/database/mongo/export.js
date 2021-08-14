@@ -16,18 +16,19 @@ module.exports = (outputFile) => {
   const { MONGO_HOST, MONGO_DBNAME } = process.env;
   const selectionsOutputPath = path.resolve(
     __dirname,
-    "../private-data",
-    "selections.json"
+    "../private-data/selections.json"
   );
   const coursesOutputPath = path.resolve(
     __dirname,
-    "../private-data",
-    "courses.json"
+    "../private-data/courses.json"
   );
   const studentsOutputPath = path.resolve(
     __dirname,
-    "../private-data",
-    "students.json"
+    "../private-data/students.json"
+  );
+  const preSelectionsOutputPath = path.resolve(
+    __dirname,
+    "../private-data/preselections.json"
   );
   mongoose.connect(`mongodb://${MONGO_HOST}/${MONGO_DBNAME}`, {
     useNewUrlParser: true,
@@ -54,9 +55,16 @@ module.exports = (outputFile) => {
 
     const selections = await model.Selection.find(
       {},
-      { _id: 0, __v: 0, password: 0 }
+      { _id: 0, __v: 0 }
     ).exec();
     fs.writeFileSync(selectionsOutputPath, JSON.stringify(selections));
+    console.log("Selections export finished!");
+
+    const preSelections = await model.Selection.find(
+      {},
+      { _id: 0, __v: 0 }
+    ).exec();
+    fs.writeFileSync(preSelectionsOutputPath, JSON.stringify(preSelections));
     console.log("Selections export finished!");
 
     // Disconnect

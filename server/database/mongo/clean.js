@@ -34,6 +34,9 @@ module.exports = () => {
     await model.Selection.deleteMany({});
     console.log("Clean all selections!!!");
 
+    await model.Preselect.deleteMany({});
+    console.log("Clean all preselect!!!");
+
     // Disconnect
     await mongoose.disconnect();
   });
