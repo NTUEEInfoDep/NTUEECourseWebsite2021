@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     immutable: false,
   },
-  selections,
+  // selections,
 });
 
 const Student = mongoose.model("Student", userSchema);
