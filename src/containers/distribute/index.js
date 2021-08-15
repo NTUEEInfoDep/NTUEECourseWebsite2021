@@ -31,6 +31,7 @@ import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import CallSplitIcon from "@material-ui/icons/CallSplit";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import { Add } from "@material-ui/icons";
+import example from "./preselectExample.png";
 
 // api
 import { DistributeAPI, CourseAPI, StudentDataAPI } from "../../api";
@@ -78,6 +79,12 @@ const useStyles = makeStyles((theme) => ({
     backgroundImage:
       "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
     boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
+  },
+  img: {
+    margin: "auto",
+    display: "block",
+    maxWidth: "min(100%,400px)",
+    maxHeight: "100%",
   },
 }));
 const columns = [
@@ -176,17 +183,21 @@ export default function Distribute() {
         complete(results) {
           let valid = true;
           let exist = true;
-          results.data[0].forEach((student) => {
-            if (!/^(b|r|d)\d{8}$/i.test(student)) {
+          console.log(results.data);
+          results.data.forEach((student) => {
+            if (!/^(b|r|d)\d{8}$/i.test(student[0])) {
               valid = false;
             }
-            if (!data.includes(student.toUpperCase())) {
+            if (!data.includes(student[0].toUpperCase())) {
               exist = false;
               nonExist.push(student);
             }
           });
           if (valid && exist) {
-            setPreselectData(results.data[0]);
+            const newData = results.data.reduce((obj, cur) => {
+              return obj.concat([cur[0].toUpperCase()]);
+            }, []);
+            setPreselectData(newData);
             setPreselectLoaded(true);
             setPreselectFilename(efile.name);
             return;
@@ -362,7 +373,8 @@ export default function Distribute() {
                   preselected for "DC Lab".
                 </Typography>
                 <Typography>
-                  ( Format example: "B00000001,B00000002,B00000003" )
+                  Format example:
+                  <img className={classes.img} src={example} />
                 </Typography>
                 <br />
                 <Typography>
@@ -480,12 +492,6 @@ export default function Distribute() {
                     Add
                   </Button>
                 </div>
-
-                {preselectUploaded
-                  ? preselectData.map((id) => (
-                      <Typography key={id}>{id}</Typography>
-                    ))
-                  : ""}
                 {loading ? (
                   <div className={classes.actionsContainer}>
                     <Fade
