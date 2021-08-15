@@ -760,63 +760,23 @@ router.get(
   "/statistics.csv",
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
-    const courses = await model.Course.find({}).exec();
-    const students = await model.Student.find({}).exec();
-    const allSelections = await model.Selection.find({}).exec();
-    const allResults = await model.Result.find({}).exec();
-
-    const rows = [
-      [
-        "courseName",
-        "中0個",
-        "中1個",
-        "中2個",
-        "第1志願",
-        "第2志願",
-        "第3志願",
-        "第4志願",
-        "第5志願",
-        "第6志願",
-        "第7志願",
-        "第8志願",
-        "第9志願",
-        "第10志願",
-      ],
-    ];
-    courses.forEach((course) => {
-      const numbers = [0, 0, 0];
-      const choices = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      let count = 0;
-      const selections = allSelections.filter(
-        (selection) => selection.courseID === course.id
+    const resp = await fetch(
+      `http://${DISTRIBUTE_SERVER_HOST}:${DISTRIBUTE_SERVER_PORT}/statistics`,
+      {
+        method: "GET",
+      }
+    );
+    const csvString = await resp.text();
+    if (resp.ok) {
+      res.setHeader("content-type", "application/csv");
+      res.setHeader(
+        "content-disposition",
+        "attachment; filename=statistics.csv"
       );
-      const results = allResults.filter(
-        (result) => result.courseName === course.name
-      );
-
-      students.forEach((student) => {
-        const result = results.filter((re) => re.studentID === student.userID);
-        const selection = selections.filter(
-          (sel) => sel.userID === student.userID
-        );
-        if (selection.length > 0) count += 1;
-        numbers[result.length] += 1;
-        result.forEach((re) => {
-          if (re.optionName !== "數電實驗") {
-            const order = selection.find(
-              (sel) => sel.name === re.optionName
-            ).ranking;
-            choices[order - 1] += 1;
-          }
-        });
-      });
-      numbers[0] = count - numbers[1] + numbers[2];
-      rows.push([course.name, ...numbers, ...choices]);
-    });
-    const output = await csvStringifyPromise(rows);
-    res.setHeader("content-type", "application/csv");
-    res.setHeader("content-disposition", "attachment; filename=statistics.csv");
-    res.status(200).send(output);
+      res.status(200).send(csvString);
+    } else {
+      res.status(400).end();
+    }
   })
 );
 

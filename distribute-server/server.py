@@ -1,9 +1,9 @@
 import os
 from pymongo import MongoClient
-from flask import Flask, request
+from flask import Flask, request, Response
 
 from algorithm import Algorithm, Course, Student
-
+from statistics import Analysis
 # ========================================
 
 app = Flask(__name__)
@@ -74,7 +74,7 @@ def getCourseid(raw_courses):
     return name
 
 
-def genStudent(raw_student, raw_selection, course_id, student_in_course_data =
+def genStudent(raw_student, raw_selections, course_id, student_in_course_data =
         {}):
     students = []
     for data in raw_student.find():  # iterate through all students
@@ -85,10 +85,10 @@ def genStudent(raw_student, raw_selection, course_id, student_in_course_data =
                     continue
             result_selection[name] = []
             # all selections made by a student of certain course
-            student_selections = raw_selection.find(
+            student_selections = raw_selections.find(
                 {"userID": data["userID"], "courseID": name})
             for i in range(len(list(student_selections))):
-                rank_i_selection = raw_selection.find(
+                rank_i_selection = raw_selections.find(
                     {"userID": data["userID"], "courseID": name, "ranking": i + 1})  # the (i+1)th selection
                 for ith_option in rank_i_selection:
                     result_selection[name].append(ith_option["name"])
@@ -103,6 +103,7 @@ def genPreselect(raw_preselects):
     for data in raw_preselects.find():
         preselects.append(data["userID"])
     return preselects
+
 # ========================================
 @app.route("/")
 def index():
@@ -113,7 +114,7 @@ def index():
 def distribute():
     client = MongoClient(MONGO_HOST, MONGO_PORT)
     db = client[MONGO_DBNAME]
-    raw_selection = db["selections"]
+    raw_selections = db["selections"]
     raw_students = db["students"]
     raw_courses = db["courses"]
     raw_preselects = db["preselects"]
@@ -124,7 +125,7 @@ def distribute():
         return "Invalid course type detected", 400
 
     course_names = getCourseid(raw_courses)
-    students = genStudent(raw_students, raw_selection, course_names)
+    students = genStudent(raw_students, raw_selections, course_names)
 
     preselects = genPreselect(raw_preselects)
 
@@ -134,11 +135,12 @@ def distribute():
     client.close()
     return ""
 
+
 @app.route("/specific_distribute", methods=["POST"])
 def specific_distribute():
     client = MongoClient(MONGO_HOST, MONGO_PORT)
     db = client[MONGO_DBNAME]
-    raw_selection = db["selections"]
+    raw_selections = db["selections"]
     raw_students = db["students"]
     raw_courses = db["courses"]
     raw_preselects = db["preselects"]
@@ -157,7 +159,7 @@ def specific_distribute():
         except ValueError:
             return "Invalid course type detected", 400
 
-        students = genStudent(raw_students, raw_selection, course_names)
+        students = genStudent(raw_students, raw_selections, course_names)
 
         preselects = genPreselect(raw_preselects)
 
@@ -172,7 +174,7 @@ def specific_distribute():
             except ValueError:
                 return "Invalid course type detected", 400
 
-            students = genStudent(raw_students, raw_selection, course_names,
+            students = genStudent(raw_students, raw_selections, course_names,
                     student_in_course_data)
 
             preselects = genPreselect(raw_preselects)
@@ -184,6 +186,30 @@ def specific_distribute():
     client.close()
     return ""
 
+
+@app.route("/statistics", methods=["GET"])
+def statistics():
+    client = MongoClient(MONGO_HOST, MONGO_PORT)
+    db = client[MONGO_DBNAME]
+    raw_selections = db["selections"]
+    raw_students = db["students"]
+    raw_courses = db["courses"]
+    raw_results = db["results"]
+
+    try:
+        courses = genCourse(raw_courses)
+    except ValueError:
+        return "Invalid course type detected", 400
+
+    course_names = getCourseid(raw_courses)
+    students = genStudent(raw_students, raw_selections, course_names)
+    results = [result for result in raw_results.find()]
+    
+    analysis = Analysis(courses, students, results)
+    analysis.analyze()
+    analysis.analyze_grade()
+    csv_string = analysis.to_csv()
+    return Response(csv_string, mimetype='text/plain')
 # ========================================
 
 
