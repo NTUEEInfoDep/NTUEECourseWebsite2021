@@ -8,6 +8,7 @@ class Analysis():
         self._students = students
         self._results = results
         self._analysis_grade_dict = dict()
+        self._analysis_selections_grade_dict = dict()
         self._selctions_df = None
         self._result_df = None
         self._analysis_order_df = None  
@@ -123,30 +124,37 @@ class Analysis():
         
         self._analysis_grade_dict = analysis_dict   
 
-    # def analyze_selection_grade(self):
-    #     analysis_dict = dict()
-
-    #     for course in self._courses:
-    #         course_id = course._id
-    #         for option_name in course._options:
-    #             option_full_name = "%s_%s" % (course_id, option_name)
-    #             df_index = [("大%d") % (i+1) for i in range(4)]
-    #             df_columns = [("第%d志願") % (i+1) for i in range(len(course._options)))]
-    #             df = pd.DataFrame(0, index=df_index, columns=df_column)
-                
-    #             df[option_full_name]
+    def analyze_selection_grade(self):
+        analysis_dict = dict()
+        for course in self._courses:
+            course_id = course._id
+            analysis_dict[course_id] = dict()
+            for option_name in course._options:
+                option_full_name = "%s_%s" % (course_id, option_name)
+                df_index = [("大%d") % (i+1) for i in range(4)]
+                df_column = [("第%d志願") % (i+1) for i in range(len(course._options))]
+                df = pd.DataFrame(0, index=df_index, columns=df_column)
+                for student in self._students:
+                    student_grade = min(student._grade, 4)
+                    student_id = student._id
+                    rank = self._selections_df[option_full_name][student_id]
+                    if rank:
+                        df[df_column[rank-1]][df_index[student_grade-1]] += 1
+                analysis_dict[course_id][option_name] = df.copy(deep=True)
+        
+        self._analysis_selections_grade_dict = analysis_dict
 
     def to_csv(self):
         csv_string = ""
         
         if type(self._analysis_order_df) != type(None):
-            csv_string += "以下為結果志願分析\n"
+            csv_string += "以下為結果與志願分析\n"
             analysis_string = io.StringIO()
             self._analysis_order_df.to_csv(analysis_string)
             csv_string += analysis_string.getvalue()
         
         if len(self._analysis_grade_dict) > 0:
-            csv_string += "\n以下為個個結果年級分析\n"
+            csv_string += "\n以下為結果與年級分析\n"
             for course_name in self._analysis_grade_dict:
                 new_string = io.StringIO()
                 self._analysis_grade_dict[course_name].to_csv(new_string)
@@ -154,4 +162,17 @@ class Analysis():
                 csv_string += new_string.getvalue()
                 csv_string += "\n"
         
+        if len(self._analysis_selections_grade_dict) > 0:
+            csv_string += "\n以下為選填志願與年級分析\n"
+            for course_name in self._analysis_selections_grade_dict:
+                analysis_course_dict = self._analysis_selections_grade_dict[course_name]
+                csv_string += "%s\n" % course_name
+                for option_name in analysis_course_dict:
+                    analysis_option_dict = analysis_course_dict[option_name]
+                    new_string = io.StringIO()
+                    analysis_option_dict.to_csv(new_string)
+                    csv_string += "%s\n" % option_name
+                    csv_string += new_string.getvalue()
+                    csv_string += "\n"
+
         return csv_string
