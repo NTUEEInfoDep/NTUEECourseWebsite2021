@@ -60,7 +60,7 @@ module.exports = (outputFile) => {
     fs.writeFileSync(selectionsOutputPath, JSON.stringify(selections));
     console.log("Selections export finished!");
 
-    const preSelections = await model.Selection.find(
+    const preSelections = await model.Preselect.find(
       {},
       { _id: 0, __v: 0 }
     ).exec();
