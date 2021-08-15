@@ -74,7 +74,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (
-      /^(b|r|d)\d{8}$/i.test(values.account) &&
+      // /^(b|r|d)\d{8}$/i.test(values.account) &&
       !/^$/i.test(values.password)
     ) {
       values.error = false;

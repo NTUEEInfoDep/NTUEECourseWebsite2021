@@ -323,7 +323,7 @@ export default function StudentData() {
           let repeat = false;
           results.data.slice(1).forEach((student) => {
             if (
-              !/^(b|r|d)\d{8}$/i.test(student[0]) ||
+              // !/^(b|r|d)\d{8}$/i.test(student[0]) ||
               !student[1] ||
               !/^\d+$/.test(student[2])
             ) {
@@ -514,11 +514,13 @@ export default function StudentData() {
       newErrors = { ...newErrors, id: true };
       newErrorsMsg = { ...newErrorsMsg, id: "id should not be empty" };
       error = true;
-    } else if (!/^(b|r|d)\d{8}$/i.test(newStudent.id)) {
-      newErrors = { ...newErrors, id: true };
-      newErrorsMsg = { ...newErrorsMsg, id: "id invalid format" };
-      error = true;
-    } else if (editId === "" && testRepeatId(newStudent.id)) {
+    }
+    // else if (!/^(b|r|d)\d{8}$/i.test(newStudent.id)) {
+    //   newErrors = { ...newErrors, id: true };
+    //   newErrorsMsg = { ...newErrorsMsg, id: "id invalid format" };
+    //   error = true;
+    // }
+    else if (editId === "" && testRepeatId(newStudent.id)) {
       newErrors = { ...newErrors, id: true };
       newErrorsMsg = { ...newErrorsMsg, id: "repeat userId" };
       error = true;
