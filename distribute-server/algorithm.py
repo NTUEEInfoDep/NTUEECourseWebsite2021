@@ -146,7 +146,8 @@ class Option:
             None
         '''
         if self._priority == 6 or self._priority == 7:
-            random.shuffle(self._priority_list)
+            self._priority_list = []
+            self.make_priority_list()
             self._limit = self._real_limit
 
 
@@ -354,7 +355,7 @@ class Course:
                 for i, option in enumerate(student._options[self._id]):
                     if option in self._options:
                         self._options[option].add_student(student._id,
-                                                          student._grade, 
+                                                          student._grade,
                                                           i + 1)
         # make priority list of each option
         for option in self._options:
