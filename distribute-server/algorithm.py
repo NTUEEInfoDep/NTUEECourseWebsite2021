@@ -78,7 +78,7 @@ class Option:
         self._priority_list = list()
         self._fix = 0
 
-    def add_student(self, student_id, student_grade):
+    def add_student(self, student_id, student_grade, ranking):
         ''' Add student and count his/her priority.
 
         Count priority bases on self._priority, and add these information into self._students.
@@ -93,18 +93,18 @@ class Option:
         grade = min(student_grade, 4)
 
         # count priority
-        priority = 0
+        priority = ranking * -1
         if self._priority == -1:
-            priority -= grade
+            priority -= grade*20
         elif self._priority == 5:
             if grade == 3 or grade == 4:
-                priority -= 1
+                priority -= 1*20
         elif self._priority == 6 and grade == 4:
-            priority -= 1
+            priority -= 1*20
         elif self._priority == 7 and grade == 3:
-            priority -= 1
+            priority -= 1*20
         elif grade == self._priority:
-            priority -= 1
+            priority -= 1*20
 
         # store information
         self._students[student_id] = priority
@@ -351,10 +351,11 @@ class Course:
             if self._id in student._options:
                 self._students[student._id] = student._options[self._id]
 
-                for option in student._options[self._id]:
+                for ranking, option in enumerate(student._options[self._id]):
                     if option in self._options:
                         self._options[option].add_student(student._id,
-                                                          student._grade)
+                                                          student._grade, 
+                                                          ranking)
         # make priority list of each option
         for option in self._options:
             self._options[option].make_priority_list()
