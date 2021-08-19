@@ -110,6 +110,17 @@ class Option:
         self._students[student_id] = priority
         self._grade[student_id] = grade
 
+    def change_priority_by_ranking(self):
+        if self._priority == 6:
+            for student_id in self._grade:
+                if self._grade[student_id] == 4:
+                    self._students[student_id] += 1*20
+        if self._priority == 7:
+            for student_id in self._grade:
+                if self._grade[student_id] == 3:
+                    self._students[student_id] += 1*20
+
+
     def make_priority_list(self):
         ''' Make priority list.
 
@@ -146,6 +157,7 @@ class Option:
             None
         '''
         if self._priority == 6 or self._priority == 7:
+            self.change_priority_by_ranking()
             self._priority_list = []
             self.make_priority_list()
             self._limit = self._real_limit
