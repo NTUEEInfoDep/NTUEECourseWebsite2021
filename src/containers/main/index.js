@@ -1,12 +1,16 @@
 import React from "react";
-
-/**
- * This is Main Page
- */
+import Top from "./TopSection";
+import Explanation from "./ExplanationSection";
+import Usage from "./UsageSection";
+import Footer from "./Footer.js";
 export default function Main() {
   return (
     <div>
-      <h1>This is Main Page</h1>
+      <Top />
+      <Explanation />
+      <div style={{ height: "100px" }} />
+      <Usage />
+      <Footer />
     </div>
   );
 }

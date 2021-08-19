@@ -30,13 +30,33 @@ $ npm start
 
 Goto `http://localhost:3000` to see the website.
 
-## Frontend Develop with docker
-This will also build `redis` and `mongodb` for backend development
+## Frontend Develop (With Docker)
 
 ```bash
-# add --build if edit package.json or package-lock.json
+# start frontend, backend, database
 $ docker-compose up -d
+```
 
-# to see frontend logs
+To see frontend logs
+
+```
 $ docker logs -f ntueecoursewebsite2021_frontend_1
 ```
+
+To reset database
+
+```bash
+$ docker exec -it ntueecoursewebsite2021_backend_1 npm run database reset
+```
+
+## Frontend Develop (Without Docker)
+
+```bash
+$ npm install
+$ npm start
+# in another terminal
+cd server
+docker-compose up -d
+cd ..
+npm run database reset
+npm run dev-server

@@ -23,7 +23,7 @@ const courseSchema = new mongoose.Schema({
     type: String,
     immutable: false,
   },
-  options: [String],
+  options: [{ name: String, limit: Number, priority: Number }],
 });
 
 const Course = mongoose.model("Course", courseSchema);
@@ -58,11 +58,11 @@ const userSchema = new mongoose.Schema({
     immutable: false,
   },
   authority: {
-    type: String,
+    type: Number,
     required: true,
     immutable: false,
   },
-  selections,
+  // selections,
 });
 
 const Student = mongoose.model("Student", userSchema);
@@ -93,7 +93,18 @@ const selectionSchema = new mongoose.Schema({
 });
 
 const Selection = mongoose.model("Selection", selectionSchema);
+// ========================================
 
+// 只有數電實驗需要
+const preselectSchema = new mongoose.Schema({
+  userID: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+});
+
+const Preselect = mongoose.model("Preselect", preselectSchema);
 // ========================================
 
 const openTimeSchema = new mongoose.Schema({
@@ -113,9 +124,33 @@ const OpenTime = mongoose.model("OpenTime", openTimeSchema);
 
 // ========================================
 
+const resultSchema = new mongoose.Schema({
+  studentID: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+  courseName: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+  optionName: {
+    type: String,
+    required: true,
+    immutable: true,
+  },
+});
+
+const Result = mongoose.model("Result", resultSchema);
+
+// ========================================
+
 module.exports = {
   Course,
   Student,
   Selection,
+  Preselect,
   OpenTime,
+  Result,
 };

@@ -1,14 +1,21 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { Route, Redirect } from "react-router-dom";
 // slices
 import { selectSession } from "../../slices/sessionSlice";
 
 // TODO
-export default function PrivateRoute({ children }) {
-  const { isLogin } = useSelector(selectSession);
+export default function PrivateRoute({ children, path }) {
+  const { isLogin, authority } = useSelector(selectSession);
   return (
-    <div>
-      {isLogin ? children : "You are not login please go to login page"}
-    </div>
+    <Route
+      path={path}
+      render={() => {
+        if (!isLogin) return <Redirect to="/login" />;
+        if (authority === 0 && children.type.name !== "Selection")
+          return <Redirect to="/" />;
+        return children;
+      }}
+    />
   );
 }
