@@ -351,11 +351,11 @@ class Course:
             if self._id in student._options:
                 self._students[student._id] = student._options[self._id]
 
-                for ranking, option in enumerate(student._options[self._id]):
+                for i, option in enumerate(student._options[self._id]):
                     if option in self._options:
                         self._options[option].add_student(student._id,
                                                           student._grade, 
-                                                          ranking)
+                                                          i + 1)
         # make priority list of each option
         for option in self._options:
             self._options[option].make_priority_list()
