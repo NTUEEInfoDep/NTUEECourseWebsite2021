@@ -93,7 +93,7 @@ class Option:
         grade = min(student_grade, 4)
 
         # count priority
-        priority = ranking * -1
+        priority = ranking
         if self._priority == -1:
             priority -= grade*20
         elif self._priority == 5:
