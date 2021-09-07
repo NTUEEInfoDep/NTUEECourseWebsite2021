@@ -12,6 +12,9 @@ PORT = os.environ.get("PORT", 8001)
 MONGO_HOST = os.environ.get("MONGO_HOST", "localhost")
 MONGO_PORT = os.environ.get("MONGO_PORT", 27017)
 MONGO_DBNAME = os.environ.get("MONGO_DBNAME", "ntuee-course")
+MONGO_USERNAME = os.environ.get("MONGO_USERNAME", "db_username")
+MONGO_PASSWORD = os.environ.get("MONGO_USERNAME", "db_password")
+
 
 # ========================================
 
@@ -189,7 +192,8 @@ def specific_distribute():
 
 @app.route("/statistics", methods=["GET"])
 def statistics():
-    client = MongoClient(MONGO_HOST, MONGO_PORT)
+    client = MongoClient(MONGO_HOST, MONGO_PORT, username='user',
+...                      password='password')
     db = client[MONGO_DBNAME]
     raw_selections = db["selections"]
     raw_students = db["students"]
