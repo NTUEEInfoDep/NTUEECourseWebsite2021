@@ -115,7 +115,7 @@ def index():
 
 @app.route("/distribute", methods=["POST"])
 def distribute():
-    client = MongoClient(MONGO_HOST, MONGO_PORT)
+    client = MongoClient(MONGO_HOST, MONGO_PORT, username=MONGO_USERNAME, password=MONGO_PASSWORD)
     db = client[MONGO_DBNAME]
     raw_selections = db["selections"]
     raw_students = db["students"]
@@ -141,7 +141,7 @@ def distribute():
 
 @app.route("/specific_distribute", methods=["POST"])
 def specific_distribute():
-    client = MongoClient(MONGO_HOST, MONGO_PORT)
+    client = MongoClient(MONGO_HOST, MONGO_PORT, username=MONGO_USERNAME, password=MONGO_PASSWORD)
     db = client[MONGO_DBNAME]
     raw_selections = db["selections"]
     raw_students = db["students"]
@@ -192,8 +192,7 @@ def specific_distribute():
 
 @app.route("/statistics", methods=["GET"])
 def statistics():
-    client = MongoClient(MONGO_HOST, MONGO_PORT, username='user',
-...                      password='password')
+    client = MongoClient(MONGO_HOST, MONGO_PORT, username=MONGO_USERNAME, password=MONGO_PASSWORD)
     db = client[MONGO_DBNAME]
     raw_selections = db["selections"]
     raw_students = db["students"]
