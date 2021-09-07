@@ -20,7 +20,7 @@ module.exports = () => {
   const SALT_ROUNDS = 10;
   const { MONGO_HOST, MONGO_DBNAME } = process.env;
 
-  mongoose.connect(`mongodb://@${MONGO_HOST}/${MONGO_DBNAME}`, {
+  mongoose.connect(`mongodb://${MONGO_HOST}/${MONGO_DBNAME}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
