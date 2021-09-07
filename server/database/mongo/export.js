@@ -13,8 +13,7 @@ module.exports = (outputFile) => {
     console.log("NODE_ENV = development");
     require("dotenv").config();
   }
-  const { MONGO_HOST, MONGO_DBNAME, MONGO_USERNAME, MONGO_PASSWORD } =
-    process.env;
+  const { MONGO_HOST, MONGO_DBNAME } = process.env;
   const selectionsOutputPath = path.resolve(
     __dirname,
     "../private-data/selections.json"
@@ -32,13 +31,10 @@ module.exports = (outputFile) => {
     "../private-data/preselections.json"
   );
 
-  mongoose.connect(
-    `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DBNAME}`,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  );
+  mongoose.connect(`mongodb://${MONGO_HOST}/${MONGO_DBNAME}`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 
   const db = mongoose.connection;
   db.on("error", console.error.bind(console, "connection error:"));

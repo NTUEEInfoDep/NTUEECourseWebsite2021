@@ -18,16 +18,12 @@ module.exports = () => {
   }
 
   const SALT_ROUNDS = 10;
-  const { MONGO_HOST, MONGO_DBNAME, MONGO_USERNAME, MONGO_PASSWORD } =
-    process.env;
+  const { MONGO_HOST, MONGO_DBNAME } = process.env;
 
-  mongoose.connect(
-    `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DBNAME}`,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  );
+  mongoose.connect(`mongodb://@${MONGO_HOST}/${MONGO_DBNAME}`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 
   const db = mongoose.connection;
   db.on("error", console.error.bind(console, "connection error:"));

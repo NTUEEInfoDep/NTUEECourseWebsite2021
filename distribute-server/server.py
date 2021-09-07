@@ -12,9 +12,6 @@ PORT = os.environ.get("PORT", 8001)
 MONGO_HOST = os.environ.get("MONGO_HOST", "localhost")
 MONGO_PORT = os.environ.get("MONGO_PORT", 27017)
 MONGO_DBNAME = os.environ.get("MONGO_DBNAME", "ntuee-course")
-MONGO_USERNAME = os.environ.get("MONGO_USERNAME", "db_username")
-MONGO_PASSWORD = os.environ.get("MONGO_USERNAME", "db_password")
-
 
 # ========================================
 
@@ -115,7 +112,7 @@ def index():
 
 @app.route("/distribute", methods=["POST"])
 def distribute():
-    client = MongoClient(MONGO_HOST, MONGO_PORT, username=MONGO_USERNAME, password=MONGO_PASSWORD)
+    client = MongoClient(MONGO_HOST, MONGO_PORT)
     db = client[MONGO_DBNAME]
     raw_selections = db["selections"]
     raw_students = db["students"]
@@ -141,7 +138,7 @@ def distribute():
 
 @app.route("/specific_distribute", methods=["POST"])
 def specific_distribute():
-    client = MongoClient(MONGO_HOST, MONGO_PORT, username=MONGO_USERNAME, password=MONGO_PASSWORD)
+    client = MongoClient(MONGO_HOST, MONGO_PORT)
     db = client[MONGO_DBNAME]
     raw_selections = db["selections"]
     raw_students = db["students"]
@@ -192,7 +189,7 @@ def specific_distribute():
 
 @app.route("/statistics", methods=["GET"])
 def statistics():
-    client = MongoClient(MONGO_HOST, MONGO_PORT, username=MONGO_USERNAME, password=MONGO_PASSWORD)
+    client = MongoClient(MONGO_HOST, MONGO_PORT)
     db = client[MONGO_DBNAME]
     raw_selections = db["selections"]
     raw_students = db["students"]
