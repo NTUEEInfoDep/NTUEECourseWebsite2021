@@ -455,10 +455,15 @@ router
       const { courseID } = req.params;
       const course = await model.Course.findOne(
         { id: courseID },
-        "name type description options"
+        "name type description options students number"
       );
       if (!course) {
         res.sendStatus(404);
+        return;
+      }
+      const { students } = course;
+      if (students.length > 0 && !students.includes(req.session.userID)) {
+        res.sendStatus(403);
         return;
       }
       req.course = course;
@@ -469,7 +474,7 @@ router
     asyncHandler(async (req, res, next) => {
       const { courseID } = req.params;
       const { userID } = req.session;
-      const { name, type, description, options } = req.course;
+      const { name, type, description, options, number } = req.course;
       let selected = await model.Selection.find({ userID, courseID }).sort({
         ranking: 1,
       });
@@ -477,7 +482,7 @@ router
       const unselected = options
         .filter((option) => !selected.includes(option.name))
         .map((selection) => selection.name);
-      res.send({ name, type, description, selected, unselected });
+      res.send({ name, type, description, selected, unselected, number });
     })
   )
   .put(
@@ -531,14 +536,20 @@ router
           typeof data.name === "string" &&
           typeof data.type === "string" &&
           typeof data.description === "string" &&
-          typeof data.options === "object"
+          typeof data.options === "object" &&
+          typeof data.students === "object" &&
+          typeof data.number === "number" &&
+          constants.COURSE_TYPE.includes(data.type)
         ) {
           pass = true;
           data.options.forEach((option) => {
             if (
               typeof option.name !== "string" ||
               typeof option.limit !== "number" ||
-              typeof option.priority !== "number"
+              typeof option.priority_type !== "string" ||
+              (typeof option.priority_value !== "number" &&
+                typeof option.priority_value !== "object") ||
+              !constants.PRIORITY_TYPE.includes(option.priority_type)
             ) {
               pass = false;
             }
@@ -550,12 +561,12 @@ router
       });
       await Promise.all(
         addData_new.map(async (data) => {
-          const { id } = data;
-          const { name } = data;
-          const { type } = data;
-          const { description } = data;
-          const { options } = data;
+          const { id, name, type, description, options, number, students } =
+            data;
           const course = await model.Course.findOne({ id }).exec();
+          const newStudents = students.map((student) => {
+            return student.toUpperCase();
+          });
           if (course) {
             await model.Course.deleteOne({ id }).exec();
           }
@@ -565,6 +576,8 @@ router
             type,
             description,
             options,
+            number,
+            students: newStudents,
           });
           await courseDocument.save();
         })
@@ -576,10 +589,6 @@ router
     express.json({ strict: false }),
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       const deleteData = req.body;
       const deleteData_new = [];
       if (!deleteData || !Array.isArray(deleteData)) {
@@ -621,12 +630,12 @@ router
       });
       await Promise.all(
         modifiedData_new.map(async (data) => {
-          const { id } = data;
-          const { name } = data;
-          const { type } = data;
-          const { description } = data;
-          const { options } = data;
+          const { id, name, type, description, options, number, students } =
+            data;
           const course = await model.Course.findOne({ id }).exec();
+          const newStudents = students.map((student) => {
+            return student.toUpperCase();
+          });
           if (course) {
             await model.Course.updateOne(
               {
@@ -637,6 +646,8 @@ router
                 type,
                 description,
                 options,
+                number,
+                students: newStudents,
               }
             );
           }

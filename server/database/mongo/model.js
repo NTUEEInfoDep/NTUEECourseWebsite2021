@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const courses = require("../data/courses.json");
+// const courses = require("../data/courses.json");
 
 // ========================================
 
@@ -23,18 +23,35 @@ const courseSchema = new mongoose.Schema({
     type: String,
     immutable: false,
   },
-  options: [{ name: String, limit: Number, priority: Number }],
+  number: {
+    type: Number,
+    required: true,
+    immutable: false,
+  },
+  students: {
+    type: [String],
+    required: true,
+    immutable: false,
+  },
+  options: [
+    {
+      name: String,
+      limit: Number,
+      priority_type: String,
+      priority_value: {},
+    },
+  ],
 });
 
 const Course = mongoose.model("Course", courseSchema);
 
 // ========================================
 
-const courseIDs = courses.map((course) => course.id);
-const selections = {};
-courseIDs.forEach((courseID) => {
-  selections[courseID] = [String];
-});
+// const courseIDs = courses.map((course) => course.id);
+// const selections = {};
+// courseIDs.forEach((courseID) => {
+//   selections[courseID] = [String];
+// });
 
 const userSchema = new mongoose.Schema({
   userID: {
