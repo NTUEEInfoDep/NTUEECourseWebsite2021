@@ -684,7 +684,7 @@
                 "summary": "add courses",
                 "description": "Add new course. Need Authority: Maintainer",
                 "requestBody": {
-                    "description": "<h2>type</h2> <b>\"higher-grade-first\":</b> 高年級優先<br><b>\"customized\":</b> 每個選項優先序可以設定 <br><b>\"none\":</b> 無優先順序<br><h2>number</h2>可以選上的數量<br><h2>limit</h2>人數上限<br><h2>priority_type</h2><b>\"higher-grade-first\":</b> 高年級優先<br><b>\"grades\":</b> 某些年同等優先(若array裡只有一項，及該年級優先)，其餘平等<br><b>\"guarantee-third-grade\":</b> 大三保障名額<br><b>\"guarantee-fourth-grade\":</b> 保障大四名額<br><b>\"preselect\":</b>可以寫已經選上的人<br><b>\"none\",\"\":</b> 無年級優先<br><h2>以下為兩個課程範例, priority_type, priority_value 只有 customized 會用到, 其他type無需.description 目前為必要",
+                    "description": "<h2>type</h2> <b>\"1,2,3,4\":</b> 必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗 <br><b>\"EE-Lab\":</b> 電電實驗<br><h2>number</h2>可以選上的數量<br><h2>limit</h2>人數上限<br><h2>priority_type</h2><b>\"higher-grade-first\":</b> 高年級優先<br><b>\"grades\":</b> 某些年同等優先(若array裡只有一項，及該年級優先)，其餘平等<br><b>\"guarantee-third-grade\":</b> 大三保障名額<br><b>\"guarantee-fourth-grade\":</b> 保障大四名額<br><b>\"preselect\":</b>可以寫已經選上的人<br><b>\"none\",\"\":</b> 無年級優先<br><h2>以下為兩個課程範例, priority_type, priority_value 只有 customized 會用到, 其他type無需.description 目前為必要",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -740,7 +740,7 @@
                             "example": [{
                                     "id": "Electronic-Circuit test",
                                     "name": "電路學test",
-                                    "type": "none",
+                                    "type": "1",
                                     "description": "test",
                                     "number": 2,
                                     "students": ["B11111111"],
@@ -761,7 +761,7 @@
                                 {
                                     "id": "Ten-Select-Two test",
                                     "name": "十選二實驗 test",
-                                    "type": "customized",
+                                    "type": "Ten-Select-Two",
                                     "description": "<p>(1) 請詳閱 <a href=\"https://bit.ly/3o0MrAb\" target=\"_blank\" style=\"color: #45bbff;\">實驗規定</a>，攸關各位的權利。</p><p>(2)特別轉載半導體實驗規定： ★★大學畢業後欲投入半導體領域者，可保留名額  ★★實驗期間需全程戴口罩、穿實驗衣含無塵衣,且著裝後需能自由移動。  ★★需遵守政府、臺大及實驗室之公共安全規定。  ★★環安衛法律條文規定沒有英文部份,若有外藉生不懂中文,將請助教以英文口譯告知。  ★★Electrical Engineering Lab (semiconductor) safety rules: ★In the labs,  students are required</p>",
                                     "number": 2,
                                     "students": [],
@@ -841,7 +841,7 @@
                 "summary": "update courses",
                 "description": "Change the content of the course of designated ids. Need Authority: Maintainer",
                 "requestBody": {
-                    "description": "<h2>type</h2> <b>\"higher-grade-first\":</b> 高年級優先<br><b>\"customized\":</b> 每個選項優先序可以設定 <br><b>\"none\":</b> 無優先順序<br><h2>number</h2>可以選上的數量<br><h2>limit</h2>人數上限<br><h2>priority_type</h2><b>\"higher-grade-first\":</b> 高年級優先<br><b>\"grades\":</b> 某些年同等優先(若array裡只有一項，及該年級優先)，其餘平等<br><b>\"guarantee-third-grade\":</b> 大三保障名額<br><b>\"guarantee-fourth-grade\":</b> 保障大四名額<br><b>\"preselect\":</b>可以寫已經選上的人<br><b>\"none\",\"\":</b> 無年級優先<br><h2>以下為兩個課程範例, priority_type, priority_value 只有 customized 會用到, 其他type無需.description 目前為必要",
+                    "description": "<h2>type</h2><b>\"1,2,3,4\":</b> 必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗 <br><b>\"EE-Lab\":</b> 電電實驗<br>><h2>number</h2>可以選上的數量<br><h2>limit</h2>人數上限<br><h2>priority_type</h2><b>\"higher-grade-first\":</b> 高年級優先<br><b>\"grades\":</b> 某些年同等優先(若array裡只有一項，及該年級優先)，其餘平等<br><b>\"guarantee-third-grade\":</b> 大三保障名額<br><b>\"guarantee-fourth-grade\":</b> 保障大四名額<br><b>\"preselect\":</b>可以寫已經選上的人<br><b>\"none\",\"\":</b> 無年級優先<br><h2>以下為兩個課程範例, priority_type, priority_value 只有 customized 會用到, 其他type無需.description 目前為必要",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -897,7 +897,7 @@
                             "example": [{
                                     "id": "Electronic-Circuit test",
                                     "name": "new 電路學test",
-                                    "type": "customized",
+                                    "type": "1",
                                     "description": "new test",
                                     "number": 1,
                                     "students": ["B00000000", "B11111111"],
@@ -977,7 +977,7 @@
                 }
             }
         },
-        "/specific_distribute": {
+        "/new_distribute": {
             "post": {
                 "tags": ["Distribution"],
                 "summary": "分發(有範圍的)",

@@ -7,7 +7,7 @@ module.exports = Object.freeze({
   AUTHORITY_ADMIN: 2,
 
   SALT_ROUNDS: 10,
-  COURSE_TYPE: ["none", "higher-grade-first", "customized"],
+  COURSE_TYPE: ["1", "2", "3", "4", "Ten-Select-Two", "EE-Lab"],
   PRIORITY_TYPE: [
     "higher-grade-first",
     "grades",

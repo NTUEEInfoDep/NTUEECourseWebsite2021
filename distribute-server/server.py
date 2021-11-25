@@ -31,13 +31,15 @@ def genCourse(raw_courses):
             option = {
                 "limit": op["limit"],
             }
-            if data["type"] == "higher-grade-first":
+            if data["type"] in "1234":
                 option["priority_type"] = "higher-grade-first"
-            elif data["type"] in "customized":
+                option["priority_value"] = "0"
+            elif data["type"] in "Ten-Select-Two":
                 option["priority_type"] = op["priority_type"]
                 option["priority_value"] = op["priority_value"]
-            elif data["type"] == "none":
+            elif data["type"] == "EE-Lab":
                 option["priority_type"] = "none"
+                option["priority_value"] = "0"
             else:
                 raise ValueError("Invalid type")
             courseDict["options"][op["name"]] = option
@@ -162,7 +164,7 @@ def specific_distribute():
     return ""
 
 @app.route("/new_distribute", methods=["POST"])
-def specific_distribute():
+def new_distribute():
     client = MongoClient(MONGO_HOST, MONGO_PORT)
     db = client[MONGO_DBNAME]
     raw_selections = db["selections"]
