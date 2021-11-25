@@ -15,5 +15,6 @@ module.exports = Object.freeze({
     "guarantee-fourth-grade",
     "none",
     "",
+    "preselect",
   ],
 });
