@@ -16,54 +16,33 @@ MONGO_DBNAME = os.environ.get("MONGO_DBNAME", "ntuee-course")
 # ========================================
 
 
-def genCourse(raw_courses, course_name = None):
+def genCourse(raw_courses):
     courses = []
-    if course_name is None:
-        for data in raw_courses.find():
-            courseDict = {}
-
-            courseDict["name"] = data["name"]
-            courseDict["id"] = data["id"]
-            courseDict["type"] = data["type"]
-            courseDict["options"] = {}
-            for op in data["options"]:
-                options = {
-                    "limit": op["limit"],
-                }
-                if data["type"] == "Ten-Select-Two":
-                    options["priority"] = op["priority"]
-                elif data["type"] in "1234":
-                    options["priority"] = -1
-                elif data["type"] == "EE-Lab":
-                    options["priority"] = 0
-                else:
-                    raise ValueError("Invalid type")
-                courseDict["options"][op["name"]] = options
-            courses.append(Course(courseDict))
-    else:
+    for data in raw_courses.find():
         courseDict = {}
-        if 0 == 0:
-            data = raw_courses.find_one({"id": course_name})
-            courseDict["name"] = data["name"]
-            courseDict["id"] = data["id"]
-            courseDict["type"] = data["type"]
-            courseDict["options"] = {}
-            for op in data["options"]:
-                options = {
-                    "limit": op["limit"],
-                }
-                if data["type"] == "Ten-Select-Two":
-                    options["priority"] = op["priority"]
-                elif data["type"] in "1234":
-                    options["priority"] = -1
-                elif data["type"] == "EE-Lab":
-                    options["priority"] = 0
-                else:
-                    raise ValueError("Invalid type")
-                courseDict["options"][op["name"]] = options
-            courses.append(Course(courseDict))
-        else:
-            print("course %s not found" % course_name)
+
+        courseDict["name"] = data["name"]
+        courseDict["id"] = data["id"]
+        courseDict["type"] = data["type"]
+        courseDict["number"] = data["number"]
+        courseDict["students"] = data["students"]
+        courseDict["options"] = {}
+        for op in data["options"]:
+            option = {
+                "limit": op["limit"],
+            }
+            if data["type"] == "higher-grade-first":
+                option["priority_type"] = "higher-grade-first"
+            elif data["type"] in "customized":
+                option["priority_type"] = op["priority_type"]
+                option["priority_value"] = op["priority_value"]
+            elif data["type"] == "none":
+                option["priority_type"] = "none"
+            else:
+                raise ValueError("Invalid type")
+            courseDict["options"][op["name"]] = option
+        courses.append(Course(courseDict))
+
     return courses
 
 
@@ -74,15 +53,11 @@ def getCourseid(raw_courses):
     return name
 
 
-def genStudent(raw_student, raw_selections, course_id, student_in_course_data =
-        {}):
+def genStudent(raw_student, raw_selections, course_id):
     students = []
     for data in raw_student.find():  # iterate through all students
         result_selection = {}
         for name in course_id:  # iterate through every course
-            if name in student_in_course_data:
-                if data["userID"] not in student_in_course_data[name]:
-                    continue
             result_selection[name] = []
             # all selections made by a student of certain course
             student_selections = raw_selections.find(
@@ -182,6 +157,32 @@ def specific_distribute():
             result = Algorithm.distribute(courses, students, preselects)
             results.extend(result)
         db.results.insert_many(results)
+
+    client.close()
+    return ""
+
+@app.route("/new_distribute", methods=["POST"])
+def specific_distribute():
+    client = MongoClient(MONGO_HOST, MONGO_PORT)
+    db = client[MONGO_DBNAME]
+    raw_selections = db["selections"]
+    raw_students = db["students"]
+    raw_courses = db["courses"]
+
+    db.results.delete_many({})
+
+    course_names = getCourseid(raw_courses)
+
+    try:
+        courses = genCourse(raw_courses)
+    except ValueError:
+        return "Invalid course type detected", 400
+
+    students = genStudent(raw_students, raw_selections, course_names)
+
+
+    results = Algorithm.distribute(courses, students)
+    db.results.insert_many(results)
 
     client.close()
     return ""

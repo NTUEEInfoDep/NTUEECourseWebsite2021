@@ -14,12 +14,21 @@ class Option:
         _real_limit: (int)
             The maximun number of the students that this options can have.
 
-        _priority: (int)
+        _priority_type: (string)
             The type of this priority.
-                0:          Priority is not associate with the grade.
-                -1:         The higher grade students will have higher priority.
-                1,2,3,4:    Students in this grade will have higher priority.
-                5:          Students with grade 3 and 4 have higher priority.
+                "higher-grade-first":       The higher grade students will have higher priority.
+                "grades":                   Students in specific grades will have higher priority.
+                "guarantee-third-grade":    Guarantee grade 3rd students to some degree
+                "guarantee-fourth-grade":   Guarantee grade 4th students to some degree
+                "none", "":                 Priority is not associate with the grade.
+                "preselect":                The result is preselected
+
+        _priority_value: (int, list(int), list(string), none)
+            The value based on _priority_type
+                int:            guarantee number of "guarantee-third-grade", "guarantee-fourth-grade"
+                list(int):      the grade(s) of "grades"
+                list(string):   the selected studentID of "preselect"
+                none:           others
 
         _selected: (list)
             Store the students who have been selected by this option.
@@ -50,33 +59,48 @@ class Option:
                     "limit": int
                         The maximun number of the students that this options can have.
 
-                    "priority": int
+                    "priority_type": (string)
                         The type of this priority.
-                            0:          Priority is not associate with the grade.
-                            -1:         The higher grade students will have higher priority.
-                            1,2,3,4:    Students in this grade will have higher priority.
-                            5:          Students with grade 3 and 4 have higher priority.
-                            6:          光電實驗 大四21 剩下無優先
-                            7:          電磁波實驗 大三12 剩下無優先
+                            "higher-grade-first":       The higher grade students will have higher priority.
+                            "grades":                   Students in specific grades will have higher priority.
+                            "guarantee-third-grade":    Guarantee grade 3rd students to some degree
+                            "guarantee-fourth-grade":   Guarantee grade 4th students to some degree
+                            "none", "":                 Priority is not associate with the grade.
+                            "preselect":                The result is preselected
+
+                    "priority_value": (int, list(int), list(string), none)
+                        The value based on _priority_type
+                            int:            guarantee number of "guarantee-third-grade", "guarantee-fourth-grade"
+                            list(int):      the grade(s) of "grades"
+                            list(string):   the selected studentID of "preselect"
+                            none:           others
                 }
         '''
 
         self._name = name
         self._real_limit = data["limit"]
-        self._priority = data["priority"]
+        self._priority_type = data["priority_type"]
+        self._priority_value = data["priority_value"]
         self._limit = data["limit"]
 
         # in the first distribution, limit the maximun for assurance
-        if self._priority == 6:
-            self._limit = 21
-        if self._priority == 7:
-            self._limit = 12
+        if self._priority_type == "guarantee-third-grade" or self._priority_type == "guarantee-fourth-grade":
+            self._limit = self._priority_value
 
         self._selected = list()
         self._students = dict()
         self._grade = dict()
         self._priority_list = list()
         self._fix = 0
+        self.guarantee_num = 0
+        self.guarantee_grade = None
+        if self._priority_type == "guarantee-third-grade":
+            self.guarantee_grade = 3
+        elif self._priority_type == "guarantee-fourth-grade":
+            self.guarantee_grade = 4
+
+        if self._priority_type == "preselect":
+            self._selected = self._priority_value 
 
     def add_student(self, student_id, student_grade, ranking):
         ''' Add student and count his/her priority.
@@ -94,32 +118,15 @@ class Option:
 
         # count priority
         priority = ranking
-        if self._priority == -1:
+        if self._priority_type == "higher-grade-first":
             priority -= grade*20
-        elif self._priority == 5:
-            if grade == 3 or grade == 4:
+        elif self._priority_type == "grades":
+            if grade in self._priority_value:
                 priority -= 1*20
-        elif self._priority == 6 and grade == 4:
-            priority -= 1*20
-        elif self._priority == 7 and grade == 3:
-            priority -= 1*20
-        elif grade == self._priority:
-            priority -= 1*20
 
         # store information
         self._students[student_id] = priority
         self._grade[student_id] = grade
-
-    def change_priority_by_ranking(self):
-        if self._priority == 6:
-            for student_id in self._grade:
-                if self._grade[student_id] == 4:
-                    self._students[student_id] += 1*20
-        if self._priority == 7:
-            for student_id in self._grade:
-                if self._grade[student_id] == 3:
-                    self._students[student_id] += 1*20
-
 
     def make_priority_list(self):
         ''' Make priority list.
@@ -132,6 +139,10 @@ class Option:
         Args:
             None
         '''
+        
+        # pass preselect
+        if self._priority_type == "preselect":
+            return
 
         # sort students
         priority_group = dict()
@@ -149,19 +160,6 @@ class Option:
             students = priority_group[heapq.heappop(priorities)]
             random.shuffle(students)
             self._priority_list.extend(students)
-
-    def update_priority_list_and_limit(self):
-        ''' Update priority list and update limit
-
-        Args:
-            None
-        '''
-        if self._priority == 6 or self._priority == 7:
-            self.change_priority_by_ranking()
-            self._priority_list = []
-            self.make_priority_list()
-            self._limit = self._real_limit
-
 
     def select(self, student_id):
         ''' Deal with this student based on self._priority_list and modify data in self._selected.
@@ -181,6 +179,10 @@ class Option:
             2. a student's id: (string)
                 the student that failed to select this option
         '''
+
+        # pass preselect
+        if self._priority_type == "preselect":
+            return student_id
 
         # check that whether this student has been selected already
         if student_id in self._selected:
@@ -204,36 +206,171 @@ class Option:
 
             # add this student to the corresponding index
             self._selected.insert(idx, student_id)
+
+            # add guarantee number
+            if self.guarantee_grade is not None:
+                if self._grade[student_id] == self.guarantee_grade:
+                    self.guarantee_num += 1
+
             return True
 
         # self._selected is full and partial mutable
         elif(self._fix < len(self._selected)):
 
-            # determine the rank of this student's priority
-            index = self._priority_list.index(student_id)
+            if self.guarantee_grade is not None:
+                if self._grade[student_id] == self.guarantee_grade:
+                    if self.guarantee_num < self._priority_value:
+                        # determine the rank of this student's priority
+                        index = self._priority_list.index(student_id)
 
-            # pop out the last one in self._selected
-            about_to_kick = self._selected.pop()
+                        find_kick = False
+                        kick_index = -1
 
-            # compare the priority to determine who can stay
-            if index > self._priority_list.index(about_to_kick):
-                self._selected.append(about_to_kick)
-                return student_id
+                        while not find_kick:
+                            about_to_kick = self._selected[kick_index]
+                            if self._grade[about_to_kick] != self.guarantee_grade:
+                                find_kick = True
+                                del self._selected[kick_index]
+                            else:
+                                kick_index -= 1
+
+
+                        idx = self._fix + index
+
+                        # find the proper index for this student to insert
+                        for i in range(self._fix, self._fix + index):
+                            idx = i
+                            if i >= len(self._selected):
+                                break
+                            compare = self._priority_list.index(self._selected[i])
+                            if compare > index:
+                                break
+
+                        # add this student to the corresponding index
+                        self._selected.insert(idx, student_id)
+
+                        self.guarantee_num += 1
+                        return about_to_kick    
+                    else:
+                        # determine the rank of this student's priority
+                        index = self._priority_list.index(student_id)
+
+                        # pop out the last one in self._selected
+                        about_to_kick = self._selected.pop()
+
+                        # compare the priority to determine who can stay
+                        if index > self._priority_list.index(about_to_kick):
+                            self._selected.append(about_to_kick)
+                            return student_id
+                        else:
+                            idx = self._fix + index
+
+                            # find the proper index for this student to insert
+                            for i in range(self._fix, self._fix + index):
+                                idx = i
+                                if i >= len(self._selected):
+                                    break
+                                compare = self._priority_list.index(self._selected[i])
+                                if compare > index:
+                                    break
+
+                            # add this student to the corresponding index
+                            self._selected.insert(idx, student_id)
+
+                            if self._grade[about_to_kick] != self.guarantee_grade:
+                                self.guarantee_num += 1
+                            return about_to_kick
+                else:
+                    if self.guarantee_num > self._priority_value:
+                        # determine the rank of this student's priority
+                        index = self._priority_list.index(student_id)
+
+                        # pop out the last one in self._selected
+                        about_to_kick = self._selected.pop()
+
+                        # compare the priority to determine who can stay
+                        if index > self._priority_list.index(about_to_kick):
+                            self._selected.append(about_to_kick)
+                            return student_id
+                        else:
+                            idx = self._fix + index
+
+                            # find the proper index for this student to insert
+                            for i in range(self._fix, self._fix + index):
+                                idx = i
+                                if i >= len(self._selected):
+                                    break
+                                compare = self._priority_list.index(self._selected[i])
+                                if compare > index:
+                                    break
+
+                            # add this student to the corresponding index
+                            self._selected.insert(idx, student_id)
+
+                            if self._grade[about_to_kick] == self.guarantee_grade:
+                                self.guarantee_num -= 1
+                            return about_to_kick
+                    else:
+                        # determine the rank of this student's priority
+                        index = self._priority_list.index(student_id)
+
+                        find_kick = False
+                        kick_index = -1
+
+                        while not find_kick:
+                            about_to_kick = self._selected[kick_index]
+                            if self._grade[about_to_kick] != self.guarantee_grade:
+                                find_kick = True
+                                del self._selected[kick_index]
+                            else:
+                                kick_index -= 1
+
+                        # compare the priority to determine who can stay
+                        if index > self._priority_list.index(about_to_kick):
+                            self._selected.append(about_to_kick)
+                            return student_id
+                        else:
+                            idx = self._fix + index
+
+                            # find the proper index for this student to insert
+                            for i in range(self._fix, self._fix + index):
+                                idx = i
+                                if i >= len(self._selected):
+                                    break
+                                compare = self._priority_list.index(self._selected[i])
+                                if compare > index:
+                                    break
+
+                            # add this student to the corresponding index
+                            self._selected.insert(idx, student_id)
+                            return about_to_kick
+
             else:
-                idx = self._fix + index
+                # determine the rank of this student's priority
+                index = self._priority_list.index(student_id)
 
-                # find the proper index for this student to insert
-                for i in range(self._fix, self._fix + index):
-                    idx = i
-                    if i >= len(self._selected):
-                        break
-                    compare = self._priority_list.index(self._selected[i])
-                    if compare > index:
-                        break
+                # pop out the last one in self._selected
+                about_to_kick = self._selected.pop()
 
-                # add this student to the corresponding index
-                self._selected.insert(idx, student_id)
-                return about_to_kick
+                # compare the priority to determine who can stay
+                if index > self._priority_list.index(about_to_kick):
+                    self._selected.append(about_to_kick)
+                    return student_id
+                else:
+                    idx = self._fix + index
+
+                    # find the proper index for this student to insert
+                    for i in range(self._fix, self._fix + index):
+                        idx = i
+                        if i >= len(self._selected):
+                            break
+                        compare = self._priority_list.index(self._selected[i])
+                        if compare > index:
+                            break
+
+                    # add this student to the corresponding index
+                    self._selected.insert(idx, student_id)
+                    return about_to_kick
 
         # self._selected is full and completely immutable
         else:
@@ -262,7 +399,6 @@ class Option:
         self.fix_index()
 
 
-
 class Course:
     ''' Class that stores data of a course and distribute function.
 
@@ -275,6 +411,10 @@ class Course:
 
         _type: (string)
             Course's type.(Required, EE-Lab, Ten-Select-Two)
+
+        limit_student: (list)
+            item: (string)
+                the student who can be distributed in this course.
 
         _options: (dict)
             key: (string):
@@ -289,6 +429,10 @@ class Course:
                 Id of students who have selected this course.
             value: (list)
                 The options that this student has selected, base on aspiration
+
+        _preselect_list: (list)
+            item: (string)
+                the option that is preselected.
 
         _distribute_result: (dict)
             key: (string)
@@ -307,13 +451,16 @@ class Course:
                     "id": (string)
                     "name": (string)
                     "type": (string)
+                    "number": (int)
+                    "students": list(string)
                     "options": (dict)
                         key: (string)
                             options' name
                         value: (dict)
                             {
                                 "limit": (int)
-                                "priority": (int)
+                                "priority_type": (string)
+                                "priority_value": (int, list(int), list(string), none)
                             }
                     }
             }
@@ -321,18 +468,19 @@ class Course:
         self._name = course["name"]
         self._id = course["id"]
         self._type = course["type"]
+        self.limit_students = course["students"]
         self._options = dict()
-        self.max_select = 1
         self._students = dict()     # candidate list
+        self._has_selected_num_list = dict()
+        self.max_select = course["number"]
         self._distribute_result = dict()
-
-        # students can select 2 options in Ten-Select-Two
-        if self._type == "Ten-Select-Two":
-            self.max_select = 2
+        self._preselect_list = list()
 
         for name, data in course["options"].items():
             option = Option(name, data)
             self._options[name] = option
+            if data["priority_type"] == "preselect":
+                self._preselect_list.append(name)
 
     def __str__(self):
         return f"Course(id={self._id}, name={self._name})"
@@ -340,25 +488,35 @@ class Course:
     def __repr__(self):
         return self.__str__()
 
-    def distribute(self, students, preselect=None):
+    def distribute(self, students):
         ''' Distribute this course and store result in self._distribute_result.
 
         Args:
             students: (list)
                 List of class Student
 
-            preselect: (list or None)
-                List of students who have already got 數電實驗.
-
         Returns:
             A dictionary contains the result of distribution.
         '''
 
-        # deal with preselect
-        if preselect is not None:
-            self._options["數電實驗"].preselect(preselect)
-
+        # generate students list who are going to be distributed in this course
         for student in students:
+            
+            # exclude student who shouldn't select this course
+            if len(self.limit_students) > 0 and student._id not in self.limit_students:
+                continue
+
+            # deal with preselect
+            self._has_selected_num_list[student._id] = 0
+            for name, option in self._options.items():
+                if option._priority_type == "preselect":
+                    check = []
+                    for student in option._priority_value:
+                        if student in check:
+                            continue
+                        check.append(student)
+                        self._has_selected_num_list[student] += 1
+
 
             # check if this student has select any option of this course
             if self._id in student._options:
@@ -369,17 +527,13 @@ class Course:
                         self._options[option].add_student(student._id,
                                                           student._grade,
                                                           i + 1)
+
         # make priority list of each option
         for option in self._options:
             self._options[option].make_priority_list()
 
         # every student select one option in an iteration
         for time in range(self.max_select):
-
-            # update priority_list (for assurance)
-            if time == 1:
-                for option in self._options:
-                    self._options[option].update_priority_list_and_limit()
 
             # fix the result of previous iterations or preselect data
             for name in self._options.keys():
@@ -388,17 +542,15 @@ class Course:
             # construct a list of students who hasn't been distributed yet
             unselect = list()
 
-            # In the first round, the students in preselect won't be added to preselect.
-            if time == 0 and preselect is not None:
-                for student in students:
-                    if self._id in student._options and student._id not in preselect:
-                        unselect.append(student._id)
+            # the students who have already on some option will be excluded.
+            for student in students:
+                # exclude student who shouldn't select this course
+                if len(self.limit_students) > 0 and student._id not in self.limit_students:
+                    continue
 
-            # add students who has select this course to unselect
-            else:
-                for student in students:
-                    if self._id in student._options:
-                        unselect.append(student._id)
+                has_select = self._has_selected_num_list[student._id]
+                if self._id in student._options and has_select <= time:
+                    unselect.append(student._id)
 
             # iterate through all the students in unselect
             for iterate_through_students in range(len(unselect)):
@@ -490,15 +642,12 @@ class Student:
 
 class Algorithm:
     @staticmethod
-    def distribute(courses, students, preselect=None):
+    def distribute(courses, students):
         ''' Run distribution of all courses
 
         Args:
             students: (list)
                 List of class Student.
-
-            preselect: (list or None)
-                List of students who have already got 數電實驗.
 
         Returns:
             A list of result (below is the result example).
@@ -514,13 +663,8 @@ class Algorithm:
         # iterate through all courses
         for course in courses:
 
-            # deal with Ten-Select-Two
-            if course._type == "Ten-Select-Two":
-                course.distribute(students, preselect)
-
-            # deal with others
-            else:
-                course.distribute(students, None)
+            # distribute
+            course.distribute(students)
 
             # manage data type and store data
             for option in course._distribute_result.keys():
@@ -551,10 +695,13 @@ if __name__ == "__main__":
                        "teacher1b", "teacher1a", "數電實驗"]}, 3)
     students = [student2, student1, student3, student4, student5, student6]
 
-    course1 = Course({"id": "course1", "name": "course1", "type": "Ten-Select-Two",
-                      "options": {"數電實驗": {"limit": 5, "priority": -1}, "teacher1b":
-                                  {"limit": 2, "priority": 3}, "teacher1a": {"limit": 2,
-                                                                             "priority": 0}}})
+    course1 = Course({"id": "course1", "name": "course1", "type": "customized", "number": 2, "students": ["B22222224"],
+                      "options": {"數電實驗": {"limit": 5, "priority_type": "guarantee-third-grade", "priority_value": 2}, "teacher1b":
+                                  {"limit": 2, "priority_type": "none", "priority_value": 0}, "teacher1a": {"limit": 2,
+                                                                             "priority_type": "grades", "priority_value": [3]}}})
     courses = [course1]
 
     preselect = ["B22222225", "B22222224", "B22222223"]
+
+    results = Algorithm.distribute(courses, students)
+    print(results)
