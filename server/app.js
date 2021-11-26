@@ -27,7 +27,7 @@ db.once("open", () => {
   console.log("Successfully connect to MongoDB!");
   console.log(`dbName = "${process.env.MONGO_DBNAME}"`);
 
-  cron.schedule("* */1 * * *", async () => {
+  cron.schedule("59 */1 * * *", async () => {
     try {
       const startTime = await model.OpenTime.findOne({
         type: constants.START_TIME_KEY,
