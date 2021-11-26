@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Tab } from "@material-ui/core";
+// import { Tab } from "@material-ui/core";
 import { ResultAPI } from "../../api";
 
 export default function Result() {
@@ -11,5 +11,5 @@ export default function Result() {
       })
       .catch((e) => console.log(`get result error: ${e}`));
   });
-  return <Tab>{result}</Tab>;
+  return <div>{result}</div>;
 }

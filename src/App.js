@@ -55,10 +55,9 @@ const Routes = () => {
       <PrivateRoute exact path="/course-manage">
         <CourseManage />
       </PrivateRoute>
-      {/*
       <PrivateRoute exact path="/distribute">
         <Distribute />
-      </PrivateRoute> */}
+      </PrivateRoute>
       <Redirect to="/login" />
     </Switch>
   );
