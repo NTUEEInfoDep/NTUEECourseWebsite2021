@@ -1,5 +1,21 @@
 const mongoose = require("mongoose");
 // const courses = require("../data/courses.json");
+// const { conn, conn_atlas } = require("./connection");
+require("dotenv").config();
+
+const conn_atlas = mongoose.createConnection(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const { MONGO_HOST, MONGO_DBNAME } = process.env;
+const conn = mongoose.createConnection(
+  `mongodb://${MONGO_HOST}/${MONGO_DBNAME}`,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
 // ========================================
 
@@ -43,7 +59,8 @@ const courseSchema = new mongoose.Schema({
   ],
 });
 
-const Course = mongoose.model("Course", courseSchema);
+const Course = conn.model("Course", courseSchema);
+const CourseAtlas = conn_atlas.model("Course", courseSchema);
 
 // ========================================
 
@@ -82,7 +99,8 @@ const userSchema = new mongoose.Schema({
   // selections,
 });
 
-const Student = mongoose.model("Student", userSchema);
+const Student = conn.model("Student", userSchema);
+const StudentAtlas = conn_atlas.model("Student", userSchema);
 
 // ========================================
 
@@ -109,7 +127,9 @@ const selectionSchema = new mongoose.Schema({
   },
 });
 
-const Selection = mongoose.model("Selection", selectionSchema);
+const Selection = conn.model("Selection", selectionSchema);
+const SelectionAtlas = conn_atlas.model("Selection", selectionSchema);
+
 // ========================================
 
 // 只有數電實驗需要
@@ -121,7 +141,9 @@ const preselectSchema = new mongoose.Schema({
   },
 });
 
-const Preselect = mongoose.model("Preselect", preselectSchema);
+const Preselect = conn.model("Preselect", preselectSchema);
+const PreselectAtlas = conn_atlas.model("Preselect", preselectSchema);
+
 // ========================================
 
 const openTimeSchema = new mongoose.Schema({
@@ -137,7 +159,8 @@ const openTimeSchema = new mongoose.Schema({
   },
 });
 
-const OpenTime = mongoose.model("OpenTime", openTimeSchema);
+const OpenTime = conn.model("OpenTime", openTimeSchema);
+const OpenTimeAtlas = conn_atlas.model("OpenTime", openTimeSchema);
 
 // ========================================
 
@@ -159,7 +182,8 @@ const resultSchema = new mongoose.Schema({
   },
 });
 
-const Result = mongoose.model("Result", resultSchema);
+const Result = conn.model("Result", resultSchema);
+const ResultAtlas = conn_atlas.model("Result", resultSchema);
 
 // ========================================
 
@@ -170,4 +194,12 @@ module.exports = {
   Preselect,
   OpenTime,
   Result,
+  CourseAtlas,
+  StudentAtlas,
+  SelectionAtlas,
+  PreselectAtlas,
+  OpenTimeAtlas,
+  ResultAtlas,
+  conn,
+  conn_atlas,
 };

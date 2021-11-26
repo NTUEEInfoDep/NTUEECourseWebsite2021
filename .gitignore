@@ -140,3 +140,4 @@ dist
 # private datas
 
 server/database/private-data/
+.env
