@@ -1,7 +1,7 @@
 [{
         "id": "Ten-Select-Two",
         "name": "十選二實驗",
-        "type": "customized",
+        "type": "Ten-Select-Two",
         "description": "<p>(1) 請詳閱 <a href=\"https://bit.ly/3o0MrAb\" target=\"_blank\" style=\"color: #45bbff;\">實驗規定</a>，攸關各位的權利。</p><p>(2)特別轉載半導體實驗規定： ★★大學畢業後欲投入半導體領域者，可保留名額  ★★實驗期間需全程戴口罩、穿實驗衣含無塵衣,且著裝後需能自由移動。  ★★需遵守政府、臺大及實驗室之公共安全規定。  ★★環安衛法律條文規定沒有英文部份,若有外藉生不懂中文,將請助教以英文口譯告知。  ★★Electrical Engineering Lab (semiconductor) safety rules: ★In the labs,  students are required to wear  masks and lab  coats /cleanroom suits, and can be able to move freely with the  coats/suits.  ★★All persons in labs must follow the related safety regulations required by the labs, NTU, and the government.  ★★Enrolled international students  will be informed by teaching assistants orally in case that the English regulations/statutes of occupational health and safety, and environmental protection are not officially available.</p><p>(3) 數電請進入 <a href=\"https://forms.gle/kJowuD9SynDYQpjB6\" target=\"_blank\" style=\"color: #45bbff;\">此表單</a> 報名。</p>",
         "students": [],
         "number": 2,
@@ -70,7 +70,7 @@
     {
         "id": "Electronics-one",
         "name": "電子學（一）",
-        "type": "higher-grade-first",
+        "type": "2",
         "description": "",
         "students": [],
         "number": 1,
@@ -103,7 +103,7 @@
     {
         "id": "Electormagnetics-one",
         "name": "電磁學一",
-        "type": "higher-grade-first",
+        "type": "2",
         "description": "",
         "students": [],
         "number": 1,
@@ -142,7 +142,7 @@
     {
         "id": "Linear-Algebra",
         "name": "工程數學-線性代數",
-        "type": "higher-grade-first",
+        "type": "2",
         "description": "",
         "students": [],
         "number": 1,
@@ -175,7 +175,7 @@
     {
         "id": "Differential-Equation",
         "name": "工程數學-微分方程",
-        "type": "higher-grade-first",
+        "type": "2",
         "description": "",
         "number": 1,
         "students": ["B00000001"],
@@ -208,7 +208,7 @@
     {
         "id": "Algorithm",
         "name": "演算法",
-        "type": "higher-grade-first",
+        "type": "3",
         "description": "",
         "number": 1,
         "students": ["B00000000"],
