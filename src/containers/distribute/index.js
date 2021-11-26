@@ -155,7 +155,7 @@ export default function Distribute() {
 
   const handleRunDistribution = () => {
     setLoading(true);
-    DistributeAPI.postDistribute(specifyData)
+    DistributeAPI.postDistribute()
       .then(() => {
         setAlert({
           open: true,
@@ -352,7 +352,7 @@ export default function Distribute() {
             activeStep={activeStep}
             orientation="vertical"
           >
-            <Step key="upload">
+            {/* <Step key="upload">
               <StepButton
                 icon={
                   <CloudUploadIcon
@@ -384,8 +384,8 @@ export default function Distribute() {
                 </Typography>
                 {preselectUploaded
                   ? preselectData.map((id) => (
-                      <Typography key={id}>{id}</Typography>
-                    ))
+                    <Typography key={id}>{id}</Typography>
+                  ))
                   : ""}
                 <br />
                 {preselectUploaded ? (
@@ -444,7 +444,7 @@ export default function Distribute() {
                   )}
                 </div>
               </StepContent>
-            </Step>
+            </Step> */}
             <Step key="run">
               <StepButton
                 icon={
@@ -457,7 +457,7 @@ export default function Distribute() {
                 onClick={() => setActiveStep(1)}
               >
                 <Typography component="h3" variant="h5">
-                  2. Run Distribution
+                  1. Run Distribution
                 </Typography>
               </StepButton>
               <StepContent>
@@ -465,7 +465,7 @@ export default function Distribute() {
                   The previous distribution result will be OVERWRITTEN. Please
                   make sure all student data and course data are correct.
                 </Typography>
-                <Typography style={{ color: "#d32f2f" }}>
+                {/* <Typography style={{ color: "#d32f2f" }}>
                   If specifying certain students for certain course is needed,
                   press "ADD" to fill in more details.
                 </Typography>
@@ -491,7 +491,7 @@ export default function Distribute() {
                   >
                     Add
                   </Button>
-                </div>
+                </div> */}
                 {loading ? (
                   <div className={classes.actionsContainer}>
                     <Fade
@@ -532,7 +532,7 @@ export default function Distribute() {
                 onClick={() => setActiveStep(2)}
               >
                 <Typography component="h3" variant="h5">
-                  3. Download Results
+                  2. Download Results
                 </Typography>
               </StepButton>
               <StepContent>
