@@ -3,11 +3,6 @@ const mongoose = require("mongoose");
 // const { conn, conn_atlas } = require("./connection");
 require("dotenv").config();
 
-const conn_atlas = mongoose.createConnection(process.env.MONGO_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
 const { MONGO_HOST, MONGO_DBNAME } = process.env;
 const conn = mongoose.createConnection(
   `mongodb://${MONGO_HOST}/${MONGO_DBNAME}`,
@@ -60,7 +55,6 @@ const courseSchema = new mongoose.Schema({
 });
 
 const Course = conn.model("Course", courseSchema);
-const CourseAtlas = conn_atlas.model("Course", courseSchema);
 
 // ========================================
 
@@ -100,7 +94,6 @@ const userSchema = new mongoose.Schema({
 });
 
 const Student = conn.model("Student", userSchema);
-const StudentAtlas = conn_atlas.model("Student", userSchema);
 
 // ========================================
 
@@ -128,7 +121,6 @@ const selectionSchema = new mongoose.Schema({
 });
 
 const Selection = conn.model("Selection", selectionSchema);
-const SelectionAtlas = conn_atlas.model("Selection", selectionSchema);
 
 // ========================================
 
@@ -142,7 +134,6 @@ const preselectSchema = new mongoose.Schema({
 });
 
 const Preselect = conn.model("Preselect", preselectSchema);
-const PreselectAtlas = conn_atlas.model("Preselect", preselectSchema);
 
 // ========================================
 
@@ -160,7 +151,6 @@ const openTimeSchema = new mongoose.Schema({
 });
 
 const OpenTime = conn.model("OpenTime", openTimeSchema);
-const OpenTimeAtlas = conn_atlas.model("OpenTime", openTimeSchema);
 
 // ========================================
 
@@ -183,7 +173,17 @@ const resultSchema = new mongoose.Schema({
 });
 
 const Result = conn.model("Result", resultSchema);
-const ResultAtlas = conn_atlas.model("Result", resultSchema);
+
+// const conn_atlas = mongoose.createConnection(process.env.MONGO_URL, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// });
+// const CourseAtlas = conn_atlas.model("Course", courseSchema);
+// const StudentAtlas = conn_atlas.model("Student", userSchema);
+// const SelectionAtlas = conn_atlas.model("Selection", selectionSchema);
+// const PreselectAtlas = conn_atlas.model("Preselect", preselectSchema);
+// const OpenTimeAtlas = conn_atlas.model("OpenTime", openTimeSchema);
+// const ResultAtlas = conn_atlas.model("Result", resultSchema);
 
 // ========================================
 
@@ -194,12 +194,12 @@ module.exports = {
   Preselect,
   OpenTime,
   Result,
-  CourseAtlas,
-  StudentAtlas,
-  SelectionAtlas,
-  PreselectAtlas,
-  OpenTimeAtlas,
-  ResultAtlas,
   conn,
-  conn_atlas,
+  // CourseAtlas,
+  // StudentAtlas,
+  // SelectionAtlas,
+  // PreselectAtlas,
+  // OpenTimeAtlas,
+  // ResultAtlas,
+  // conn_atlas,
 };
