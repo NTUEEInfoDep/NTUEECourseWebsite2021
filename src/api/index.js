@@ -93,3 +93,7 @@ export const OpentimeAPI = {
       .put(`/api/opentime`, { start, end })
       .catch((error) => errorHandling(error)),
 };
+
+export const ResultAPI = {
+  getResult: () => axios.get("/api/result"),
+};
