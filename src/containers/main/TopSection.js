@@ -10,6 +10,8 @@ import DownArrow from "./downarrow.js";
 import moment from "moment";
 import PickTime from "./SetTimeButton.js";
 import { OpentimeAPI } from "../../api";
+import Button from "@material-ui/core/Button";
+import { Link } from "react-router-dom";
 /**
  * This is Main Page
  */
@@ -130,7 +132,7 @@ export default function Top() {
           }}
         >
           <Paper className={classes.paper}>
-            <Grid item style={{ marginTop: "20%", marginLeft: "5%" }}>
+            <Grid item style={{ marginTop: "15%", marginLeft: "5%" }}>
               <Typography
                 gutterBottom
                 variant="h5"
@@ -161,11 +163,28 @@ export default function Top() {
                 <></>
               )}
             </Grid>
+            <Button
+              style={{
+                width: "70%",
+                display: "flex",
+                margin: "15% auto",
+              }}
+              variant="outlined"
+              color="primary"
+            >
+              <Link
+                style={{ textDecoration: "none", color: "white" }}
+                to="/courses"
+              >
+                Start to Select Courses
+              </Link>
+            </Button>
           </Paper>
         </Grid>
+
         <div
           onClick={scrollToNextSection}
-          style={{ margin: "auto", maxWidth: "46px", marginTop: "12%" }}
+          style={{ margin: "auto", maxWidth: "46px", marginTop: "5%" }}
         >
           <DownArrow />
         </div>
