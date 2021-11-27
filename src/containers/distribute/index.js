@@ -454,7 +454,7 @@ export default function Distribute() {
                     })}
                   />
                 }
-                onClick={() => setActiveStep(1)}
+                onClick={() => setActiveStep(0)}
               >
                 <Typography component="h3" variant="h5">
                   1. Run Distribution
@@ -529,7 +529,7 @@ export default function Distribute() {
                     })}
                   />
                 }
-                onClick={() => setActiveStep(2)}
+                onClick={() => setActiveStep(1)}
               >
                 <Typography component="h3" variant="h5">
                   2. Download Results
