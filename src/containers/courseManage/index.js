@@ -324,11 +324,6 @@ export default function CourseManage() {
     handleCoursesReload();
   }, []);
 
-  useEffect(() => {
-    console.log(newOption)
-    console.log(editOption)
-  }, [newOption]);
-
   return (
     <div>
       <Grid container spacing={3} direction="row">
