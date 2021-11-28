@@ -450,7 +450,7 @@ export default function Distribute() {
                 icon={
                   <CallSplitIcon
                     className={clsx(classes.stepButton, {
-                      [classes.active]: activeStep === 1,
+                      [classes.active]: activeStep === 0,
                     })}
                   />
                 }
@@ -525,7 +525,7 @@ export default function Distribute() {
                 icon={
                   <GetAppIcon
                     className={clsx(classes.stepButton, {
-                      [classes.active]: activeStep === 2,
+                      [classes.active]: activeStep === 1,
                     })}
                   />
                 }
