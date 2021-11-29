@@ -26,7 +26,7 @@ export const SessionAPI = {
 export const CourseAPI = {
   getCourses: () =>
     axios
-      .get(`/api/courses?name&type&description&options`)
+      .get(`/api/courses?name&type&description&options&students`)
       .catch((error) => errorHandling(error)),
   postCourse: (course) =>
     axios.post(`/api/course`, [course]).catch((error) => errorHandling(error)),
