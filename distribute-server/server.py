@@ -212,6 +212,7 @@ def statistics():
     analysis.analyze()
     analysis.analyze_grade()
     analysis.analyze_selection_grade()
+    analysis.analyze_selection_result()
     csv_string = analysis.to_csv()
     return Response(csv_string, mimetype='text/plain')
 # ========================================
