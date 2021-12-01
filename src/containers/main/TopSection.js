@@ -112,6 +112,7 @@ export default function Top() {
     scroller.scrollTo("explanation", { smooth: true, duration: 1500 });
   };
   const classes = useStyles();
+  const { isLogin } = useSelector(selectSession);
   return (
     <Element name="title">
       <div className={classes.root}>
@@ -163,13 +164,33 @@ export default function Top() {
                 <></>
               )}
             </Grid>
+            {!isLogin && (
+              <Button
+                style={{
+                  width: "70%",
+                  display: "flex",
+                  margin: "auto",
+                  marginTop: "15%",
+                  marginBottom: "3%",
+                }}
+                variant="outlined"
+                color="primary"
+              >
+                <Link
+                  style={{ textDecoration: "none", color: "white" }}
+                  to="/login"
+                >
+                  Log in
+                </Link>
+              </Button>
+            )}
             <Button
               style={{
                 width: "70%",
                 display: "flex",
-                margin: "15% auto",
+                margin: "auto",
               }}
-              variant="outlined"
+              variant="contained"
               color="primary"
             >
               <Link
