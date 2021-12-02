@@ -107,6 +107,7 @@ export default function CourseManage() {
   const [alert, setAlert] = useState({});
   const [mdescription, setMDescription] = useState("");
   const [editOption, setEditOption] = useState(0);
+  const [grades, setGrades] = useState([]);
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -130,7 +131,10 @@ export default function CourseManage() {
   };
 
   const handleCourseOption = (event, key) => {
-    if (key === "limit" && event.target.value.replace(/[^\d]/g, "") !== "") {
+    if (
+      (key === "limit" || key === "priority_value") &&
+      event.target.value.replace(/[^\d]/g, "") !== ""
+    ) {
       setNewOption({
         ...newOption,
         [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
@@ -320,6 +324,16 @@ export default function CourseManage() {
     handleCoursesReload();
   }, []);
 
+  useEffect(() => {
+    setGrades([]);
+  }, [newOption.priority_type]);
+
+  useEffect(() => {
+    if (grades.length > 0) {
+      setNewOption({ ...newOption, priority_value: grades });
+    }
+  }, [grades]);
+
   return (
     <div>
       <Grid container spacing={3} direction="row">
@@ -394,7 +408,7 @@ export default function CourseManage() {
                     priorityData.find(
                       ({ id: ID }) => ID === option.priority_type
                     )?.text
-                  }` ?? ""
+                  } ; ${option.priority_value}` ?? ""
                 }
                 variant="outlined"
                 color={option === newOption ? "secondary" : "default"}
@@ -447,6 +461,9 @@ export default function CourseManage() {
               newOption={newOption}
               handleCourseOption={handleCourseOption}
               errors={errors}
+              grades={grades}
+              setGrades={setGrades}
+              setNewOption={setNewOption}
             />
             {!editOption ? (
               <Button
@@ -537,7 +554,18 @@ export default function CourseManage() {
 }
 
 function AdditionalFormControl(props) {
-  const { newOption, handleCourseOption, errors } = props;
+  const { newOption, handleCourseOption, errors, grades, setGrades } = props;
+  const handleGrades = (event) => {
+    if (event.target.checked) {
+      const gradeCopy = [...grades, event.target.value];
+      gradeCopy.sort(function (a, b) {
+        return a - b;
+      });
+      setGrades(gradeCopy);
+    } else {
+      setGrades(grades.filter((g) => g !== event.target.value));
+    }
+  };
   if (newOption !== undefined) {
     if (newOption.priority_type === "grades") {
       return (
@@ -546,28 +574,28 @@ function AdditionalFormControl(props) {
             control={<Checkbox />}
             value={1}
             label="大一"
-            onChange={(e) => handleCourseOption(e, "priority_value")}
+            onChange={handleGrades}
             labelPlacement="top"
           />
           <FormControlLabel
             control={<Checkbox />}
             value={2}
             label="大二"
-            onChange={(e) => handleCourseOption(e, "priority_value")}
+            onChange={handleGrades}
             labelPlacement="top"
           />
           <FormControlLabel
             control={<Checkbox />}
             value={3}
             label="大三"
-            onChange={(e) => handleCourseOption(e, "priority_value")}
+            onChange={handleGrades}
             labelPlacement="top"
           />
           <FormControlLabel
             control={<Checkbox />}
             value={4}
             label="大四"
-            onChange={(e) => handleCourseOption(e, "priority_value")}
+            onChange={handleGrades}
             labelPlacement="top"
           />
         </span>
