@@ -90,12 +90,14 @@ export default function CourseManage() {
     type: "",
     description: "",
     options: [],
+    number: 0,
+    students: [],
   };
   const emptyOption = {
     name: "",
     limit: "",
     priority_type: "",
-    priority_value: "",
+    priority_value: 0,
   };
   const [courses, setCourses] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -126,7 +128,14 @@ export default function CourseManage() {
   };
 
   const handleCourse = (event, key) => {
-    setCourse({ ...course, [key]: event.target.value });
+    if (key === "number" && event.target.value.replace(/[^\d]/g, "") !== "") {
+      setCourse({
+        ...course,
+        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
+      });
+    } else {
+      setCourse({ ...course, [key]: event.target.value });
+    }
     if (event.target.value.length) setErrors({ ...errors, [key]: false });
   };
 
@@ -395,6 +404,15 @@ export default function CourseManage() {
               ))}
             </Select>
           </FormControl>
+          <TextField
+            id="number"
+            label="Selected options limit"
+            type="number"
+            fullWidth
+            value={course.number}
+            error={errors.number}
+            onChange={(e) => handleCourse(e, "number")}
+          />
 
           <DialogContentText className={classes.optionsTitle}>
             Options
