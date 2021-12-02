@@ -106,6 +106,7 @@ export default function CourseManage() {
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({});
   const [mdescription, setMDescription] = useState("");
+  const [editOption, setEditOption] = useState(0);
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -116,6 +117,7 @@ export default function CourseManage() {
     setErrors({});
     setDialogOpen(false);
     setMDescription("");
+    setEditOption(0);
   };
 
   const showAlert = (severity, msg) => {
@@ -177,6 +179,10 @@ export default function CourseManage() {
         ...errors,
         newOption: false,
       });
+    if (index === editOption - 1) {
+      setNewOption(emptyOption);
+      setEditOption(0);
+    }
     setCourse({
       ...course,
       options: [
@@ -272,6 +278,40 @@ export default function CourseManage() {
     setConfirmOpen(true);
   };
 
+  const handleEditOption = (index) => {
+    setEditOption(index + 1);
+    setNewOption(course.options[index]);
+  };
+
+  const handleModifyOption = (index) => {
+    if (newOption.name === "") {
+      showAlert("warning", `Name is required.`);
+      return;
+    }
+    if (errors.newOption) {
+      showAlert("warning", `The option ${newOption.name} is repeated.`);
+      return;
+    }
+    if (newOption.limit === "") {
+      showAlert("warning", `Limit is required.`);
+      return;
+    }
+    if (newOption.priority_type === "") {
+      showAlert("warning", `Priority_type is required.`);
+      return;
+    }
+    setCourse({
+      ...course,
+      options: [
+        ...course.options.slice(0, index),
+        newOption,
+        ...course.options.slice(index + 1),
+      ],
+    });
+    setNewOption(emptyOption);
+    setEditOption(0);
+  };
+
   useEffect(() => {
     setCourse({ ...course, description: mdescription });
   }, [mdescription]);
@@ -341,16 +381,6 @@ export default function CourseManage() {
               ))}
             </Select>
           </FormControl>
-          {/* <TextField
-            id="desc"
-            label="Description (HTML)"
-            type="text"
-            fullWidth
-            multiline
-            value={course.description}
-            error={errors.description}
-            onChange={(e) => handleCourse(e, "description")}
-          /> */}
 
           <DialogContentText className={classes.optionsTitle}>
             Options
@@ -370,6 +400,7 @@ export default function CourseManage() {
                 color={option === newOption ? "secondary" : "default"}
                 onDelete={() => handleCourseDelOption(_index)}
                 padding={1}
+                onClick={() => handleEditOption(_index)}
               />
             ))}
           </div>
@@ -380,7 +411,11 @@ export default function CourseManage() {
               error={errors.newOption}
               onChange={(e) => handleCourseOption(e, "name")}
               onKeyDown={(e) => {
-                if (e.code === "Enter") handleCourseAddOption();
+                if (e.code === "Enter") {
+                  !editOption
+                    ? handleCourseAddOption()
+                    : handleModifyOption(editOption - 1);
+                }
               }}
             />
             <TextField
@@ -413,15 +448,27 @@ export default function CourseManage() {
               handleCourseOption={handleCourseOption}
               errors={errors}
             />
-            <Button
-              startIcon={<Add />}
-              variant="outlined"
-              size="small"
-              onClick={handleCourseAddOption}
-              style={{ marginLeft: "20px" }}
-            >
-              Add
-            </Button>
+            {!editOption ? (
+              <Button
+                startIcon={<Add />}
+                variant="outlined"
+                size="small"
+                onClick={handleCourseAddOption}
+                style={{ marginLeft: "20px" }}
+              >
+                Add
+              </Button>
+            ) : (
+              <Button
+                startIcon={<Edit />}
+                variant="outlined"
+                size="small"
+                onClick={() => handleModifyOption(editOption - 1)}
+                style={{ marginLeft: "20px" }}
+              >
+                Modify
+              </Button>
+            )}
           </div>
           <DialogContentText
             className={classes.optionsTitle}

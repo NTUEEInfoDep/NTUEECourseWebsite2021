@@ -12,6 +12,7 @@ import MainRoute from "./components/routes/mainRoute";
 import Drawer from "./containers/drawer";
 import Main from "./containers/main";
 import Courses from "./containers/courses";
+import Result from "./containers/result";
 import Selection from "./containers/selection";
 import Login from "./containers/login";
 import StudentData from "./containers/studentData";
@@ -38,6 +39,9 @@ const Routes = () => {
       </MainRoute>
       <PublicRoute exact path="/courses">
         <Courses />
+      </PublicRoute>
+      <PublicRoute exact path="/result">
+        <Result />
       </PublicRoute>
       <PrivateRoute exact path="/selection/:courseId">
         <Selection />

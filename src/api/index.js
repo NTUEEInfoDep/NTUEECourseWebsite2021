@@ -79,7 +79,7 @@ export const SelectAPI = {
 
 export const DistributeAPI = {
   // postDistribute: () => axios.post(`/api/distribute`),
-  postDistribute: (data) => axios.post(`/api/new_distribute`, data),
+  postDistribute: () => axios.post(`/api/new_distribute`),
   putPreselect: (ids) =>
     axios.put(`/api/preselect`, ids).catch((error) => errorHandling(error)),
   getResult: () => axios.get(`/api/result.csv`),
@@ -92,4 +92,8 @@ export const OpentimeAPI = {
     axios
       .put(`/api/opentime`, { start, end })
       .catch((error) => errorHandling(error)),
+};
+
+export const ResultAPI = {
+  getResult: () => axios.get("/api/result"),
 };

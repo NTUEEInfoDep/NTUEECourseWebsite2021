@@ -24,13 +24,14 @@ import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import HomeIcon from "@material-ui/icons/Home"; // Main
 import ExitToAppIcon from "@material-ui/icons/ExitToApp"; // Login, Logout
 import ClassIcon from "@material-ui/icons/Class"; // Courses
+import PlaylistAddCheckIcon from "@material-ui/icons/PlaylistAddCheck"; //  Result
 import PeopleIcon from "@material-ui/icons/People"; // Student Data
 import CloudUploadIcon from "@material-ui/icons/CloudUpload"; // Course Manage
 import ShuffleIcon from "@material-ui/icons/Shuffle"; // Distribute
 // slices, logout
-import { selectSession, logout } from "../../slices/sessionSlice";
-//route
 import { Redirect } from "react-router";
+import { selectSession, logout } from "../../slices/sessionSlice";
+// route
 
 const drawerWidth = 200;
 const maxPhoneWidth = 700;
@@ -155,6 +156,7 @@ const Drawer = ({ children }) => {
         1: [
           { text: "Main", to: "/", icon: <HomeIcon /> },
           { text: "Courses", to: "/courses", icon: <ClassIcon /> },
+          { text: "Result", to: "/result", icon: <PlaylistAddCheckIcon /> },
           {
             text: "Student Data",
             to: "/studentdata",
@@ -169,6 +171,7 @@ const Drawer = ({ children }) => {
         2: [
           { text: "Main", to: "/", icon: <HomeIcon /> },
           { text: "Courses", to: "/courses", icon: <ClassIcon /> },
+          { text: "Result", to: "/result", icon: <PlaylistAddCheckIcon /> },
           {
             text: "Student Data",
             to: "/studentdata",
@@ -188,6 +191,7 @@ const Drawer = ({ children }) => {
       }[authority] || [
         { text: "Main", to: "/", icon: <HomeIcon /> },
         { text: "Courses", to: "/courses", icon: <ClassIcon /> },
+        { text: "Result", to: "/result", icon: <PlaylistAddCheckIcon /> },
       ];
 
   const userName = isLogin ? userID : "";

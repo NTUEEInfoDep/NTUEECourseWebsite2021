@@ -324,6 +324,55 @@
                 }
             }
         },
+        "/result": {
+            "get": {
+                "tags": ["Selection"],
+                "summary": "get a list of selection of the user",
+                "description": "Get a list of all selections of the user. Need Authority: User",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "userID": {
+                                                "type": "string"
+                                            },
+                                            "courseID": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "ranking": {
+                                                "type": "number"
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": [{
+                                        "userID": "B00000000",
+                                        "courseID": "Ten-Select-Two",
+                                        "name": "電磁學",
+                                        "ranking": 1
+                                    },
+                                    {
+                                        "userID": "B00000000",
+                                        "courseID": "Ten-Select-Two",
+                                        "name": "半導體",
+                                        "ranking": 2
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "tags": ["User"],
