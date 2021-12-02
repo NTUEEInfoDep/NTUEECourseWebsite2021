@@ -20,15 +20,16 @@ import {
 import { Alert } from "@material-ui/lab";
 import { Add, Edit } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
+import { FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 
 // components
+import MDEditor from "@uiw/react-md-editor";
 import CourseTable from "./CourseTable";
 
 // api
 import { CourseAPI } from "../../api";
 
-//MdEditor
-import MDEditor from "@uiw/react-md-editor";
+// MdEditor
 import "./mdeditor.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -69,15 +70,12 @@ const typeData = [
 ];
 
 const priorityData = [
-  { id: 0, text: "無" },
-  { id: 1, text: "大一" },
-  { id: 2, text: "大二" },
-  { id: 3, text: "大三" },
-  { id: 4, text: "大四" },
-  { id: 5, text: "大三、大四" },
-  { id: 6, text: "大四21人(光電實驗)" },
-  { id: 7, text: "大三12人(電磁波實驗)" },
-  { id: -1, text: "高年級" },
+  { id: "none", text: "無" },
+  { id: "higher-grade-first", text: "高年級優先" },
+  { id: "grades", text: "特定年級優先" },
+  { id: "guarantee-third-grade", text: "大三保證" },
+  { id: "guarantee-fourth-grade", text: "大四保證" },
+  { id: "preselect", text: "預選" },
 ];
 
 /**
@@ -96,7 +94,8 @@ export default function CourseManage() {
   const emptyOption = {
     name: "",
     limit: "",
-    priority: "",
+    priority_type: "",
+    priority_value: "",
   };
   const [courses, setCourses] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -134,12 +133,10 @@ export default function CourseManage() {
         ...newOption,
         [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
       });
+    } else if (key !== "limit") {
+      setNewOption({ ...newOption, [key]: event.target.value });
     } else {
-      if (key !== "limit") {
-        setNewOption({ ...newOption, [key]: event.target.value });
-      } else {
-        setNewOption({ ...newOption, [key]: "" });
-      }
+      setNewOption({ ...newOption, [key]: "" });
     }
     setErrors({
       ...errors,
@@ -363,12 +360,11 @@ export default function CourseManage() {
               <Chip
                 key={option.name}
                 label={
-                  option.name +
-                    " ; " +
-                    option.limit +
-                    "人 ; " +
-                    priorityData.find(({ id: ID }) => ID === option.priority)
-                      ?.text ?? ""
+                  `${option.name} ; ${option.limit}人 ; ${
+                    priorityData.find(
+                      ({ id: ID }) => ID === option.priority_type
+                    )?.text
+                  }` ?? ""
                 }
                 variant="outlined"
                 color={option === newOption ? "secondary" : "default"}
@@ -400,18 +396,23 @@ export default function CourseManage() {
             >
               <InputLabel>優先年級</InputLabel>
               <Select
-                value={newOption.priority}
+                value={newOption.priority_type}
                 error={errors.newOption}
-                onChange={(e) => handleCourseOption(e, "priority")}
+                onChange={(e) => handleCourseOption(e, "priority_type")}
                 style={{ width: "100px" }}
               >
-                {priorityData.map((priority) => (
-                  <MenuItem key={priority.id} value={priority.id}>
-                    {priority.text}
+                {priorityData.map((priority_type) => (
+                  <MenuItem key={priority_type.id} value={priority_type.id}>
+                    {priority_type.text}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
+            <AdditionalFormControl
+              newOption={newOption}
+              handleCourseOption={handleCourseOption}
+              errors={errors}
+            />
             <Button
               startIcon={<Add />}
               variant="outlined"
@@ -486,4 +487,61 @@ export default function CourseManage() {
       </Snackbar>
     </div>
   );
+}
+
+function AdditionalFormControl(props) {
+  const { newOption, handleCourseOption, errors } = props;
+  if (newOption !== undefined) {
+    if (newOption.priority_type === "grades") {
+      return (
+        <span>
+          <FormControlLabel
+            control={<Checkbox />}
+            value={1}
+            label="大一"
+            onChange={(e) => handleCourseOption(e, "priority_value")}
+            labelPlacement="top"
+          />
+          <FormControlLabel
+            control={<Checkbox />}
+            value={2}
+            label="大二"
+            onChange={(e) => handleCourseOption(e, "priority_value")}
+            labelPlacement="top"
+          />
+          <FormControlLabel
+            control={<Checkbox />}
+            value={3}
+            label="大三"
+            onChange={(e) => handleCourseOption(e, "priority_value")}
+            labelPlacement="top"
+          />
+          <FormControlLabel
+            control={<Checkbox />}
+            value={4}
+            label="大四"
+            onChange={(e) => handleCourseOption(e, "priority_value")}
+            labelPlacement="top"
+          />
+        </span>
+      );
+    }
+    if (
+      newOption.priority_type === "guarantee-third-grade" ||
+      newOption.priority_type === "guarantee-fourth-grade"
+    ) {
+      return (
+        <TextField
+          placeholder="優先人數"
+          value={newOption.priority_value}
+          error={errors.newOption}
+          style={{ width: "100px", marginLeft: "20px" }}
+          onChange={(e) => handleCourseOption(e, "priority_value")}
+        />
+      );
+    }
+
+    return null;
+  }
+  return null;
 }
