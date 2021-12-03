@@ -221,7 +221,7 @@ export default function CourseManage() {
 
   const handleCourseApply = async () => {
     const errs = {};
-    ["id", "name", "type", "description", "options"].forEach((key) => {
+    ["id", "name", "type", "options"].forEach((key) => {
       errs[key] = !course[key]?.length;
     });
     setErrors({ ...errors, ...errs });
@@ -229,14 +229,15 @@ export default function CourseManage() {
       if (errs?.id) showAlert("warning", "Course ID is required.");
       else if (errs?.name) showAlert("warning", "Course Name is required.");
       else if (errs?.type) showAlert("warning", "Course Type is required.");
-      else if (errs?.description)
-        showAlert("warning", "Course Description is required.");
+      // else if (errs?.description)
+      //   showAlert("warning", "Course Description is required.");
       else if (errs?.options)
         showAlert("warning", "At least one option is required.");
       return;
     }
     try {
       if (currentId === "") {
+        console.log(course)
         await CourseAPI.postCourse(course);
         showAlert("success", `Course ${course.name} added.`);
         handleCoursesReload();
