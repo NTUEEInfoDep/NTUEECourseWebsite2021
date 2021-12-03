@@ -221,21 +221,16 @@ export default function CourseManage() {
 
   const handleCourseApply = async () => {
     const errs = {};
-    ["id", "name", "type", "description", "options", "number"].forEach(
-      (key) => {
-        errs[key] = !course[key]?.length;
-      }
-    );
-    // if(course.number === 0){
-
-    // }
+    ["id", "name", "type", "options", "number"].forEach((key) => {
+      errs[key] = !course[key]?.length;
+    });
     setErrors({ ...errors, ...errs });
     if (Object.keys(errs).some((key) => errs[key])) {
       if (errs?.id) showAlert("warning", "Course ID is required.");
       else if (errs?.name) showAlert("warning", "Course Name is required.");
       else if (errs?.type) showAlert("warning", "Course Type is required.");
-      else if (errs?.description)
-        showAlert("warning", "Course Description is required.");
+      // else if (errs?.description)
+      //   showAlert("warning", "Course Description is required.");
       else if (errs?.options)
         showAlert("warning", "At least one option is required.");
       return;
