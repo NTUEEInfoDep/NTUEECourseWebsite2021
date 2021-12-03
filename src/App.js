@@ -8,6 +8,7 @@ import PublicRoute from "./components/routes/publicRoute";
 import PrivateRoute from "./components/routes/privateRoute";
 import LoginRoute from "./components/routes/loginRoute";
 import MainRoute from "./components/routes/mainRoute";
+import AdminRoute from "./components/routes/adminRoute";
 // containers
 import Drawer from "./containers/drawer";
 import Main from "./containers/main";
@@ -55,9 +56,9 @@ const Routes = () => {
       <PrivateRoute exact path="/course-manage">
         <CourseManage />
       </PrivateRoute>
-      <PrivateRoute exact path="/distribute">
+      <AdminRoute exact path="/distribute">
         <Distribute />
-      </PrivateRoute>
+      </AdminRoute>
       <Redirect to="/login" />
     </Switch>
   );
