@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
 }));
 const StyledSlide = styled(Slide)`
   .carousel__inner-slide {
-    max-width: 400px;
+    max-width: 700px;
     /* margin: "auto"; */
     display: flex;
     overflow-y: auto;
@@ -50,7 +50,7 @@ const StyledSlide = styled(Slide)`
   }
 `;
 const StyledCarouselProvider = styled(CarouselProvider)`
-  width: 35%;
+  width: 70%;
   border: solid;
   /* margin-top: 3%; */
   padding: 2%;
