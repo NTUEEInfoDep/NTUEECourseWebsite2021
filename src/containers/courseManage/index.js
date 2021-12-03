@@ -237,7 +237,6 @@ export default function CourseManage() {
     }
     try {
       if (currentId === "") {
-        console.log(course)
         await CourseAPI.postCourse(course);
         showAlert("success", `Course ${course.name} added.`);
         handleCoursesReload();
