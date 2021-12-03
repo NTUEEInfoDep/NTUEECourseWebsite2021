@@ -128,7 +128,7 @@ export default function Top() {
             padding: "10px",
             margin: "auto",
             marginTop: "5%",
-            marginLeft: "0.5%",
+            marginLeft: "30%",
             width: "90%",
             maxWidth: "500px",
             maxHeight: "500px",
