@@ -11,7 +11,7 @@ import moment from "moment";
 import PickTime from "./SetTimeButton.js";
 import { OpentimeAPI } from "../../api";
 import Button from "@material-ui/core/Button";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 /**
  * This is Main Page
  */
@@ -20,6 +20,7 @@ export default function Top() {
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
   const [showLeft, setShowLeft] = useState(false);
+  const history=useHistory()
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -175,6 +176,7 @@ export default function Top() {
                 }}
                 variant="outlined"
                 color="primary"
+                onClick={()=>history.push("/login")}
               >
                 <Link
                   style={{ textDecoration: "none", color: "white" }}
