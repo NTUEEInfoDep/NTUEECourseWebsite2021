@@ -140,8 +140,13 @@ export default function CourseManage() {
   };
 
   const handleCourseOption = (event, key) => {
-    if (
-      (key === "limit" || key === "priority_value") &&
+    if (key === "limit" && event.target.value.replace(/[^\d]/g, "") !== "") {
+      setNewOption({
+        ...newOption,
+        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
+      });
+    } else if (
+      key === "priority_value" &&
       event.target.value.replace(/[^\d]/g, "") !== ""
     ) {
       setNewOption({
@@ -626,10 +631,12 @@ function AdditionalFormControl(props) {
       return (
         <TextField
           placeholder="優先人數"
+          defalut={0}
+          type="number"
           value={newOption.priority_value}
           error={errors.newOption}
           style={{ width: "100px", marginLeft: "20px" }}
-          onChange={(e) => handleCourseOption(e, "priority_value")}
+          onChange={(event) => handleCourseOption(event, "priority_value")}
         />
       );
     }
