@@ -100,10 +100,10 @@ export default function Courses() {
       .catch(() => {});
   }, []);
   // select grade
-  const [selectedGrade, setSelectedGrade] = useState("1");
-  const handleSelectGrade = (event, value) => {
+  //const [selectedGrade, setSelectedGrade] = useState("1");
+  /*const handleSelectGrade = (event, value) => {
     setSelectedGrade(value);
-  };
+  };*/
 
   // select course
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -116,7 +116,28 @@ export default function Courses() {
 
   return (
     <div>
-      {/* <Toolbar>
+      <Grid container>
+        {courses
+          .filter(
+            (c) =>
+              (!c.students.length || c.students.includes(userID))
+          )
+          .map(({ id, name }) => (
+            <Grid item xs={6} sm={4} md={3} key={id}>
+              <Course
+                id={id}
+                name={name}
+                handleSelectCourse={handleSelectCourse}
+              />
+            </Grid>
+          ))}
+      </Grid>
+      <Paper> {selectedCourse && <Selection course={selectedCourse} />} </Paper>
+    </div>
+  );
+}
+
+/*{ <Toolbar>
         <div className={classes.search}>
           <div className={classes.searchIcon}>
             <SearchIcon />
@@ -129,7 +150,7 @@ export default function Courses() {
             }}
           />
         </div>
-      </Toolbar> */}
+      </Toolbar> }
       <div>
         <Tabs
           value={selectedGrade}
@@ -147,28 +168,7 @@ export default function Courses() {
             />
           ))}
         </Tabs>
-      </div>
-      <Grid container>
-        {courses
-          .filter(
-            (c) =>
-              c.type === selectedGrade &&
-              (!c.students.length || c.students.includes(userID))
-          )
-          .map(({ id, name }) => (
-            <Grid item xs={6} sm={4} md={3} key={id}>
-              <Course
-                id={id}
-                name={name}
-                handleSelectCourse={handleSelectCourse}
-              />
-            </Grid>
-          ))}
-      </Grid>
-      <Paper> {selectedCourse && <Selection course={selectedCourse} />} </Paper>
-    </div>
-  );
-}
+      </div>*/
 
 const fakeCourseData = [
   {
