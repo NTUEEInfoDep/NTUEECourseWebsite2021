@@ -76,6 +76,7 @@ const priorityData = [
   { id: "guarantee-third-grade", text: "大三保證" },
   { id: "guarantee-fourth-grade", text: "大四保證" },
   { id: "preselect", text: "預選" },
+  { id: "", text: "無" },
 ];
 
 /**
@@ -90,7 +91,7 @@ export default function CourseManage() {
     type: "",
     description: "",
     options: [],
-    number: 0,
+    number: 1,
     students: [],
   };
   const emptyOption = {
@@ -431,7 +432,11 @@ export default function CourseManage() {
                     priorityData.find(
                       ({ id: ID }) => ID === option.priority_type
                     )?.text
-                  } ; ${option.priority_value}` ?? ""
+                  } ; ${
+                    option.priority_type === "preselect"
+                      ? option.priority_value.length
+                      : option.priority_value
+                  }` ?? ""
                 }
                 variant="outlined"
                 color={option === newOption ? "secondary" : "default"}
