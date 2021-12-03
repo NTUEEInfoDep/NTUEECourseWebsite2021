@@ -20,15 +20,16 @@ import {
 import { Alert } from "@material-ui/lab";
 import { Add, Edit } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
+import { FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 
 // components
+import MDEditor from "@uiw/react-md-editor";
 import CourseTable from "./CourseTable";
 
 // api
 import { CourseAPI } from "../../api";
 
-//MdEditor
-import MDEditor from "@uiw/react-md-editor";
+// MdEditor
 import "./mdeditor.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -69,15 +70,12 @@ const typeData = [
 ];
 
 const priorityData = [
-  { id: 0, text: "無" },
-  { id: 1, text: "大一" },
-  { id: 2, text: "大二" },
-  { id: 3, text: "大三" },
-  { id: 4, text: "大四" },
-  { id: 5, text: "大三、大四" },
-  { id: 6, text: "大四21人(光電實驗)" },
-  { id: 7, text: "大三12人(電磁波實驗)" },
-  { id: -1, text: "高年級" },
+  { id: "none", text: "無" },
+  { id: "higher-grade-first", text: "高年級優先" },
+  { id: "grades", text: "特定年級優先" },
+  { id: "guarantee-third-grade", text: "大三保證" },
+  { id: "guarantee-fourth-grade", text: "大四保證" },
+  { id: "preselect", text: "預選" },
 ];
 
 /**
@@ -92,11 +90,14 @@ export default function CourseManage() {
     type: "",
     description: "",
     options: [],
+    number: 0,
+    students: [],
   };
   const emptyOption = {
     name: "",
     limit: "",
-    priority: "",
+    priority_type: "",
+    priority_value: 0,
   };
   const [courses, setCourses] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -107,6 +108,8 @@ export default function CourseManage() {
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({});
   const [mdescription, setMDescription] = useState("");
+  const [editOption, setEditOption] = useState(0);
+  const [grades, setGrades] = useState([]);
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -117,6 +120,7 @@ export default function CourseManage() {
     setErrors({});
     setDialogOpen(false);
     setMDescription("");
+    setEditOption(0);
   };
 
   const showAlert = (severity, msg) => {
@@ -124,7 +128,14 @@ export default function CourseManage() {
   };
 
   const handleCourse = (event, key) => {
-    setCourse({ ...course, [key]: event.target.value });
+    if (key === "number" && event.target.value.replace(/[^\d]/g, "") !== "") {
+      setCourse({
+        ...course,
+        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
+      });
+    } else {
+      setCourse({ ...course, [key]: event.target.value });
+    }
     if (event.target.value.length) setErrors({ ...errors, [key]: false });
   };
 
@@ -134,12 +145,18 @@ export default function CourseManage() {
         ...newOption,
         [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
       });
+    } else if (
+      key === "priority_value" &&
+      event.target.value.replace(/[^\d]/g, "") !== ""
+    ) {
+      setNewOption({
+        ...newOption,
+        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
+      });
+    } else if (key !== "limit") {
+      setNewOption({ ...newOption, [key]: event.target.value });
     } else {
-      if (key !== "limit") {
-        setNewOption({ ...newOption, [key]: event.target.value });
-      } else {
-        setNewOption({ ...newOption, [key]: "" });
-      }
+      setNewOption({ ...newOption, [key]: "" });
     }
     setErrors({
       ...errors,
@@ -180,6 +197,10 @@ export default function CourseManage() {
         ...errors,
         newOption: false,
       });
+    if (index === editOption - 1) {
+      setNewOption(emptyOption);
+      setEditOption(0);
+    }
     setCourse({
       ...course,
       options: [
@@ -275,6 +296,40 @@ export default function CourseManage() {
     setConfirmOpen(true);
   };
 
+  const handleEditOption = (index) => {
+    setEditOption(index + 1);
+    setNewOption(course.options[index]);
+  };
+
+  const handleModifyOption = (index) => {
+    if (newOption.name === "") {
+      showAlert("warning", `Name is required.`);
+      return;
+    }
+    if (errors.newOption) {
+      showAlert("warning", `The option ${newOption.name} is repeated.`);
+      return;
+    }
+    if (newOption.limit === "") {
+      showAlert("warning", `Limit is required.`);
+      return;
+    }
+    if (newOption.priority_type === "") {
+      showAlert("warning", `Priority_type is required.`);
+      return;
+    }
+    setCourse({
+      ...course,
+      options: [
+        ...course.options.slice(0, index),
+        newOption,
+        ...course.options.slice(index + 1),
+      ],
+    });
+    setNewOption(emptyOption);
+    setEditOption(0);
+  };
+
   useEffect(() => {
     setCourse({ ...course, description: mdescription });
   }, [mdescription]);
@@ -282,6 +337,16 @@ export default function CourseManage() {
   useEffect(() => {
     handleCoursesReload();
   }, []);
+
+  useEffect(() => {
+    setGrades([]);
+  }, [newOption.priority_type]);
+
+  useEffect(() => {
+    if (grades.length > 0) {
+      setNewOption({ ...newOption, priority_value: grades });
+    }
+  }, [grades]);
 
   return (
     <div>
@@ -344,16 +409,15 @@ export default function CourseManage() {
               ))}
             </Select>
           </FormControl>
-          {/* <TextField
-            id="desc"
-            label="Description (HTML)"
-            type="text"
+          <TextField
+            id="number"
+            label="Selected options limit"
+            type="number"
             fullWidth
-            multiline
-            value={course.description}
-            error={errors.description}
-            onChange={(e) => handleCourse(e, "description")}
-          /> */}
+            value={course.number}
+            error={errors.number}
+            onChange={(e) => handleCourse(e, "number")}
+          />
 
           <DialogContentText className={classes.optionsTitle}>
             Options
@@ -363,17 +427,17 @@ export default function CourseManage() {
               <Chip
                 key={option.name}
                 label={
-                  option.name +
-                    " ; " +
-                    option.limit +
-                    "人 ; " +
-                    priorityData.find(({ id: ID }) => ID === option.priority)
-                      ?.text ?? ""
+                  `${option.name} ; ${option.limit}人 ; ${
+                    priorityData.find(
+                      ({ id: ID }) => ID === option.priority_type
+                    )?.text
+                  } ; ${option.priority_value}` ?? ""
                 }
                 variant="outlined"
                 color={option === newOption ? "secondary" : "default"}
                 onDelete={() => handleCourseDelOption(_index)}
                 padding={1}
+                onClick={() => handleEditOption(_index)}
               />
             ))}
           </div>
@@ -384,7 +448,11 @@ export default function CourseManage() {
               error={errors.newOption}
               onChange={(e) => handleCourseOption(e, "name")}
               onKeyDown={(e) => {
-                if (e.code === "Enter") handleCourseAddOption();
+                if (e.code === "Enter") {
+                  !editOption
+                    ? handleCourseAddOption()
+                    : handleModifyOption(editOption - 1);
+                }
               }}
             />
             <TextField
@@ -400,27 +468,47 @@ export default function CourseManage() {
             >
               <InputLabel>優先年級</InputLabel>
               <Select
-                value={newOption.priority}
+                value={newOption.priority_type}
                 error={errors.newOption}
-                onChange={(e) => handleCourseOption(e, "priority")}
+                onChange={(e) => handleCourseOption(e, "priority_type")}
                 style={{ width: "100px" }}
               >
-                {priorityData.map((priority) => (
-                  <MenuItem key={priority.id} value={priority.id}>
-                    {priority.text}
+                {priorityData.map((priority_type) => (
+                  <MenuItem key={priority_type.id} value={priority_type.id}>
+                    {priority_type.text}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-            <Button
-              startIcon={<Add />}
-              variant="outlined"
-              size="small"
-              onClick={handleCourseAddOption}
-              style={{ marginLeft: "20px" }}
-            >
-              Add
-            </Button>
+            <AdditionalFormControl
+              newOption={newOption}
+              handleCourseOption={handleCourseOption}
+              errors={errors}
+              grades={grades}
+              setGrades={setGrades}
+              setNewOption={setNewOption}
+            />
+            {!editOption ? (
+              <Button
+                startIcon={<Add />}
+                variant="outlined"
+                size="small"
+                onClick={handleCourseAddOption}
+                style={{ marginLeft: "20px" }}
+              >
+                Add
+              </Button>
+            ) : (
+              <Button
+                startIcon={<Edit />}
+                variant="outlined"
+                size="small"
+                onClick={() => handleModifyOption(editOption - 1)}
+                style={{ marginLeft: "20px" }}
+              >
+                Modify
+              </Button>
+            )}
           </div>
           <DialogContentText
             className={classes.optionsTitle}
@@ -486,4 +574,74 @@ export default function CourseManage() {
       </Snackbar>
     </div>
   );
+}
+
+function AdditionalFormControl(props) {
+  const { newOption, handleCourseOption, errors, grades, setGrades } = props;
+  const handleGrades = (event) => {
+    if (event.target.checked) {
+      const gradeCopy = [...grades, event.target.value];
+      gradeCopy.sort(function (a, b) {
+        return a - b;
+      });
+      setGrades(gradeCopy);
+    } else {
+      setGrades(grades.filter((g) => g !== event.target.value));
+    }
+  };
+  if (newOption !== undefined) {
+    if (newOption.priority_type === "grades") {
+      return (
+        <span>
+          <FormControlLabel
+            control={<Checkbox />}
+            value={1}
+            label="大一"
+            onChange={handleGrades}
+            labelPlacement="top"
+          />
+          <FormControlLabel
+            control={<Checkbox />}
+            value={2}
+            label="大二"
+            onChange={handleGrades}
+            labelPlacement="top"
+          />
+          <FormControlLabel
+            control={<Checkbox />}
+            value={3}
+            label="大三"
+            onChange={handleGrades}
+            labelPlacement="top"
+          />
+          <FormControlLabel
+            control={<Checkbox />}
+            value={4}
+            label="大四"
+            onChange={handleGrades}
+            labelPlacement="top"
+          />
+        </span>
+      );
+    }
+    if (
+      newOption.priority_type === "guarantee-third-grade" ||
+      newOption.priority_type === "guarantee-fourth-grade"
+    ) {
+      return (
+        <TextField
+          placeholder="優先人數"
+          defalut={0}
+          type="number"
+          value={newOption.priority_value}
+          error={errors.newOption}
+          style={{ width: "100px", marginLeft: "20px" }}
+          onChange={(event) => handleCourseOption(event, "priority_value")}
+        />
+      );
+    }
+
+    return null;
+  }
+  return null;
 }

@@ -10,6 +10,8 @@ import DownArrow from "./downarrow.js";
 import moment from "moment";
 import PickTime from "./SetTimeButton.js";
 import { OpentimeAPI } from "../../api";
+import Button from "@material-ui/core/Button";
+import { Link, useHistory } from "react-router-dom";
 /**
  * This is Main Page
  */
@@ -18,6 +20,7 @@ export default function Top() {
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
   const [showLeft, setShowLeft] = useState(false);
+  const history=useHistory()
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -110,6 +113,7 @@ export default function Top() {
     scroller.scrollTo("explanation", { smooth: true, duration: 1500 });
   };
   const classes = useStyles();
+  const { isLogin } = useSelector(selectSession);
   return (
     <Element name="title">
       <div className={classes.root}>
@@ -131,7 +135,7 @@ export default function Top() {
           }}
         >
           <Paper className={classes.paper}>
-            <Grid item style={{ marginTop: "20%", marginLeft: "5%" }}>
+            <Grid item style={{ marginTop: "15%", marginLeft: "5%" }}>
               <Typography
                 gutterBottom
                 variant="h5"
@@ -162,11 +166,49 @@ export default function Top() {
                 <></>
               )}
             </Grid>
+            {!isLogin && (
+              <Button
+                style={{
+                  width: "70%",
+                  display: "flex",
+                  margin: "auto",
+                  marginTop: "15%",
+                  marginBottom: "3%",
+                }}
+                variant="outlined"
+                color="primary"
+                onClick={()=>history.push("/login")}
+              >
+                <Link
+                  style={{ textDecoration: "none", color: "white" }}
+                  to="/login"
+                >
+                  Log in
+                </Link>
+              </Button>
+            )}
+            <Button
+              style={{
+                width: "70%",
+                display: "flex",
+                margin: "auto",
+              }}
+              variant="contained"
+              color="primary"
+            >
+              <Link
+                style={{ textDecoration: "none", color: "white" }}
+                to="/courses"
+              >
+                Start to Select Courses
+              </Link>
+            </Button>
           </Paper>
         </Grid>
+
         <div
           onClick={scrollToNextSection}
-          style={{ margin: "auto", maxWidth: "46px", marginTop: "12%" }}
+          style={{ margin: "auto", maxWidth: "46px", marginTop: "5%" }}
         >
           <DownArrow />
         </div>

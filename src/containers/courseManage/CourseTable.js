@@ -36,21 +36,29 @@ export default function CourseTable({
             <TableCell>Type</TableCell>
             <TableCell>Description</TableCell>
             <TableCell>Options</TableCell>
+            <TableCell>Number</TableCell>
+            <TableCell>Students</TableCell>
             <TableCell />
           </TableRow>
         </TableHead>
         <TableBody>
-          {courses.map(({ id, name, type, description, options }, _index) => (
-            <TableRow key={id}>
-              <TableCell>{id}</TableCell>
-              <TableCell>{name}</TableCell>
-              <TableCell>
-                {typeData.find(({ id: ID }) => ID === type)?.text ?? ""}
-              </TableCell>
-              <TableCell>{description ? "✔" : ""}</TableCell>
-              <TableCell>{options.length}</TableCell>
-              <TableCell>
-                {/* <IconButton
+          {courses.map(
+            (
+              { id, name, type, description, options, number, students },
+              _index
+            ) => (
+              <TableRow key={id}>
+                <TableCell>{id}</TableCell>
+                <TableCell>{name}</TableCell>
+                <TableCell>
+                  {typeData.find(({ id: ID }) => ID === type)?.text ?? ""}
+                </TableCell>
+                <TableCell>{description ? "✔" : ""}</TableCell>
+                <TableCell>{options.length}</TableCell>
+                <TableCell>{number}</TableCell>
+                <TableCell>{students.length > 0 ? "✔" : ""}</TableCell>
+                <TableCell>
+                  {/* <IconButton
                   disabled={_index === 0}
                   onClick={() => reorderCourse(_index, -1)}
                 >
@@ -62,15 +70,16 @@ export default function CourseTable({
                 >
                   <ArrowDownward />
                 </IconButton> */}
-                <IconButton onClick={() => editCourse(_index)}>
-                  <Edit />
-                </IconButton>
-                <IconButton onClick={() => deleteCourse(_index)}>
-                  <Delete />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
+                  <IconButton onClick={() => editCourse(_index)}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton onClick={() => deleteCourse(_index)}>
+                    <Delete />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            )
+          )}
         </TableBody>
       </Table>
     </TableContainer>

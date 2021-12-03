@@ -515,6 +515,21 @@ router
       res.status(204).end();
     })
   );
+
+router.route("/result").get(
+  openTimeMiddleware,
+  loginRequired,
+  asyncHandler(async (req, res, next) => {
+    const { userID } = req.session;
+    console.log(userID);
+    const results = await model.Selection.find({ userID }).sort({
+      courseID: 1,
+      ranking: 1,
+    });
+    res.send(results);
+  })
+);
+
 router
   .route("/course")
   .all(openTimeMiddleware)

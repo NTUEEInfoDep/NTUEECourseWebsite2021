@@ -6,11 +6,15 @@ import { fade, makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 
 // components
+import { useSelector } from "react-redux";
 import Course from "./course";
 import Selection from "../selection";
 
 // api
 import { CourseAPI } from "../../api";
+
+// session
+import { selectSession } from "../../slices/sessionSlice";
 
 const useStyles = makeStyles((theme) => ({
   search: {
@@ -85,11 +89,14 @@ export default function Courses() {
   const history = useHistory();
   // get courses
   const grades = gradeData;
+  const { userID } = useSelector(selectSession);
   const [courses, setCourses] = useState([]);
   useEffect(() => {
     // const courseData = fakeCourseData;
     CourseAPI.getCourses()
-      .then((res) => setCourses(res.data))
+      .then((res) => {
+        setCourses(res.data);
+      })
       .catch(() => {});
   }, []);
   // select grade
@@ -143,7 +150,11 @@ export default function Courses() {
       </div>
       <Grid container>
         {courses
-          .filter((c) => c.type === selectedGrade)
+          .filter(
+            (c) =>
+              c.type === selectedGrade &&
+              (!c.students.length || c.students.includes(userID))
+          )
           .map(({ id, name }) => (
             <Grid item xs={6} sm={4} md={3} key={id}>
               <Course

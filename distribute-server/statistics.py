@@ -12,9 +12,11 @@ class Analysis():
         self._selctions_df = None
         self._result_df = None
         self._analysis_order_df = None  
+        self._analysis_order_option_df = dict()
         self.selections_to_df()
         self.result_to_df()
 
+    # Initilize selecions in to a pandas dataframe
     def selections_to_df(self):
         df_index = [i._id for i in self._students]
         df_columns = list()
@@ -40,6 +42,7 @@ class Analysis():
 
         self._selections_df = selections_df         
     
+    # Initilize results in to a pandas dataframe
     def result_to_df(self):
         df_index = [i._id for i in self._students]
         df_columns = list()
@@ -66,6 +69,7 @@ class Analysis():
         
         self._result_df = result_df         
     
+    # Standard Analysis including 中幾個 & 第幾志願
     def analyze(self):
         df_column = ["中%d個" % i for i in range(3)] + [("第%d志願") % (i+1) for i in range(10)]
         df_index = [course._name for course in self._courses]
@@ -94,6 +98,7 @@ class Analysis():
         
         self._analysis_order_df = analysis_order_df
 
+    # Analysis of grade distribution
     def analyze_grade(self):
         analysis_dict = dict()
 
@@ -124,6 +129,7 @@ class Analysis():
         
         self._analysis_grade_dict = analysis_dict   
 
+    # Analysis of grade distribution
     def analyze_selection_grade(self):
         analysis_dict = dict()
         for course in self._courses:
@@ -144,6 +150,32 @@ class Analysis():
         
         self._analysis_selections_grade_dict = analysis_dict
 
+    # Analysis of selection order distribution
+    def analyze_selection_result(self):
+        analysis_dict = dict()
+        for course in self._courses:
+            course_id = course._id
+            num_options = len(course._options)
+            df_column = [("第%d志願") % (i+1) for i in range(num_options)]
+            df_index = [option_name for option_name in course._options]
+            df = pd.DataFrame(0, index=df_index, columns=df_column)
+                
+            for i, option_name in enumerate(course._options):
+                option_full_name = "%s_%s" % (course_id, option_name)
+
+                selection_matrix = self._selections_df.filter(like=option_full_name, axis=1).to_numpy()
+                result_matrix = self._result_df.filter(like=option_full_name, axis=1).to_numpy()
+
+                analysis_matrix = np.multiply(selection_matrix, result_matrix)
+                
+                for order in range(num_options):
+                    df["第%d志願" % (order+1)][i] = int(np.sum(analysis_matrix == order+1))
+                    
+            analysis_dict[course_id] = df.copy(deep=True)
+        
+        self._analysis_order_option_dict = analysis_dict
+
+    # export the analysis result into csv string
     def to_csv(self):
         csv_string = ""
         
@@ -153,6 +185,15 @@ class Analysis():
             self._analysis_order_df.to_csv(analysis_string)
             csv_string += analysis_string.getvalue()
         
+        if len(self._analysis_order_option_dict) > 0:
+            csv_string += "\n以下為結果與選填志願分析\n"
+            for course_name in self._analysis_order_option_dict:
+                new_string = io.StringIO()
+                self._analysis_order_option_dict[course_name].to_csv(new_string)
+                csv_string += "%s\n" % course_name
+                csv_string += new_string.getvalue()
+                csv_string += "\n"
+        
         if len(self._analysis_grade_dict) > 0:
             csv_string += "\n以下為結果與年級分析\n"
             for course_name in self._analysis_grade_dict:
@@ -161,7 +202,8 @@ class Analysis():
                 csv_string += "%s\n" % course_name
                 csv_string += new_string.getvalue()
                 csv_string += "\n"
-        
+
+
         if len(self._analysis_selections_grade_dict) > 0:
             csv_string += "\n以下為選填志願與年級分析\n"
             for course_name in self._analysis_selections_grade_dict:

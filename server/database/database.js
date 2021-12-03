@@ -1,6 +1,7 @@
 // Database operations cli
 
 const resetMongo = require("./mongo/reset");
+const privateResetMongo = require("./mongo/private_reset");
 const exportSelections = require("./mongo/export");
 const admin = require("./mongo/admin");
 const clean = require("./mongo/clean");
@@ -15,6 +16,14 @@ require("yargs") // eslint-disable-line
     () => {},
     (argv) => {
       resetMongo();
+    }
+  )
+  .command(
+    "private-reset",
+    "Reset all data in database.",
+    () => {},
+    (argv) => {
+      privateResetMongo();
     }
   )
   .command(
