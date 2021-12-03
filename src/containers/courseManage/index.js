@@ -221,9 +221,14 @@ export default function CourseManage() {
 
   const handleCourseApply = async () => {
     const errs = {};
-    ["id", "name", "type", "description", "options"].forEach((key) => {
-      errs[key] = !course[key]?.length;
-    });
+    ["id", "name", "type", "description", "options", "number"].forEach(
+      (key) => {
+        errs[key] = !course[key]?.length;
+      }
+    );
+    // if(course.number === 0){
+
+    // }
     setErrors({ ...errors, ...errs });
     if (Object.keys(errs).some((key) => errs[key])) {
       if (errs?.id) showAlert("warning", "Course ID is required.");
@@ -478,11 +483,15 @@ export default function CourseManage() {
                 onChange={(e) => handleCourseOption(e, "priority_type")}
                 style={{ width: "100px" }}
               >
-                {priorityData.map((priority_type) => (
-                  <MenuItem key={priority_type.id} value={priority_type.id}>
-                    {priority_type.text}
-                  </MenuItem>
-                ))}
+                {priorityData.map((priority_type) => {
+                  if (priority_type.id !== "") {
+                    return (
+                      <MenuItem key={priority_type.id} value={priority_type.id}>
+                        {priority_type.text}
+                      </MenuItem>
+                    );
+                  }
+                })}
               </Select>
             </FormControl>
             <AdditionalFormControl
