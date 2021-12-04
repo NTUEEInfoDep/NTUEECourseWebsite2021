@@ -96,5 +96,13 @@ export const OpentimeAPI = {
 };
 
 export const ResultAPI = {
-  getResult: () => axios.get("/api/result"),
+  getResult: () =>
+    axios.get("/api/result").catch((error) => errorHandling(error)),
+};
+
+export const SampleAPI = {
+  getSample: (userID) =>
+    axios
+      .get("/api/sample", { params: { userID } })
+      .catch((error) => errorHandling(error)),
 };

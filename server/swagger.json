@@ -1078,6 +1078,31 @@
                 }
             }
         },
+        "/sample": {
+            "get": {
+                "tags": ["Distribution"],
+                "summary": "sample",
+                "description": "Sample",
+                "parameters": [{
+                    "name": "userID",
+                    "in": "query",
+                    "description": "userID",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "example": "B00000000"
+                    }
+                }],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
         "/authority": {
             "put": {
                 "tags": ["Management"],

@@ -19,6 +19,7 @@ import Login from "./containers/login";
 import StudentData from "./containers/studentData";
 import CourseManage from "./containers/courseManage";
 import Distribute from "./containers/distribute";
+import Sample from "./containers/sample";
 import theme from "./theme";
 // compononets
 import Loading from "./components/loading";
@@ -55,6 +56,9 @@ const Routes = () => {
       </PrivateRoute>
       <PrivateRoute exact path="/course-manage">
         <CourseManage />
+      </PrivateRoute>
+      <PrivateRoute exact path="/sample">
+        <Sample />
       </PrivateRoute>
       <AdminRoute exact path="/distribute">
         <Distribute />

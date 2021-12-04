@@ -25,6 +25,7 @@ import HomeIcon from "@material-ui/icons/Home"; // Main
 import ExitToAppIcon from "@material-ui/icons/ExitToApp"; // Login, Logout
 import ClassIcon from "@material-ui/icons/Class"; // Courses
 import PlaylistAddCheckIcon from "@material-ui/icons/PlaylistAddCheck"; //  Result
+import Search from "@material-ui/icons/Search";
 import PeopleIcon from "@material-ui/icons/People"; // Student Data
 import CloudUploadIcon from "@material-ui/icons/CloudUpload"; // Course Manage
 import ShuffleIcon from "@material-ui/icons/Shuffle"; // Distribute
@@ -167,6 +168,7 @@ const Drawer = ({ children }) => {
             to: "/course-manage",
             icon: <CloudUploadIcon />,
           },
+          { text: "Sample", to: "/sample", icon: <Search /> },
         ],
         2: [
           { text: "Main", to: "/", icon: <HomeIcon /> },
@@ -187,6 +189,7 @@ const Drawer = ({ children }) => {
             to: "/distribute",
             icon: <ShuffleIcon />,
           },
+          { text: "Sample", to: "/sample", icon: <Search /> },
         ],
       }[authority] || [
         { text: "Main", to: "/", icon: <HomeIcon /> },

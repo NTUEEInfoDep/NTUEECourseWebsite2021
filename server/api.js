@@ -806,4 +806,37 @@ router.get(
   })
 );
 
+router.get(
+  "/sample",
+  permissionRequired(constants.AUTHORITY_MAINTAINER),
+  asyncHandler(async (req, res, next) => {
+    let { userID } = req.query;
+    userID = userID.toUpperCase();
+    const userData = await model.Student.findOne({ userID });
+    const selectionData = await model.Selection.find({ userID }).sort({
+      courseID: 1,
+      ranking: 1,
+    });
+    const resultData = await model.Result.find({ studentID: userID });
+    const courses = await model.Course.find({}, "id name");
+    const coursesName2Id = {};
+    await Promise.all(
+      courses.map((course) => {
+        coursesName2Id[course.name] = course.id;
+      })
+    );
+    const results = {};
+    await Promise.all(
+      resultData.map((result) => {
+        results[coursesName2Id[result.courseName]] = result.optionName;
+      })
+    );
+    if (!userData || !userID) {
+      res.status(404).end();
+    } else {
+      res.send({ userData, selectionData, results });
+    }
+  })
+);
+
 module.exports = router;
