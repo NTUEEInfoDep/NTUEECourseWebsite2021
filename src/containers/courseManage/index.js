@@ -134,6 +134,11 @@ export default function CourseManage() {
         ...course,
         [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
       });
+      // if (Number(event.target.value.replace(/[^\d]/g, ""), 10) === 0) {
+      //   setErrors({ ...errors, [key]: true });
+      // } else {
+      //   setErrors({ ...errors, [key]: false });
+      // }
     } else {
       setCourse({ ...course, [key]: event.target.value });
     }
@@ -221,9 +226,12 @@ export default function CourseManage() {
 
   const handleCourseApply = async () => {
     const errs = {};
-    ["id", "name", "type", "options", "number"].forEach((key) => {
+    ["id", "name", "type", "options"].forEach((key) => {
       errs[key] = !course[key]?.length;
     });
+    if (!course.number || course.number === 0) {
+      errs.number = true;
+    }
     setErrors({ ...errors, ...errs });
     if (Object.keys(errs).some((key) => errs[key])) {
       if (errs?.id) showAlert("warning", "Course ID is required.");
@@ -231,6 +239,11 @@ export default function CourseManage() {
       else if (errs?.type) showAlert("warning", "Course Type is required.");
       // else if (errs?.description)
       //   showAlert("warning", "Course Description is required.");
+      else if (errs?.number)
+        showAlert(
+          "warning",
+          "Limitation selected courses number must be larger than 0"
+        );
       else if (errs?.options)
         showAlert("warning", "At least one option is required.");
       return;
@@ -412,7 +425,7 @@ export default function CourseManage() {
           </FormControl>
           <TextField
             id="number"
-            label="Selected options limit"
+            label="Limitation selected courses number"
             type="number"
             fullWidth
             value={course.number}
