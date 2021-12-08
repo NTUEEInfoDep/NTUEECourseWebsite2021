@@ -13,27 +13,18 @@ import {
   Paper,
 } from "@material-ui/core";
 
-const classes = ["red", "orange", "lime", "green", "blue", "purple"];
+const classes = ["odd", "even"];
 const useStyles = makeStyles(() => ({
-  red: {
-    backgroundColor: "#f06292",
+  odd: {
+    backgroundImage: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
   },
-  orange: {
-    backgroundColor: "#ff8a65",
+  even: {
+    backgroundImage: "linear-gradient(45deg, #FF8E53 30%, #FE6B8B 90%)",
   },
-  lime: {
-    color: "black",
-    backgroundColor: "#eeff41",
-  },
-  green: {
-    color: "black",
-    backgroundColor: "#c1ff7a",
-  },
-  blue: {
-    backgroundColor: "#66cfff",
-  },
-  purple: {
-    backgroundColor: "#9670ff",
+  table: {
+    width: "70%",
+    minWidth: "500px",
+    margin: "auto",
   },
 }));
 
@@ -51,7 +42,7 @@ export default function ResultTable({ result }) {
   const courseStyle = useStyles();
   const type = getType(result);
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} className={courseStyle.table}>
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -62,10 +53,10 @@ export default function ResultTable({ result }) {
         </TableHead>
         <TableBody>
           {result.map(({ _id, courseID, name, ranking }, i) => (
-            <TableRow key={_id}>
-              <TableCell className={courseStyle[type[i]]}>{courseID}</TableCell>
-              <TableCell className={courseStyle[type[i]]}>{name}</TableCell>
-              <TableCell className={courseStyle[type[i]]}>{ranking}</TableCell>
+            <TableRow key={_id} className={courseStyle[type[i]]}>
+              <TableCell>{courseID}</TableCell>
+              <TableCell>{name}</TableCell>
+              <TableCell>{ranking}</TableCell>
             </TableRow>
           ))}
         </TableBody>
