@@ -526,7 +526,15 @@ router.route("/result").get(
       courseID: 1,
       ranking: 1,
     });
-    res.send(results);
+    const courses = await model.Course.find({}, "id name");
+    const coursesId2Name = {};
+    await Promise.all(
+      courses.map((course) => {
+        coursesId2Name[course.id] = course.name;
+      })
+    );
+
+    res.send({ results, coursesId2Name });
   })
 );
 
@@ -818,23 +826,88 @@ router.get(
       ranking: 1,
     });
     const resultData = await model.Result.find({ studentID: userID });
-    const courses = await model.Course.find({}, "id name");
+    const courses = await model.Course.find({}, "id name options");
     const coursesName2Id = {};
+    const coursesId2Name = {};
     await Promise.all(
       courses.map((course) => {
         coursesName2Id[course.name] = course.id;
+        coursesId2Name[course.id] = course.name;
       })
     );
     const results = {};
     await Promise.all(
       resultData.map((result) => {
-        results[coursesName2Id[result.courseName]] = result.optionName;
+        if (!results[coursesName2Id[result.courseName]]) {
+          results[coursesName2Id[result.courseName]] = [result.optionName];
+        } else {
+          results[coursesName2Id[result.courseName]] = [
+            ...results[coursesName2Id[result.courseName]],
+            result.optionName,
+          ];
+        }
+      })
+    );
+    const preselects = {};
+    await Promise.all(
+      courses.map((course) => {
+        const { options, id } = course;
+        options.forEach((option) => {
+          if (option.priority_type === "preselect") {
+            if (option.priority_value.indexOf(userID) > -1) {
+              preselects[id] = option.name;
+            }
+          }
+        });
+      })
+    );
+    const newSelectionData = JSON.parse(JSON.stringify(selectionData));
+    const finalSelection = [];
+    let preselect = "";
+    for (let i = 0; i < newSelectionData.length; i++) {
+      const data = selectionData[i];
+      finalSelection.push(data);
+      if (preselect !== "" && preselect !== data.courseID) {
+        finalSelection.push({
+          courseID: data.preselect,
+          ranking: "preselect",
+          name: preselects[preselect],
+        });
+        delete preselects[preselect];
+        preselect = "";
+      }
+      if (Object.keys(preselects).indexOf(data.courseID) > -1) {
+        preselect = data.courseID;
+      }
+    }
+    if (preselect !== "") {
+      finalSelection.push({
+        courseID: preselect,
+        ranking: "preselect",
+        name: preselects[preselect],
+      });
+      delete preselects[preselect];
+      preselect = "";
+    }
+    await Promise.all(
+      Object.keys(preselects).map((key) => {
+        finalSelection.push({
+          courseID: key,
+          ranking: "preselect",
+          name: preselects[key],
+        });
       })
     );
     if (!userData || !userID) {
       res.status(404).end();
     } else {
-      res.send({ userData, selectionData, results });
+      res.send({
+        userData,
+        selectionData: finalSelection,
+        results,
+        coursesId2Name,
+        preselects,
+      });
     }
   })
 );

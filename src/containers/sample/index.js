@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Input, Snackbar } from "@material-ui/core";
+import { Button, Input, Snackbar, Stack } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import { makeStyles } from "@material-ui/core/styles";
 import { SampleAPI } from "../../api";
@@ -8,6 +8,7 @@ import UserTable from "./userTable";
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    textAlign: "center",
     "& > *": {
       margin: theme.spacing(1),
     },
@@ -17,7 +18,9 @@ const useStyles = makeStyles((theme) => ({
 export default function Sample() {
   const [userData, setUserData] = useState(null);
   const [selectionData, setSelectionData] = useState([]);
-  const [resultData, setResultData] = useState([]);
+  const [resultData, setResultData] = useState({});
+  const [id2Name, setId2Name] = useState({});
+  const [preselects, setPreselects] = useState({});
   const [value, setValue] = useState("");
   const [alert, setAlert] = useState({});
 
@@ -29,6 +32,8 @@ export default function Sample() {
         setUserData(res.data.userData);
         setSelectionData(res.data.selectionData);
         setResultData(res.data.results);
+        setId2Name(res.data.coursesId2Name);
+        setPreselects(res.data.preselects);
       })
       .catch(() => {
         setAlert({
@@ -44,15 +49,22 @@ export default function Sample() {
   };
 
   return (
-    <div className={classes.root}>
-      <Input placeholder="StudentID" value={value} onChange={handleChange} />
-      <Button variant="contained" color="primary" onClick={handleSearch}>
-        Search
-      </Button>
+    <div>
+      <div className={classes.root}>
+        <Input placeholder="StudentID" value={value} onChange={handleChange} />
+        <Button variant="contained" color="primary" onClick={handleSearch}>
+          Search
+        </Button>
+      </div>
       {userData ? (
         <>
           <UserTable userData={userData} />
-          <SampleTable selectionData={selectionData} resultData={resultData} />
+          <SampleTable
+            selectionData={selectionData}
+            resultData={resultData}
+            id2Name={id2Name}
+            preselects={preselects}
+          />
         </>
       ) : (
         <></>

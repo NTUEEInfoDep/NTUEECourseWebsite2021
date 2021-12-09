@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 
 // material-ui
@@ -38,7 +38,7 @@ const getType = (list) => {
   return ret;
 };
 
-export default function ResultTable({ result }) {
+export default function ResultTable({ result, id2Name }) {
   const courseStyle = useStyles();
   const type = getType(result);
   return (
@@ -46,7 +46,7 @@ export default function ResultTable({ result }) {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Course ID</TableCell>
+            <TableCell>Course Name</TableCell>
             <TableCell>Name</TableCell>
             <TableCell>Ranking</TableCell>
           </TableRow>
@@ -54,7 +54,7 @@ export default function ResultTable({ result }) {
         <TableBody>
           {result.map(({ _id, courseID, name, ranking }, i) => (
             <TableRow key={_id} className={courseStyle[type[i]]}>
-              <TableCell>{courseID}</TableCell>
+              <TableCell>{id2Name[courseID]}</TableCell>
               <TableCell>{name}</TableCell>
               <TableCell>{ranking}</TableCell>
             </TableRow>
@@ -65,15 +65,15 @@ export default function ResultTable({ result }) {
   );
 }
 
-ResultTable.propTypes = {
-  result: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      courseID: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      ranking: PropTypes.number.isRequired,
-      userId: PropTypes.string,
-      __v: PropTypes.number,
-    })
-  ).isRequired,
-};
+// ResultTable.propTypes = {
+//   result: PropTypes.arrayOf(
+//     PropTypes.shape({
+//       _id: PropTypes.string.isRequired,
+//       courseID: PropTypes.string.isRequired,
+//       name: PropTypes.string.isRequired,
+//       ranking: PropTypes.number.isRequired,
+//       userId: PropTypes.string,
+//       __v: PropTypes.number,
+//     })
+//   ).isRequired,
+// };

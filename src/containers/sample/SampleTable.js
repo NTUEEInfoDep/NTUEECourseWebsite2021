@@ -9,6 +9,7 @@ import {
   TableRow,
   TableCell,
   Paper,
+  Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -20,6 +21,14 @@ const useStyles = makeStyles(() => ({
   },
   gray: {
     backgroundColor: "#444444",
+  },
+  table: {
+    maxWidth: "1000px",
+    margin: "auto",
+    maxHeight: "60vh",
+  },
+  text: {
+    textAlign: "center",
   },
 }));
 
@@ -33,29 +42,48 @@ const getType = (list) => {
   return ret;
 };
 
-export default function sampleTable({ selectionData, resultData }) {
+export default function sampleTable({
+  selectionData,
+  resultData,
+  id2Name,
+  preselects,
+}) {
   const courseStyle = useStyles();
   const type = getType(selectionData);
 
-  return (
-    <TableContainer component={Paper}>
-      <Table size="small">
+  return selectionData.length === 0 ? (
+    <Typography variant="h3" className={courseStyle.text}>
+      No chosen courses
+    </Typography>
+  ) : (
+    <TableContainer component={Paper} className={courseStyle.table}>
+      <Table size="small" stickyHeader aria-label="sticky table">
         <TableHead>
           <TableRow>
-            <TableCell>Course ID</TableCell>
-            <TableCell>Option Name</TableCell>
-            <TableCell>Ranking</TableCell>
-            <TableCell>Result</TableCell>
+            <TableCell>Course Name</TableCell>
+            <TableCell align="center">Option Name</TableCell>
+            <TableCell align="center">Ranking</TableCell>
+            <TableCell align="center">Result</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {selectionData.map(({ _id, courseID, name, ranking }, i) => (
             <TableRow key={_id}>
-              <TableCell className={courseStyle[type[i]]}>{courseID}</TableCell>
-              <TableCell className={courseStyle[type[i]]}>{name}</TableCell>
-              <TableCell className={courseStyle[type[i]]}>{ranking}</TableCell>
               <TableCell className={courseStyle[type[i]]}>
-                {name === resultData[courseID] ? "✔" : ""}
+                {id2Name[courseID]}
+              </TableCell>
+              <TableCell className={courseStyle[type[i]]} align="center">
+                {name}
+              </TableCell>
+              <TableCell className={courseStyle[type[i]]} align="center">
+                {ranking}
+              </TableCell>
+              <TableCell className={courseStyle[type[i]]} align="center">
+                {resultData[courseID]
+                  ? resultData[courseID].indexOf(name) > -1
+                    ? "✔"
+                    : ""
+                  : ""}
               </TableCell>
             </TableRow>
           ))}
