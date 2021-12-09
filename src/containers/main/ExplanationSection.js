@@ -114,7 +114,7 @@ export default function Explanation() {
         {/* //first paper */}
         <StyledCarouselProvider
           naturalSlideWidth={isMobile ? 190 : 350}
-          naturalSlideHeight={isMobile ? 250 : 400}
+          naturalSlideHeight={isMobile ? 250 : 200}
           totalSlides={8}
           visibleSlides={1}
           // dragEnabled={false}
