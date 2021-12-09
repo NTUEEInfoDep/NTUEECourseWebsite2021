@@ -10,8 +10,8 @@ export default function Result() {
       .then((res) => {
         setResult(res.data);
       })
-      .catch((e) => {
-        throw new Error(`get result error: ${e}`);
+      .catch(() => {
+        setResult([]);
       });
   }, []);
   return (
