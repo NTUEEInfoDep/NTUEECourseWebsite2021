@@ -15,6 +15,7 @@ import {
   Select,
   MenuItem,
   Chip,
+  Typography,
   Snackbar,
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
@@ -24,12 +25,12 @@ import { FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 
 // components
 import MDEditor from "@uiw/react-md-editor";
+import Papa from "papaparse";
 import CourseTable from "./CourseTable";
 
-import Papa from "papaparse";
 import { selectSession } from "../../slices/sessionSlice";
 // api
-import { CourseAPI } from "../../api";
+import { CourseAPI, StudentDataAPI, DistributeAPI } from "../../api";
 
 // MdEditor
 import "./mdeditor.css";
@@ -114,16 +115,24 @@ export default function CourseManage() {
   const [editOption, setEditOption] = useState(0);
   const [grades, setGrades] = useState([]);
 
+  const [uploaded, setUploaded] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
   const [filename, setFilename] = React.useState("");
-  const [uploaded, setUploaded] = React.useState(false);
-  const [addMultipleOpen, setAddMultipleOpen] = React.useState(false);
+  const [singlePreselect, setSinglePreselect] = useState("");
   const [newStudentMultiple, setNewStudentMultiple] = React.useState({
     id: "",
     name: "",
     grade: "",
     authority: "",
   });
+
+  const [students, setStudents] = useState([]);
+  const [addMultipleOpen, setAddMultipleOpen] = React.useState(false);
+  const [preselectUploaded, setPreselectUploaded] = useState(false);
+  const [preselectLoaded, setPreselectLoaded] = useState(false);
+  const [preselectFilename, setPreselectFilename] = useState("");
+  const [preselectData, setPreselectData] = useState([]);
+  const [addSingleOpen, setAddSingleOpen] = useState(false);
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -357,10 +366,10 @@ export default function CourseManage() {
     setEditOption(0);
   };
 
+  // handler for add multiple student dialog
   const handleOpenAddMultiple = () => {
     // console.log("handleOpenAddMultiple");
     setUploaded(false);
-    setAddMultipleOpen(true);
     setNewStudentMultiple({
       id: "",
       name: "",
@@ -369,11 +378,36 @@ export default function CourseManage() {
     });
     setLoaded(false);
     setFilename("");
+    // setPreselectData([]);
+    setAddMultipleOpen(true);
   };
-
   const handleCloseAddMultiple = () => {
     // console.log("handleCloseAddMultiple");
+    setUploaded(false);
+    setNewStudentMultiple({
+      id: "",
+      name: "",
+      grade: "",
+      authority: "",
+    });
+    setLoaded(false);
+    setFilename("");
+    // setPreselectData([]);
     setAddMultipleOpen(false);
+  };
+
+  // handler for add single student dialog
+  const handleOpenAddSingle = () => {
+    // console.log("handleOpenAddMultiple");
+    setSinglePreselect("");
+    // setPreselectData([]);
+    setAddSingleOpen(true);
+  };
+  const handleCloseAddSingle = () => {
+    // console.log("handleOpenAddMultiple");
+    setSinglePreselect("");
+    // setPreselectData([]);
+    setAddSingleOpen(false);
   };
 
   const handleAddMultipleStudents = async () => {
@@ -427,6 +461,92 @@ export default function CourseManage() {
       }
     }
   };
+  // upload preselect csv
+  const handleUploadCsv = async (efile) => {
+    const data = students.map((s) => s.id);
+    const nonExist = [];
+    if (efile) {
+      Papa.parse(efile, {
+        skipEmptyLines: true,
+        complete(results) {
+          let valid = true;
+          let exist = true;
+          console.log(results.data);
+          results.data.forEach((student) => {
+            if (!/^(b|r|d)\d{8}$/i.test(student[0])) {
+              valid = false;
+            }
+            if (!data.includes(student[0].toUpperCase())) {
+              exist = false;
+              nonExist.push(student);
+            }
+          });
+          if (valid && exist) {
+            const newData = results.data.reduce((obj, cur) => {
+              return obj.concat([cur[0].toUpperCase()]);
+            }, []);
+            setPreselectData(newData);
+            setPreselectLoaded(true);
+            setPreselectFilename(efile.name);
+            return;
+          }
+          if (!valid) {
+            setAlert({
+              open: true,
+              severity: "error",
+              msg: "Invalid student data format.",
+            });
+          }
+          if (!exist) {
+            setAlert({
+              open: true,
+              severity: "error",
+              msg: `No student data: ${nonExist.join(", ")}`,
+            });
+          }
+        },
+      });
+    }
+  };
+  const handlePreselectUpload = async () => {
+    if (preselectLoaded) {
+      try {
+        await DistributeAPI.putPreselect(preselectData);
+        setPreselectUploaded(true);
+        setPreselectLoaded(false);
+        setAlert({
+          open: true,
+          severity: "success",
+          msg: "Upload preselect student data complete.",
+        });
+      } catch (err) {
+        setAlert({
+          open: true,
+          severity: "error",
+          msg: "Failed to upload preselect student data.",
+        });
+      }
+    }
+  };
+  const handleResetPreselectUpload = () => {
+    setPreselectLoaded(false);
+    setPreselectUploaded(false);
+    setPreselectData([]);
+    setPreselectFilename("");
+  };
+
+  // get students data from backend
+  const handleStudentDataReload = async () => {
+    try {
+      setStudents((await StudentDataAPI.getStudentData()).data);
+    } catch (err) {
+      setAlert({
+        open: true,
+        severity: "error",
+        msg: "Failed to load student data.",
+      });
+    }
+  };
 
   useEffect(() => {
     setCourse({ ...course, description: mdescription });
@@ -434,6 +554,7 @@ export default function CourseManage() {
 
   useEffect(() => {
     handleCoursesReload();
+    handleStudentDataReload();
   }, []);
 
   useEffect(() => {
@@ -452,6 +573,22 @@ export default function CourseManage() {
         <Grid item sm={12}>
           <Button onClick={addCourse} variant="outlined" color="primary">
             Add Course
+          </Button>
+          <Button
+            onClick={handleOpenAddMultiple}
+            variant="outlined"
+            color="primary"
+            style={{ marginLeft: "10px" }}
+          >
+            Add csv for 數電實驗預選
+          </Button>
+          <Button
+            onClick={handleOpenAddSingle}
+            variant="outlined"
+            color="primary"
+            style={{ marginLeft: "10px" }}
+          >
+            Add single Preselect
           </Button>
         </Grid>
         <Grid item sm={12}>
@@ -679,6 +816,89 @@ export default function CourseManage() {
           >
             Delete
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        aria-labelledby="simple-dialog-title"
+        disableBackdropClick
+        open={addMultipleOpen}
+        onClose={handleCloseAddMultiple}
+      >
+        {preselectUploaded ? (
+          <DialogTitle id="simple-dialog-title">Upload Completed</DialogTitle>
+        ) : (
+          <DialogTitle id="simple-dialog-title">
+            Add multiple students from csv file
+          </DialogTitle>
+        )}
+        <DialogContent>
+          <Typography>
+            {preselectUploaded && preselectData.length
+              ? "Current preselect data:"
+              : ""}
+          </Typography>
+          {preselectUploaded
+            ? preselectData.map((id) => <Typography key={id}>{id}</Typography>)
+            : ""}
+          <br />
+          {preselectUploaded ? (
+            ""
+          ) : (
+            <label htmlFor="contained-button-file">
+              <input
+                accept=".csv"
+                className={classes.input}
+                id="contained-button-file"
+                type="file"
+                style={{ display: "none" }}
+                onChange={(e) => handleUploadCsv(e.target.files[0])}
+              />
+              <Button variant="outlined" color="primary" component="span">
+                Select csv file
+              </Button>
+            </label>
+          )}
+          {preselectLoaded && !preselectUploaded ? ` ${preselectFilename}` : ""}
+        </DialogContent>
+        <DialogActions>
+          {preselectUploaded ? (
+            <>
+              <Button
+                className={classes.button}
+                onClick={handleResetPreselectUpload}
+              >
+                Select Another File
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleCloseAddMultiple}
+              >
+                Done
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                className={classes.button}
+                onClick={handleCloseAddMultiple}
+              >
+                Cancel
+              </Button>
+              {preselectLoaded ? (
+                <Button
+                  onClick={handlePreselectUpload}
+                  variant="contained"
+                  color="primary"
+                >
+                  Upload
+                </Button>
+              ) : (
+                <> </>
+              )}
+            </>
+          )}
         </DialogActions>
       </Dialog>
       <Snackbar
