@@ -116,23 +116,39 @@ export default function Courses() {
 
   return (
     <div>
-      <Grid container>
-        {courses
-          .filter(
-            (c) =>
-              (!c.students.length || c.students.includes(userID))
-          )
-          .map(({ id, name }) => (
-            <Grid item xs={6} sm={4} md={3} key={id}>
-              <Course
-                id={id}
-                name={name}
-                handleSelectCourse={handleSelectCourse}
-              />
+      {grades.map(({ id, text }) =>
+        courses.filter(
+          (c) =>
+            c.type === id && (!c.students.length || c.students.includes(userID))
+        ).length ? (
+          <>
+            <p>{text}</p>
+            <Grid container>
+              {courses
+                .filter(
+                  (c) =>
+                    c.type === id &&
+                    (!c.students.length || c.students.includes(userID))
+                )
+                .map(({ id, name }) => (
+                  <Grid item xs={6} sm={4} md={3} key={id}>
+                    <Course
+                      id={id}
+                      name={name}
+                      handleSelectCourse={handleSelectCourse}
+                    />
+                  </Grid>
+                ))}
             </Grid>
-          ))}
-      </Grid>
-      <Paper> {selectedCourse && <Selection course={selectedCourse} />} </Paper>
+            <Paper>
+              {" "}
+              {selectedCourse && <Selection course={selectedCourse} />}{" "}
+            </Paper>
+          </>
+        ) : (
+          <></>
+        )
+      )}
     </div>
   );
 }
