@@ -26,6 +26,8 @@ import { FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 import MDEditor from "@uiw/react-md-editor";
 import CourseTable from "./CourseTable";
 
+import Papa from "papaparse";
+import { selectSession } from "../../slices/sessionSlice";
 // api
 import { CourseAPI } from "../../api";
 
@@ -111,6 +113,17 @@ export default function CourseManage() {
   const [mdescription, setMDescription] = useState("");
   const [editOption, setEditOption] = useState(0);
   const [grades, setGrades] = useState([]);
+
+  const [loaded, setLoaded] = React.useState(false);
+  const [filename, setFilename] = React.useState("");
+  const [uploaded, setUploaded] = React.useState(false);
+  const [addMultipleOpen, setAddMultipleOpen] = React.useState(false);
+  const [newStudentMultiple, setNewStudentMultiple] = React.useState({
+    id: "",
+    name: "",
+    grade: "",
+    authority: "",
+  });
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -344,6 +357,77 @@ export default function CourseManage() {
     setEditOption(0);
   };
 
+  const handleOpenAddMultiple = () => {
+    // console.log("handleOpenAddMultiple");
+    setUploaded(false);
+    setAddMultipleOpen(true);
+    setNewStudentMultiple({
+      id: "",
+      name: "",
+      grade: "",
+      authority: "",
+    });
+    setLoaded(false);
+    setFilename("");
+  };
+
+  const handleCloseAddMultiple = () => {
+    // console.log("handleCloseAddMultiple");
+    setAddMultipleOpen(false);
+  };
+
+  const handleAddMultipleStudents = async () => {
+    // console.log("handleAddMultipleStudents");
+    if (loaded) {
+      const newData = newStudentMultiple.map((student) => {
+        const password = genPassword();
+        return { ...student, password };
+      });
+      // console.log(newData);
+      // console.log("start post datas");
+      try {
+        await StudentDataAPI.postStudentData(
+          newData.map((student) => {
+            return {
+              userID: student.id,
+              grade: Number(student.grade),
+              password: student.password,
+              name: student.name,
+              authority: Number(student.authority),
+            };
+          })
+        );
+        // console.log("finish post");
+        setUploaded(true);
+        setData(data.concat(newData));
+        // console.log(newData);
+        // console.log(data);
+
+        setNewStudentMultiple({
+          id: "",
+          name: "",
+          grade: "",
+          authority: "",
+        });
+
+        setLoaded(false);
+        const csvData = [];
+        newData.forEach((e) => {
+          csvData.push({
+            userID: e.id,
+            name: e.name,
+            grade: e.grade,
+            password: e.password,
+          });
+        });
+        setCsv(Papa.unparse(csvData));
+        showAlert("success", "Add multiple student data complete.");
+      } catch (err) {
+        showAlert("error", "Failed to Add multiple student data.");
+      }
+    }
+  };
+
   useEffect(() => {
     setCourse({ ...course, description: mdescription });
   }, [mdescription]);
@@ -530,6 +614,19 @@ export default function CourseManage() {
               >
                 Modify
               </Button>
+            )}
+            {true ? (
+              <Button
+                startIcon={<Edit />}
+                variant="outlined"
+                size="small"
+                onClick={handleOpenAddMultiple}
+                style={{ marginLeft: "20px" }}
+              >
+                Add Preselection(csv)
+              </Button>
+            ) : (
+              <></>
             )}
           </div>
           <DialogContentText
