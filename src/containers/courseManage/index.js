@@ -16,7 +16,7 @@ import {
   MenuItem,
   Chip,
   Typography,
-  Snackbar,
+  Snackbar
 } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import { Add, Edit } from "@material-ui/icons";
@@ -37,39 +37,39 @@ import "./mdeditor.css";
 
 const useStyles = makeStyles((theme) => ({
   optionsTitle: {
-    margin: `${theme.spacing(1)}px 0 0 0`,
+    margin: `${theme.spacing(1)}px 0 0 0`
   },
   options: {
     "& > *": {
-      margin: theme.spacing(0.5),
-    },
+      margin: theme.spacing(0.5)
+    }
   },
   optionsAdd: {
-    margin: `${theme.spacing(1)}px 0 0 0`,
-  },
+    margin: `${theme.spacing(1)}px 0 0 0`
+  }
 }));
 
 const typeData = [
   {
     id: "1",
-    text: "大一必修",
+    text: "大一必修"
   },
   {
     id: "2",
-    text: "大二必修",
+    text: "大二必修"
   },
   {
     id: "3",
-    text: "大三必修",
+    text: "大三必修"
   },
   {
     id: "Ten-Select-Two",
-    text: "十選二實驗",
+    text: "十選二實驗"
   },
   {
     id: "EE-Lab",
-    text: "電電實驗",
-  },
+    text: "電電實驗"
+  }
 ];
 
 const priorityData = [
@@ -79,7 +79,7 @@ const priorityData = [
   { id: "guarantee-third-grade", text: "大三保證" },
   { id: "guarantee-fourth-grade", text: "大四保證" },
   { id: "preselect", text: "預選" },
-  { id: "", text: "無" },
+  { id: "", text: "無" }
 ];
 
 /**
@@ -95,13 +95,13 @@ export default function CourseManage() {
     description: "",
     options: [],
     number: 1,
-    students: [],
+    students: []
   };
   const emptyOption = {
     name: "",
     limit: "",
     priority_type: "",
-    priority_value: 0,
+    priority_value: 0
   };
   const [courses, setCourses] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -122,7 +122,7 @@ export default function CourseManage() {
     id: "",
     name: "",
     grade: "",
-    authority: "",
+    authority: ""
   });
 
   const [students, setStudents] = useState([]);
@@ -134,6 +134,7 @@ export default function CourseManage() {
 
   const [addStudentsOpen, setAddStudentsOpen] = useState(false);
   const [addStudentsData, setAddStudentsData] = useState([]);
+  const [studentsLoaded, setStudentsLoaded] = useState(false);
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -155,7 +156,7 @@ export default function CourseManage() {
     if (key === "number" && event.target.value.replace(/[^\d]/g, "") !== "") {
       setCourse({
         ...course,
-        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
+        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10)
       });
       // if (Number(event.target.value.replace(/[^\d]/g, ""), 10) === 0) {
       //   setErrors({ ...errors, [key]: true });
@@ -172,7 +173,7 @@ export default function CourseManage() {
     if (key === "limit" && event.target.value.replace(/[^\d]/g, "") !== "") {
       setNewOption({
         ...newOption,
-        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
+        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10)
       });
     } else if (
       key === "priority_value" &&
@@ -180,7 +181,7 @@ export default function CourseManage() {
     ) {
       setNewOption({
         ...newOption,
-        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10),
+        [key]: Number(event.target.value.replace(/[^\d]/g, ""), 10)
       });
     } else if (key !== "limit") {
       setNewOption({ ...newOption, [key]: event.target.value });
@@ -191,7 +192,7 @@ export default function CourseManage() {
       ...errors,
       newOption: !!course.options.find(
         (option) => option.name === event.target.value
-      ),
+      )
     });
   };
 
@@ -215,7 +216,7 @@ export default function CourseManage() {
     }
     setCourse({
       ...course,
-      options: [...course.options, newOption],
+      options: [...course.options, newOption]
     });
     setNewOption(emptyOption);
   };
@@ -224,7 +225,7 @@ export default function CourseManage() {
     if (course.options[index] === newOption)
       setErrors({
         ...errors,
-        newOption: false,
+        newOption: false
       });
     if (index === editOption - 1) {
       setNewOption(emptyOption);
@@ -234,8 +235,8 @@ export default function CourseManage() {
       ...course,
       options: [
         ...course.options.slice(0, index),
-        ...course.options.slice(index + 1),
-      ],
+        ...course.options.slice(index + 1)
+      ]
     });
   };
 
@@ -280,7 +281,7 @@ export default function CourseManage() {
       } else {
         await CourseAPI.putCourse({
           ...course,
-          id: currentId,
+          id: currentId
         });
         showAlert("success", `Course ${course.name} modified.`);
         handleCoursesReload();
@@ -310,7 +311,7 @@ export default function CourseManage() {
     setCourses([
       ...excluded.slice(0, position),
       courses[index],
-      ...excluded.slice(position),
+      ...excluded.slice(position)
     ]);
   };
 
@@ -360,9 +361,13 @@ export default function CourseManage() {
       options: [
         ...course.options.slice(0, index),
         newOption,
-        ...course.options.slice(index + 1),
-      ],
+        ...course.options.slice(index + 1)
+      ]
     });
+    setNewOption(emptyOption);
+    setEditOption(0);
+  };
+  const cancelModifyOption = (index) => {
     setNewOption(emptyOption);
     setEditOption(0);
   };
@@ -375,7 +380,7 @@ export default function CourseManage() {
       id: "",
       name: "",
       grade: "",
-      authority: "",
+      authority: ""
     });
     setPreselectLoaded(false);
     setPreselectFilename("");
@@ -389,9 +394,10 @@ export default function CourseManage() {
       id: "",
       name: "",
       grade: "",
-      authority: "",
+      authority: ""
     });
     setPreselectLoaded(false);
+    setStudentsLoaded(false);
     setPreselectFilename("");
     // setPreselectData([]);
     setAddMultipleOpen(false);
@@ -428,7 +434,7 @@ export default function CourseManage() {
               grade: Number(student.grade),
               password: student.password,
               name: student.name,
-              authority: Number(student.authority),
+              authority: Number(student.authority)
             };
           })
         );
@@ -442,7 +448,7 @@ export default function CourseManage() {
           id: "",
           name: "",
           grade: "",
-          authority: "",
+          authority: ""
         });
 
         setLoaded(false);
@@ -452,7 +458,7 @@ export default function CourseManage() {
             userID: e.id,
             name: e.name,
             grade: e.grade,
-            password: e.password,
+            password: e.password
           });
         });
         setCsv(Papa.unparse(csvData));
@@ -495,17 +501,17 @@ export default function CourseManage() {
             setAlert({
               open: true,
               severity: "error",
-              msg: "Invalid student data format.",
+              msg: "Invalid student data format."
             });
           }
           if (!exist) {
             setAlert({
               open: true,
               severity: "error",
-              msg: `No student data: ${nonExist.join(", ")}`,
+              msg: `No student data: ${nonExist.join(", ")}`
             });
           }
-        },
+        }
       });
     }
   };
@@ -515,14 +521,15 @@ export default function CourseManage() {
     setPreselectLoaded(false);
     setPreselectData([]);
     setPreselectFilename("");
+    setAddMultipleOpen(false);
   };
   const handleClearPreselect = () => {
     setPreselectUploaded(false);
     setPreselectFilename("");
     setPreselectLoaded(false);
     setPreselectData([]);
-
     setNewOption({ ...newOption, priority_value: [] });
+    setAddMultipleOpen(false);
   };
   const handleResetPreselectUpload = () => {
     setPreselectLoaded(false);
@@ -555,33 +562,45 @@ export default function CourseManage() {
               return obj.concat([cur[0].toUpperCase()]);
             }, []);
             setAddStudentsData(newData);
+            setStudentsLoaded(true);
             return;
           }
           if (!valid) {
             setAlert({
               open: true,
               severity: "error",
-              msg: "Invalid student data format.",
+              msg: "Invalid student data format."
             });
           }
           if (!exist) {
             setAlert({
               open: true,
               severity: "error",
-              msg: `No student data: ${nonExist.join(", ")}`,
+              msg: `No student data: ${nonExist.join(", ")}`
             });
           }
-        },
+        }
       });
     }
   };
   const handleAddStudentsCsv = () => {
     setCourse({
       ...course,
-      students: addStudentsData,
+      students: addStudentsData
     });
     setAddStudentsData([]);
+    setAddStudentsOpen(false);
   };
+
+  const handleClearStudents = () => {
+    setCourse({
+      ...course,
+      students: []
+    });
+    setAddStudentsData([]);
+    setAddStudentsOpen(false);
+  };
+
   const handleOpenStudents = () => {
     setAddStudentsOpen(true);
     setAddStudentsData([]);
@@ -599,7 +618,7 @@ export default function CourseManage() {
       setAlert({
         open: true,
         severity: "error",
-        msg: "Failed to load student data.",
+        msg: "Failed to load student data."
       });
     }
   };
@@ -631,14 +650,14 @@ export default function CourseManage() {
             Add Course
           </Button>
 
-          <Button
+          {/* <Button
             onClick={handleOpenAddSingle}
             variant="outlined"
             color="primary"
             style={{ marginLeft: "10px" }}
           >
             Add single Preselect
-          </Button>
+          </Button> */}
         </Grid>
         <Grid item sm={12}>
           <CourseTable
@@ -716,34 +735,12 @@ export default function CourseManage() {
           <DialogContentText className={classes.optionsTitle}>
             Options
           </DialogContentText>
-          <div className={classes.options}>
-            {course.options.map((option, _index) => (
-              <Chip
-                key={option.name}
-                label={
-                  `${option.name} ; ${option.limit}人 ; ${
-                    priorityData.find(
-                      ({ id: ID }) => ID === option.priority_type
-                    )?.text
-                  } ; ${
-                    option.priority_type === "preselect"
-                      ? option.priority_value.length
-                      : option.priority_value
-                  }` ?? ""
-                }
-                variant="outlined"
-                color={option === newOption ? "secondary" : "default"}
-                onDelete={() => handleCourseDelOption(_index)}
-                padding={1}
-                onClick={() => handleEditOption(_index)}
-              />
-            ))}
-          </div>
           <div className={classes.optionsAdd} style={{ marginTop: "3px" }}>
             <TextField
               placeholder="名字"
               value={newOption.name}
               error={errors.newOption}
+              style={{ width: "150px" }}
               onChange={(e) => handleCourseOption(e, "name")}
               onKeyDown={(e) => {
                 if (e.code === "Enter") {
@@ -802,15 +799,26 @@ export default function CourseManage() {
                 Add
               </Button>
             ) : (
-              <Button
-                startIcon={<Edit />}
-                variant="outlined"
-                size="small"
-                onClick={() => handleModifyOption(editOption - 1)}
-                style={{ marginLeft: "20px" }}
-              >
-                Modify
-              </Button>
+              <>
+                <Button
+                  startIcon={<Edit />}
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleModifyOption(editOption - 1)}
+                  style={{ marginLeft: "10px" }}
+                >
+                  Modify
+                </Button>
+                <Button
+                  startIcon={<Edit />}
+                  variant="outlined"
+                  size="small"
+                  onClick={() => cancelModifyOption(editOption - 1)}
+                  style={{ marginLeft: "10px" }}
+                >
+                  Cancel
+                </Button>
+              </>
             )}
             {/* {true ? (
               <Button
@@ -825,6 +833,29 @@ export default function CourseManage() {
             ) : (
               <></>
             )} */}
+          </div>
+          <div className={classes.options}>
+            {course.options.map((option, _index) => (
+              <Chip
+                key={option.name}
+                label={
+                  `${option.name} ; ${option.limit}人 ; ${
+                    priorityData.find(
+                      ({ id: ID }) => ID === option.priority_type
+                    )?.text
+                  } ; ${
+                    option.priority_type === "preselect"
+                      ? option.priority_value.length
+                      : option.priority_value
+                  }` ?? ""
+                }
+                variant="outlined"
+                color={option === newOption ? "secondary" : "default"}
+                onDelete={() => handleCourseDelOption(_index)}
+                padding={1}
+                onClick={() => handleEditOption(_index)}
+              />
+            ))}
           </div>
           <DialogContentText
             className={classes.optionsTitle}
@@ -886,105 +917,84 @@ export default function CourseManage() {
         onClose={handleCloseAddMultiple}
       >
         <DialogTitle id="simple-dialog-title">
-          Add multiple preselects from csv file
+          {newOption.priority_type === "preselect" &&
+          (!newOption.priority_value.length ||
+            newOption.priority_value.length === 0)
+            ? "Add multiple preselects from csv file"
+            : "Modify multiple preselects from csv file"}
         </DialogTitle>
 
         <DialogContent>
-          <Typography>Current preselect data(Added):</Typography>
-          {newOption.priority_type === "preselect" &&
-          newOption.priority_value.length
-            ? newOption.priority_value.map((id) => (
-                <Typography key={id}>{id}</Typography>
-              ))
-            : "none"}
-          <br />
-          <Typography>Current preselect data(yet be Added):</Typography>
-          {preselectLoaded && preselectData.length
-            ? preselectData.map((id) => <Typography key={id}>{id}</Typography>)
-            : "none"}
-          <br />
-          <br />
-          {preselectUploaded ? (
-            ""
+          <Typography variant="h5">New preselect data:</Typography>
+          {preselectLoaded && !preselectUploaded ? (
+            <Typography variant="h6">File: {preselectFilename}</Typography>
           ) : (
-            <label htmlFor="contained-button-file">
-              <input
-                accept=".csv"
-                className={classes.input}
-                id="contained-button-file"
-                type="file"
-                style={{ display: "none" }}
-                onChange={(e) => {
-                  handleUploadCsv(e.target.files[0]);
-                  console.log(e.target.files);
-                }}
-              />
-              <Button variant="outlined" color="primary" component="span">
-                Select csv file
-              </Button>
-            </label>
+            <Typography variant="h6">File: None</Typography>
           )}
-          {preselectLoaded && !preselectUploaded ? ` ${preselectFilename}` : ""}
+          {preselectLoaded && preselectData.length ? (
+            preselectData.map((id) => <Typography key={id}>{id}</Typography>)
+          ) : (
+            <br />
+          )}
+          <br />
+          <Typography variant="h5">Original preselect data:</Typography>
+          {newOption.priority_type === "preselect" &&
+          newOption.priority_value.length ? (
+            newOption.priority_value.map((id) => (
+              <Typography key={id}>{id}</Typography>
+            ))
+          ) : (
+            <Typography>None</Typography>
+          )}
+          <br />
+          <br />
         </DialogContent>
         <DialogActions>
-          {preselectUploaded ? (
-            <>
-              <Button
-                className={classes.button}
-                onClick={handleResetPreselectUpload}
-              >
-                Select Another File
-              </Button>
+          <label htmlFor="contained-button-file">
+            <input
+              accept=".csv"
+              className={classes.input}
+              id="contained-button-file"
+              type="file"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                handleUploadCsv(e.target.files[0]);
+              }}
+            />
+            <Button variant="outlined" color="primary" component="span">
+              Select csv file
+            </Button>
+          </label>
+          <Button className={classes.button} onClick={handleCloseAddMultiple}>
+            Cancel
+          </Button>
+          <>
+            {!preselectLoaded ? (
               <Button
                 className={classes.button}
                 onClick={handleClearPreselect}
-                color="primary"
+                color="secondary"
                 variant="contained"
               >
                 Clear
               </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleCloseAddMultiple}
-              >
-                Done
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                className={classes.button}
-                onClick={handleCloseAddMultiple}
-              >
-                Cancel
-              </Button>
-              {!preselectUploaded && !preselectLoaded ? (
+            ) : (
+              ""
+            )}
+            {preselectLoaded ? (
+              <>
                 <Button
-                  className={classes.button}
-                  onClick={handleClearPreselect}
-                  color="primary"
+                  onClick={handleAddCsv}
                   variant="contained"
+                  color="primary"
                 >
-                  Clear
+                  Replace
                 </Button>
-              ) : (
-                ""
-              )}
-              {preselectLoaded ? (
-                <>
-                  <Button
-                    onClick={handleAddCsv}
-                    variant="contained"
-                    color="primary"
-                  >
-                    Add
-                  </Button>
-                </>
-              ) : (
-                <> </>
-              )}
-            </>
+              </>
+            ) : (
+              <> </>
+            )}
+          </>
           )}
         </DialogActions>
       </Dialog>
@@ -996,26 +1006,29 @@ export default function CourseManage() {
         onClose={handleCloseAddMultiple}
       >
         <DialogTitle id="simple-dialog-title">
-          Add multiple students from csv file
+          {course.students.length === 0
+            ? "Add multiple students from csv file"
+            : "Modify multiple students from csv file"}
         </DialogTitle>
 
         <DialogContent>
-          <Typography>Current students data:</Typography>
-          {course.students.length > 0
-            ? course.students.map((id) => (
-                <Typography key={id}>{id}</Typography>
-              ))
-            : "none"}
+          <Typography variant="h5">New students data:</Typography>
+          {addStudentsData.length > 0 ? (
+            addStudentsData.map((id) => <Typography key={id}>{id}</Typography>)
+          ) : (
+            <Typography>None</Typography>
+          )}
           <br />
-          <Typography>Pending students data:</Typography>
-          {addStudentsData.length > 0
-            ? addStudentsData.map((id) => (
-                <Typography key={id}>{id}</Typography>
-              ))
-            : "none"}
+          <Typography variant="h5">Current students data:</Typography>
+          {course.students.length > 0 ? (
+            course.students.map((id) => <Typography key={id}>{id}</Typography>)
+          ) : (
+            <Typography>None</Typography>
+          )}
           <br />
           <br />
-
+        </DialogContent>
+        <DialogActions>
           <label htmlFor="contained-button-file">
             <input
               accept=".csv"
@@ -1032,18 +1045,27 @@ export default function CourseManage() {
               Select csv file
             </Button>
           </label>
-        </DialogContent>
-        <DialogActions>
           <Button className={classes.button} onClick={handleCloseStudents}>
             Cancel
           </Button>
-          <Button
-            onClick={handleAddStudentsCsv}
-            variant="contained"
-            color="primary"
-          >
-            Add
-          </Button>
+          {!studentsLoaded ? (
+            <Button
+              className={classes.button}
+              onClick={handleClearStudents}
+              color="secondary"
+              variant="contained"
+            >
+              Clear
+            </Button>
+          ) : (
+            <Button
+              onClick={handleAddStudentsCsv}
+              variant="contained"
+              color="primary"
+            >
+              Replace
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
       <Snackbar
@@ -1067,7 +1089,7 @@ function AdditionalFormControl(props) {
     errors,
     grades,
     setGrades,
-    handleOpenAddMultiple,
+    handleOpenAddMultiple
   } = props;
   const handleGrades = (event) => {
     if (event.target.checked) {
@@ -1141,8 +1163,8 @@ function AdditionalFormControl(props) {
           style={{ marginLeft: "20px" }}
         >
           {newOption.priority_value.length
-            ? "Modify csv for 數電實驗預選"
-            : "Add csv for 數電實驗預選"}
+            ? "Modify csv for preselect"
+            : "Add csv for preselect"}
         </Button>
       );
     }
