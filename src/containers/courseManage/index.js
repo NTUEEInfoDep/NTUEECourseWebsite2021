@@ -589,6 +589,7 @@ export default function CourseManage() {
       students: addStudentsData
     });
     setAddStudentsData([]);
+    setStudentsLoaded(false);
     setAddStudentsOpen(false);
   };
 
@@ -598,6 +599,7 @@ export default function CourseManage() {
       students: []
     });
     setAddStudentsData([]);
+    setStudentsLoaded(false);
     setAddStudentsOpen(false);
   };
 
@@ -607,6 +609,7 @@ export default function CourseManage() {
   };
   const handleCloseStudents = () => {
     setAddStudentsOpen(false);
+    setStudentsLoaded(false);
     setAddStudentsData([]);
   };
 
@@ -721,6 +724,9 @@ export default function CourseManage() {
             error={errors.number}
             onChange={(e) => handleCourse(e, "number")}
           />
+          <DialogContentText className={classes.optionsTitle}>
+            Students
+          </DialogContentText>
           <Button
             startIcon={<Edit />}
             variant="contained"
@@ -730,7 +736,7 @@ export default function CourseManage() {
             style={{ marginTop: "10px" }}
             onClick={handleOpenStudents}
           >
-            Students
+            Students ({course.students.length})
           </Button>
           <DialogContentText className={classes.optionsTitle}>
             Options
