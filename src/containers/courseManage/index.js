@@ -369,29 +369,29 @@ export default function CourseManage() {
   // handler for add multiple student dialog
   const handleOpenAddMultiple = () => {
     // console.log("handleOpenAddMultiple");
-    setUploaded(false);
+    setPreselectUploaded(false);
     setNewStudentMultiple({
       id: "",
       name: "",
       grade: "",
       authority: "",
     });
-    setLoaded(false);
-    setFilename("");
+    setPreselectLoaded(false);
+    setPreselectFilename("");
     // setPreselectData([]);
     setAddMultipleOpen(true);
   };
   const handleCloseAddMultiple = () => {
     // console.log("handleCloseAddMultiple");
-    setUploaded(false);
+    setPreselectUploaded(false);
     setNewStudentMultiple({
       id: "",
       name: "",
       grade: "",
       authority: "",
     });
-    setLoaded(false);
-    setFilename("");
+    setPreselectLoaded(false);
+    setPreselectFilename("");
     // setPreselectData([]);
     setAddMultipleOpen(false);
   };
@@ -508,25 +508,20 @@ export default function CourseManage() {
       });
     }
   };
-  const handlePreselectUpload = async () => {
-    if (preselectLoaded) {
-      try {
-        await DistributeAPI.putPreselect(preselectData);
-        setPreselectUploaded(true);
-        setPreselectLoaded(false);
-        setAlert({
-          open: true,
-          severity: "success",
-          msg: "Upload preselect student data complete.",
-        });
-      } catch (err) {
-        setAlert({
-          open: true,
-          severity: "error",
-          msg: "Failed to upload preselect student data.",
-        });
-      }
-    }
+  const handleAddCsv = () => {
+    setNewOption({ ...newOption, priority_value: preselectData });
+    setPreselectUploaded(true);
+    setPreselectLoaded(false);
+    setPreselectData([]);
+    setPreselectFilename("");
+  };
+  const handleClearPreselect = () => {
+    setPreselectUploaded(false);
+    setPreselectFilename("");
+    setPreselectLoaded(false);
+    setPreselectData([]);
+
+    setNewOption({ ...newOption, priority_value: [] });
   };
   const handleResetPreselectUpload = () => {
     setPreselectLoaded(false);
@@ -574,14 +569,7 @@ export default function CourseManage() {
           <Button onClick={addCourse} variant="outlined" color="primary">
             Add Course
           </Button>
-          <Button
-            onClick={handleOpenAddMultiple}
-            variant="outlined"
-            color="primary"
-            style={{ marginLeft: "10px" }}
-          >
-            Add csv for 數電實驗預選
-          </Button>
+
           <Button
             onClick={handleOpenAddSingle}
             variant="outlined"
@@ -730,6 +718,7 @@ export default function CourseManage() {
               grades={grades}
               setGrades={setGrades}
               setNewOption={setNewOption}
+              handleOpenAddMultiple={handleOpenAddMultiple}
             />
             {!editOption ? (
               <Button
@@ -752,7 +741,7 @@ export default function CourseManage() {
                 Modify
               </Button>
             )}
-            {true ? (
+            {/* {true ? (
               <Button
                 startIcon={<Edit />}
                 variant="outlined"
@@ -764,7 +753,7 @@ export default function CourseManage() {
               </Button>
             ) : (
               <></>
-            )}
+            )} */}
           </div>
           <DialogContentText
             className={classes.optionsTitle}
@@ -825,22 +814,24 @@ export default function CourseManage() {
         open={addMultipleOpen}
         onClose={handleCloseAddMultiple}
       >
-        {preselectUploaded ? (
-          <DialogTitle id="simple-dialog-title">Upload Completed</DialogTitle>
-        ) : (
-          <DialogTitle id="simple-dialog-title">
-            Add multiple students from csv file
-          </DialogTitle>
-        )}
+        <DialogTitle id="simple-dialog-title">
+          Add multiple students from csv file
+        </DialogTitle>
+
         <DialogContent>
-          <Typography>
-            {preselectUploaded && preselectData.length
-              ? "Current preselect data:"
-              : ""}
-          </Typography>
-          {preselectUploaded
+          <Typography>Current preselect data(Added):</Typography>
+          {newOption.priority_type === "preselect" &&
+          newOption.priority_value.length
+            ? newOption.priority_value.map((id) => (
+                <Typography key={id}>{id}</Typography>
+              ))
+            : "none"}
+          <br />
+          <Typography>Current preselect data(yet be Added):</Typography>
+          {preselectLoaded && preselectData.length
             ? preselectData.map((id) => <Typography key={id}>{id}</Typography>)
-            : ""}
+            : "none"}
+          <br />
           <br />
           {preselectUploaded ? (
             ""
@@ -852,7 +843,10 @@ export default function CourseManage() {
                 id="contained-button-file"
                 type="file"
                 style={{ display: "none" }}
-                onChange={(e) => handleUploadCsv(e.target.files[0])}
+                onChange={(e) => {
+                  handleUploadCsv(e.target.files[0]);
+                  console.log(e.target.files);
+                }}
               />
               <Button variant="outlined" color="primary" component="span">
                 Select csv file
@@ -871,6 +865,14 @@ export default function CourseManage() {
                 Select Another File
               </Button>
               <Button
+                className={classes.button}
+                onClick={handleClearPreselect}
+                color="primary"
+                variant="contained"
+              >
+                Clear
+              </Button>
+              <Button
                 variant="contained"
                 color="primary"
                 onClick={handleCloseAddMultiple}
@@ -886,14 +888,28 @@ export default function CourseManage() {
               >
                 Cancel
               </Button>
-              {preselectLoaded ? (
+              {!preselectUploaded && !preselectLoaded ? (
                 <Button
-                  onClick={handlePreselectUpload}
-                  variant="contained"
+                  className={classes.button}
+                  onClick={handleClearPreselect}
                   color="primary"
+                  variant="contained"
                 >
-                  Upload
+                  Clear
                 </Button>
+              ) : (
+                ""
+              )}
+              {preselectLoaded ? (
+                <>
+                  <Button
+                    onClick={handleAddCsv}
+                    variant="contained"
+                    color="primary"
+                  >
+                    Add
+                  </Button>
+                </>
               ) : (
                 <> </>
               )}
@@ -916,7 +932,14 @@ export default function CourseManage() {
 }
 
 function AdditionalFormControl(props) {
-  const { newOption, handleCourseOption, errors, grades, setGrades } = props;
+  const {
+    newOption,
+    handleCourseOption,
+    errors,
+    grades,
+    setGrades,
+    handleOpenAddMultiple,
+  } = props;
   const handleGrades = (event) => {
     if (event.target.checked) {
       const gradeCopy = [...grades, event.target.value];
@@ -977,6 +1000,21 @@ function AdditionalFormControl(props) {
           style={{ width: "100px", marginLeft: "20px" }}
           onChange={(event) => handleCourseOption(event, "priority_value")}
         />
+      );
+    }
+    if (newOption.priority_type === "preselect") {
+      return (
+        <Button
+          startIcon={<Edit />}
+          variant="outlined"
+          size="small"
+          onClick={handleOpenAddMultiple}
+          style={{ marginLeft: "20px" }}
+        >
+          {newOption.priority_value.length
+            ? "Modify csv for 數電實驗預選"
+            : "Add csv for 數電實驗預選"}
+        </Button>
       );
     }
 
