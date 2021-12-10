@@ -118,7 +118,6 @@ export default function CourseManage() {
   const [uploaded, setUploaded] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
   const [filename, setFilename] = React.useState("");
-  const [singlePreselect, setSinglePreselect] = useState("");
   const [newStudentMultiple, setNewStudentMultiple] = React.useState({
     id: "",
     name: "",
@@ -132,7 +131,9 @@ export default function CourseManage() {
   const [preselectLoaded, setPreselectLoaded] = useState(false);
   const [preselectFilename, setPreselectFilename] = useState("");
   const [preselectData, setPreselectData] = useState([]);
-  const [addSingleOpen, setAddSingleOpen] = useState(false);
+
+  const [addStudentsOpen, setAddStudentsOpen] = useState(false);
+  const [addStudentsData, setAddStudentsData] = useState([]);
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -530,6 +531,66 @@ export default function CourseManage() {
     setPreselectFilename("");
   };
 
+  const handleUploadStudentsCsv = async (efile) => {
+    const data = students.map((s) => s.id);
+    const nonExist = [];
+    if (efile) {
+      Papa.parse(efile, {
+        skipEmptyLines: true,
+        complete(results) {
+          let valid = true;
+          let exist = true;
+          console.log(results.data);
+          results.data.forEach((student) => {
+            if (!/^(b|r|d)\d{8}$/i.test(student[0])) {
+              valid = false;
+            }
+            if (!data.includes(student[0].toUpperCase())) {
+              exist = false;
+              nonExist.push(student);
+            }
+          });
+          if (valid && exist) {
+            const newData = results.data.reduce((obj, cur) => {
+              return obj.concat([cur[0].toUpperCase()]);
+            }, []);
+            setAddStudentsData(newData);
+            return;
+          }
+          if (!valid) {
+            setAlert({
+              open: true,
+              severity: "error",
+              msg: "Invalid student data format.",
+            });
+          }
+          if (!exist) {
+            setAlert({
+              open: true,
+              severity: "error",
+              msg: `No student data: ${nonExist.join(", ")}`,
+            });
+          }
+        },
+      });
+    }
+  };
+  const handleAddStudentsCsv = () => {
+    setCourse({
+      ...course,
+      students: addStudentsData,
+    });
+    setAddStudentsData([]);
+  };
+  const handleOpenStudents = () => {
+    setAddStudentsOpen(true);
+    setAddStudentsData([]);
+  };
+  const handleCloseStudents = () => {
+    setAddStudentsOpen(false);
+    setAddStudentsData([]);
+  };
+
   // get students data from backend
   const handleStudentDataReload = async () => {
     try {
@@ -641,7 +702,17 @@ export default function CourseManage() {
             error={errors.number}
             onChange={(e) => handleCourse(e, "number")}
           />
-
+          <Button
+            startIcon={<Edit />}
+            variant="contained"
+            size="small"
+            color="primary"
+            sx={{ width: 1 / 2 }}
+            style={{ marginTop: "10px" }}
+            onClick={handleOpenStudents}
+          >
+            Students
+          </Button>
           <DialogContentText className={classes.optionsTitle}>
             Options
           </DialogContentText>
@@ -815,7 +886,7 @@ export default function CourseManage() {
         onClose={handleCloseAddMultiple}
       >
         <DialogTitle id="simple-dialog-title">
-          Add multiple students from csv file
+          Add multiple preselects from csv file
         </DialogTitle>
 
         <DialogContent>
@@ -915,6 +986,64 @@ export default function CourseManage() {
               )}
             </>
           )}
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        aria-labelledby="simple-dialog-title"
+        disableBackdropClick
+        open={addStudentsOpen}
+        onClose={handleCloseAddMultiple}
+      >
+        <DialogTitle id="simple-dialog-title">
+          Add multiple students from csv file
+        </DialogTitle>
+
+        <DialogContent>
+          <Typography>Current students data:</Typography>
+          {course.students.length > 0
+            ? course.students.map((id) => (
+                <Typography key={id}>{id}</Typography>
+              ))
+            : "none"}
+          <br />
+          <Typography>Pending students data:</Typography>
+          {addStudentsData.length > 0
+            ? addStudentsData.map((id) => (
+                <Typography key={id}>{id}</Typography>
+              ))
+            : "none"}
+          <br />
+          <br />
+
+          <label htmlFor="contained-button-file">
+            <input
+              accept=".csv"
+              className={classes.input}
+              id="contained-button-file"
+              type="file"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                handleUploadStudentsCsv(e.target.files[0]);
+                console.log(e.target.files);
+              }}
+            />
+            <Button variant="outlined" color="primary" component="span">
+              Select csv file
+            </Button>
+          </label>
+        </DialogContent>
+        <DialogActions>
+          <Button className={classes.button} onClick={handleCloseStudents}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleAddStudentsCsv}
+            variant="contained"
+            color="primary"
+          >
+            Add
+          </Button>
         </DialogActions>
       </Dialog>
       <Snackbar
