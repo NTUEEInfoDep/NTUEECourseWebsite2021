@@ -1113,28 +1113,68 @@ function AdditionalFormControl(props) {
       return (
         <span>
           <FormControlLabel
-            control={<Checkbox />}
+            control={
+              <Checkbox
+                defaultChecked={
+                  newOption.priority_value
+                    ? newOption.priority_value.some(
+                        (element) => element === "1"
+                      )
+                    : false
+                }
+              />
+            }
             value={1}
             label="大一"
             onChange={handleGrades}
             labelPlacement="top"
           />
           <FormControlLabel
-            control={<Checkbox />}
+            control={
+              <Checkbox
+                defaultChecked={
+                  newOption.priority_value
+                    ? newOption.priority_value.some(
+                        (element) => element === "2"
+                      )
+                    : false
+                }
+              />
+            }
             value={2}
             label="大二"
             onChange={handleGrades}
             labelPlacement="top"
           />
           <FormControlLabel
-            control={<Checkbox />}
+            control={
+              <Checkbox
+                defaultChecked={
+                  newOption.priority_value
+                    ? newOption.priority_value.some(
+                        (element) => element === "3"
+                      )
+                    : false
+                }
+              />
+            }
             value={3}
             label="大三"
             onChange={handleGrades}
             labelPlacement="top"
           />
           <FormControlLabel
-            control={<Checkbox />}
+            control={
+              <Checkbox
+                defaultChecked={
+                  newOption.priority_value
+                    ? newOption.priority_value.some(
+                        (element) => element === "4"
+                      )
+                    : false
+                }
+              />
+            }
             value={4}
             label="大四"
             onChange={handleGrades}
@@ -1151,7 +1191,6 @@ function AdditionalFormControl(props) {
         <TextField
           placeholder="優先人數"
           defalut={0}
-          type="number"
           value={newOption.priority_value}
           error={errors.newOption}
           style={{ width: "100px", marginLeft: "20px" }}
