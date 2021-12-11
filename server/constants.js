@@ -18,7 +18,6 @@ module.exports = Object.freeze({
       ["userID", "grade", "password", "name", "authority"],
     ],
     ["Selection", "SelectionAtlas", ["courseID", "userID", "name", "ranking"]],
-    ["Preselect", "PreselectAtlas", ["userID"]],
     ["OpenTime", "OpenTimeAtlas", ["type", "time"]],
     ["Result", "ResultAtlas", ["studentID", "courseName", "optionName"]],
   ],
