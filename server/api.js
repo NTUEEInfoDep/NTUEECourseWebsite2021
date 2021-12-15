@@ -455,10 +455,15 @@ router
       const { courseID } = req.params;
       const course = await model.Course.findOne(
         { id: courseID },
-        "name type description options"
+        "name type description options students number"
       );
       if (!course) {
         res.sendStatus(404);
+        return;
+      }
+      const { students } = course;
+      if (students.length > 0 && !students.includes(req.session.userID)) {
+        res.sendStatus(403);
         return;
       }
       req.course = course;
@@ -469,7 +474,7 @@ router
     asyncHandler(async (req, res, next) => {
       const { courseID } = req.params;
       const { userID } = req.session;
-      const { name, type, description, options } = req.course;
+      const { name, type, description, options, number } = req.course;
       let selected = await model.Selection.find({ userID, courseID }).sort({
         ranking: 1,
       });
@@ -477,7 +482,7 @@ router
       const unselected = options
         .filter((option) => !selected.includes(option.name))
         .map((selection) => selection.name);
-      res.send({ name, type, description, selected, unselected });
+      res.send({ name, type, description, selected, unselected, number });
     })
   )
   .put(
@@ -510,6 +515,29 @@ router
       res.status(204).end();
     })
   );
+
+router.route("/result").get(
+  openTimeMiddleware,
+  loginRequired,
+  asyncHandler(async (req, res, next) => {
+    const { userID } = req.session;
+    console.log(userID);
+    const results = await model.Selection.find({ userID }).sort({
+      courseID: 1,
+      ranking: 1,
+    });
+    const courses = await model.Course.find({}, "id name");
+    const coursesId2Name = {};
+    await Promise.all(
+      courses.map((course) => {
+        coursesId2Name[course.id] = course.name;
+      })
+    );
+
+    res.send({ results, coursesId2Name });
+  })
+);
+
 router
   .route("/course")
   .all(openTimeMiddleware)
@@ -531,14 +559,20 @@ router
           typeof data.name === "string" &&
           typeof data.type === "string" &&
           typeof data.description === "string" &&
-          typeof data.options === "object"
+          typeof data.options === "object" &&
+          typeof data.students === "object" &&
+          typeof data.number === "number" &&
+          constants.COURSE_TYPE.includes(data.type)
         ) {
           pass = true;
           data.options.forEach((option) => {
             if (
               typeof option.name !== "string" ||
               typeof option.limit !== "number" ||
-              typeof option.priority !== "number"
+              typeof option.priority_type !== "string" ||
+              (typeof option.priority_value !== "number" &&
+                typeof option.priority_value !== "object") ||
+              !constants.PRIORITY_TYPE.includes(option.priority_type)
             ) {
               pass = false;
             }
@@ -550,12 +584,12 @@ router
       });
       await Promise.all(
         addData_new.map(async (data) => {
-          const { id } = data;
-          const { name } = data;
-          const { type } = data;
-          const { description } = data;
-          const { options } = data;
+          const { id, name, type, description, options, number, students } =
+            data;
           const course = await model.Course.findOne({ id }).exec();
+          const newStudents = students.map((student) => {
+            return student.toUpperCase();
+          });
           if (course) {
             await model.Course.deleteOne({ id }).exec();
           }
@@ -565,6 +599,8 @@ router
             type,
             description,
             options,
+            number,
+            students: newStudents,
           });
           await courseDocument.save();
         })
@@ -576,10 +612,6 @@ router
     express.json({ strict: false }),
     permissionRequired(constants.AUTHORITY_MAINTAINER),
     asyncHandler(async (req, res, next) => {
-      if (!req.session.userID) {
-        res.status(403).end();
-        return;
-      }
       const deleteData = req.body;
       const deleteData_new = [];
       if (!deleteData || !Array.isArray(deleteData)) {
@@ -621,12 +653,12 @@ router
       });
       await Promise.all(
         modifiedData_new.map(async (data) => {
-          const { id } = data;
-          const { name } = data;
-          const { type } = data;
-          const { description } = data;
-          const { options } = data;
+          const { id, name, type, description, options, number, students } =
+            data;
           const course = await model.Course.findOne({ id }).exec();
+          const newStudents = students.map((student) => {
+            return student.toUpperCase();
+          });
           if (course) {
             await model.Course.updateOne(
               {
@@ -637,6 +669,8 @@ router
                 type,
                 description,
                 options,
+                number,
+                students: newStudents,
               }
             );
           }
@@ -718,12 +752,12 @@ router.post(
 );
 
 router.post(
-  "/specific_distribute",
+  "/new_distribute",
   express.json({ strict: false }),
   permissionRequired(constants.AUTHORITY_ADMIN),
   asyncHandler(async (req, res, next) => {
     const resp = await fetch(
-      `http://${DISTRIBUTE_SERVER_HOST}:${DISTRIBUTE_SERVER_PORT}/specific_distribute`,
+      `http://${DISTRIBUTE_SERVER_HOST}:${DISTRIBUTE_SERVER_PORT}/new_distribute`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -776,6 +810,104 @@ router.get(
       res.status(200).send(csvString);
     } else {
       res.status(400).end();
+    }
+  })
+);
+
+router.get(
+  "/sample",
+  permissionRequired(constants.AUTHORITY_MAINTAINER),
+  asyncHandler(async (req, res, next) => {
+    let { userID } = req.query;
+    userID = userID.toUpperCase();
+    const userData = await model.Student.findOne({ userID });
+    const selectionData = await model.Selection.find({ userID }).sort({
+      courseID: 1,
+      ranking: 1,
+    });
+    const resultData = await model.Result.find({ studentID: userID });
+    const courses = await model.Course.find({}, "id name options");
+    const coursesName2Id = {};
+    const coursesId2Name = {};
+    await Promise.all(
+      courses.map((course) => {
+        coursesName2Id[course.name] = course.id;
+        coursesId2Name[course.id] = course.name;
+      })
+    );
+    const results = {};
+    await Promise.all(
+      resultData.map((result) => {
+        if (!results[coursesName2Id[result.courseName]]) {
+          results[coursesName2Id[result.courseName]] = [result.optionName];
+        } else {
+          results[coursesName2Id[result.courseName]] = [
+            ...results[coursesName2Id[result.courseName]],
+            result.optionName,
+          ];
+        }
+      })
+    );
+    const preselects = {};
+    await Promise.all(
+      courses.map((course) => {
+        const { options, id } = course;
+        options.forEach((option) => {
+          if (option.priority_type === "preselect") {
+            if (option.priority_value.indexOf(userID) > -1) {
+              preselects[id] = option.name;
+            }
+          }
+        });
+      })
+    );
+    const newSelectionData = JSON.parse(JSON.stringify(selectionData));
+    const finalSelection = [];
+    let preselect = "";
+    for (let i = 0; i < newSelectionData.length; i++) {
+      const data = selectionData[i];
+      finalSelection.push(data);
+      if (preselect !== "" && preselect !== data.courseID) {
+        finalSelection.push({
+          courseID: data.preselect,
+          ranking: "preselect",
+          name: preselects[preselect],
+        });
+        delete preselects[preselect];
+        preselect = "";
+      }
+      if (Object.keys(preselects).indexOf(data.courseID) > -1) {
+        preselect = data.courseID;
+      }
+    }
+    if (preselect !== "") {
+      finalSelection.push({
+        courseID: preselect,
+        ranking: "preselect",
+        name: preselects[preselect],
+      });
+      delete preselects[preselect];
+      preselect = "";
+    }
+    await Promise.all(
+      Object.keys(preselects).map((key) => {
+        finalSelection.push({
+          courseID: key,
+          ranking: "preselect",
+          name: preselects[key],
+        });
+      })
+    );
+    if (!userData || !userID) {
+      res.status(404).end();
+    } else {
+      res.send({
+        userData,
+        selectionData: finalSelection,
+        results,
+        coursesId2Name,
+        preselects,
+      });
     }
   })
 );

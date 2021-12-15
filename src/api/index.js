@@ -2,7 +2,7 @@ import axios from "axios";
 import qs from "qs";
 
 const errorHandling = (error) => {
-  if (error.response.status === 403) window.location.reload("/");
+  if (error.response.status === 403) window.location.replace("/");
 };
 
 export const SessionAPI = {
@@ -26,7 +26,7 @@ export const SessionAPI = {
 export const CourseAPI = {
   getCourses: () =>
     axios
-      .get(`/api/courses?name&type&description&options`)
+      .get(`/api/courses?name&type&description&options&number&students`)
       .catch((error) => errorHandling(error)),
   postCourse: (course) =>
     axios.post(`/api/course`, [course]).catch((error) => errorHandling(error)),
@@ -79,7 +79,7 @@ export const SelectAPI = {
 
 export const DistributeAPI = {
   // postDistribute: () => axios.post(`/api/distribute`),
-  postDistribute: (data) => axios.post(`/api/specific_distribute`, data),
+  postDistribute: () => axios.post(`/api/new_distribute`),
   putPreselect: (ids) =>
     axios.put(`/api/preselect`, ids).catch((error) => errorHandling(error)),
   getResult: () => axios.get(`/api/result.csv`),
@@ -91,5 +91,17 @@ export const OpentimeAPI = {
   putOpentime: (start, end) =>
     axios
       .put(`/api/opentime`, { start, end })
+      .catch((error) => errorHandling(error)),
+};
+
+export const ResultAPI = {
+  getResult: () =>
+    axios.get("/api/result").catch((error) => errorHandling(error)),
+};
+
+export const SampleAPI = {
+  getSample: (userID) =>
+    axios
+      .get("/api/sample", { params: { userID } })
       .catch((error) => errorHandling(error)),
 };

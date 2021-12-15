@@ -6,11 +6,15 @@ import { fade, makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 
 // components
+import { useSelector } from "react-redux";
 import Course from "./course";
 import Selection from "../selection";
 
 // api
 import { CourseAPI } from "../../api";
+
+// session
+import { selectSession } from "../../slices/sessionSlice";
 
 const useStyles = makeStyles((theme) => ({
   search: {
@@ -85,18 +89,21 @@ export default function Courses() {
   const history = useHistory();
   // get courses
   const grades = gradeData;
+  const { userID } = useSelector(selectSession);
   const [courses, setCourses] = useState([]);
   useEffect(() => {
     // const courseData = fakeCourseData;
     CourseAPI.getCourses()
-      .then((res) => setCourses(res.data))
+      .then((res) => {
+        setCourses(res.data);
+      })
       .catch(() => {});
   }, []);
   // select grade
-  const [selectedGrade, setSelectedGrade] = useState("1");
-  const handleSelectGrade = (event, value) => {
+  //const [selectedGrade, setSelectedGrade] = useState("1");
+  /*const handleSelectGrade = (event, value) => {
     setSelectedGrade(value);
-  };
+  };*/
 
   // select course
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -109,7 +116,44 @@ export default function Courses() {
 
   return (
     <div>
-      {/* <Toolbar>
+      {grades.map(({ id, text }) =>
+        courses.filter(
+          (c) =>
+            c.type === id && (!c.students.length || c.students.includes(userID))
+        ).length ? (
+          <>
+            <p>{text}</p>
+            <Grid container>
+              {courses
+                .filter(
+                  (c) =>
+                    c.type === id &&
+                    (!c.students.length || c.students.includes(userID))
+                )
+                .map(({ id, name }) => (
+                  <Grid item xs={6} sm={4} md={3} key={id}>
+                    <Course
+                      id={id}
+                      name={name}
+                      handleSelectCourse={handleSelectCourse}
+                    />
+                  </Grid>
+                ))}
+            </Grid>
+            <Paper>
+              {" "}
+              {selectedCourse && <Selection course={selectedCourse} />}{" "}
+            </Paper>
+          </>
+        ) : (
+          <></>
+        )
+      )}
+    </div>
+  );
+}
+
+/*{ <Toolbar>
         <div className={classes.search}>
           <div className={classes.searchIcon}>
             <SearchIcon />
@@ -122,7 +166,7 @@ export default function Courses() {
             }}
           />
         </div>
-      </Toolbar> */}
+      </Toolbar> }
       <div>
         <Tabs
           value={selectedGrade}
@@ -140,24 +184,7 @@ export default function Courses() {
             />
           ))}
         </Tabs>
-      </div>
-      <Grid container>
-        {courses
-          .filter((c) => c.type === selectedGrade)
-          .map(({ id, name }) => (
-            <Grid item xs={6} sm={4} md={3} key={id}>
-              <Course
-                id={id}
-                name={name}
-                handleSelectCourse={handleSelectCourse}
-              />
-            </Grid>
-          ))}
-      </Grid>
-      <Paper> {selectedCourse && <Selection course={selectedCourse} />} </Paper>
-    </div>
-  );
-}
+      </div>*/
 
 const fakeCourseData = [
   {

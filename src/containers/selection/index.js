@@ -9,13 +9,15 @@ import Link from "@material-ui/core/Link";
 import HomeIcon from "@material-ui/icons/Home";
 import ClassIcon from "@material-ui/icons/Class";
 import ViewCarouselIcon from "@material-ui/icons/ViewCarousel";
+import { Snackbar } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
 // import initialData from "./initial-data";
+import MDEditor from "@uiw/react-md-editor";
 import Column from "./column";
 import { SelectAPI } from "../../api";
 import Loading from "../../components/loading";
 
-//MdEditor
-import MDEditor from "@uiw/react-md-editor";
+// MdEditor
 
 const useStyles = makeStyles((theme) => ({
   styledColumns: {
@@ -51,6 +53,8 @@ const Selection = () => {
   const theme = useTheme();
   const { courseId } = useParams();
   const [data, setData] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [effectUpdate, setEffectUpdate] = useState(false);
   const classes = useStyles();
   useEffect(async () => {
     try {
@@ -62,13 +66,28 @@ const Selection = () => {
   }, []); // only run the first time
   useEffect(async () => {
     if (!data) return;
+    if (!effectUpdate) {
+      setEffectUpdate(true);
+      return;
+    }
     try {
       await SelectAPI.putSelections(courseId, data.selected);
+      setOpen(true);
       // setData(res.data);
     } catch (err) {
       console.error(err);
     }
   }, [data]);
+  function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
+  function handleClose(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+    console.log("close");
+  }
   function handleHomeClick() {
     history.push(``);
     // event.preventDefault();
@@ -186,6 +205,11 @@ const Selection = () => {
           <MDEditor.Markdown source={data.description} />
         </div>
       )}
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          Successfully saved!
+        </Alert>
+      </Snackbar>
       {data ? (
         <DragDropContext onDragEnd={onDragEnd}>
           <div className={classes.styledColumns}>
