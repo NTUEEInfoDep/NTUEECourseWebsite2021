@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function userTable({ userData }) {
+export default function UserTable({ userData }) {
   const { userID, name, grade } = userData;
   const userStyle = useStyles();
 

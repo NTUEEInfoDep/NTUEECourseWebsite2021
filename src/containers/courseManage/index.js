@@ -404,70 +404,70 @@ export default function CourseManage() {
   };
 
   // handler for add single student dialog
-  const handleOpenAddSingle = () => {
-    // console.log("handleOpenAddMultiple");
-    setSinglePreselect("");
-    // setPreselectData([]);
-    setAddSingleOpen(true);
-  };
-  const handleCloseAddSingle = () => {
-    // console.log("handleOpenAddMultiple");
-    setSinglePreselect("");
-    // setPreselectData([]);
-    setAddSingleOpen(false);
-  };
+  // const handleOpenAddSingle = () => {
+  //   // console.log("handleOpenAddMultiple");
+  //   setSinglePreselect("");
+  //   // setPreselectData([]);
+  //   setAddSingleOpen(true);
+  // };
+  // const handleCloseAddSingle = () => {
+  //   // console.log("handleOpenAddMultiple");
+  //   setSinglePreselect("");
+  //   // setPreselectData([]);
+  //   setAddSingleOpen(false);
+  // };
 
-  const handleAddMultipleStudents = async () => {
-    // console.log("handleAddMultipleStudents");
-    if (loaded) {
-      const newData = newStudentMultiple.map((student) => {
-        const password = genPassword();
-        return { ...student, password };
-      });
-      // console.log(newData);
-      // console.log("start post datas");
-      try {
-        await StudentDataAPI.postStudentData(
-          newData.map((student) => {
-            return {
-              userID: student.id,
-              grade: Number(student.grade),
-              password: student.password,
-              name: student.name,
-              authority: Number(student.authority)
-            };
-          })
-        );
-        // console.log("finish post");
-        setUploaded(true);
-        setData(data.concat(newData));
-        // console.log(newData);
-        // console.log(data);
+  // const handleAddMultipleStudents = async () => {
+  //   // console.log("handleAddMultipleStudents");
+  //   if (loaded) {
+  //     const newData = newStudentMultiple.map((student) => {
+  //       const password = genPassword();
+  //       return { ...student, password };
+  //     });
+  //     // console.log(newData);
+  //     // console.log("start post datas");
+  //     try {
+  //       await StudentDataAPI.postStudentData(
+  //         newData.map((student) => {
+  //           return {
+  //             userID: student.id,
+  //             grade: Number(student.grade),
+  //             password: student.password,
+  //             name: student.name,
+  //             authority: Number(student.authority)
+  //           };
+  //         })
+  //       );
+  //       // console.log("finish post");
+  //       setUploaded(true);
+  //       setData(data.concat(newData));
+  //       // console.log(newData);
+  //       // console.log(data);
 
-        setNewStudentMultiple({
-          id: "",
-          name: "",
-          grade: "",
-          authority: ""
-        });
+  //       setNewStudentMultiple({
+  //         id: "",
+  //         name: "",
+  //         grade: "",
+  //         authority: ""
+  //       });
 
-        setLoaded(false);
-        const csvData = [];
-        newData.forEach((e) => {
-          csvData.push({
-            userID: e.id,
-            name: e.name,
-            grade: e.grade,
-            password: e.password
-          });
-        });
-        setCsv(Papa.unparse(csvData));
-        showAlert("success", "Add multiple student data complete.");
-      } catch (err) {
-        showAlert("error", "Failed to Add multiple student data.");
-      }
-    }
-  };
+  //       setLoaded(false);
+  //       const csvData = [];
+  //       newData.forEach((e) => {
+  //         csvData.push({
+  //           userID: e.id,
+  //           name: e.name,
+  //           grade: e.grade,
+  //           password: e.password
+  //         });
+  //       });
+  //       setCsv(Papa.unparse(csvData));
+  //       showAlert("success", "Add multiple student data complete.");
+  //     } catch (err) {
+  //       showAlert("error", "Failed to Add multiple student data.");
+  //     }
+  //   }
+  // };
   // upload preselect csv
   const handleUploadCsv = async (efile) => {
     const data = students.map((s) => s.id);

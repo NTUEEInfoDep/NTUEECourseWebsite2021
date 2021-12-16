@@ -42,7 +42,7 @@ const getType = (list) => {
   return ret;
 };
 
-export default function sampleTable({
+export default function SampleTable({
   selectionData,
   resultData,
   id2Name,
