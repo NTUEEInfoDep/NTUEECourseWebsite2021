@@ -1,0 +1,75 @@
+# This file is used for production, not for development!
+
+version: "3.4"
+
+services:
+  course-frontend:
+    build:
+      context: .
+      dockerfile: ./prod-support/frontend/Dockerfile
+    expose:
+      - "3000"
+    networks:
+      - course-frontend
+    environment:
+      - REACT_APP_API_HOST=course-backend
+    links:
+      - "course-backend"
+  course-backend:
+    build:
+      context: .
+      dockerfile: ./prod-support/backend/Dockerfile
+    expose:
+      - "8000"
+    networks:
+      - course-backend
+    environment:
+      - DISTRIBUTE_SERVER_HOST=course-distribute-server
+      - DISTRIBUTE_SERVER_PORT=8001
+      - MONGO_HOST=course-mongodb
+      - REDIS_HOST=course-redisdb
+    links:
+      - "course-distribute-server"
+
+  course-mongodb:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=eeinfo
+      - MONGO_INITDB_ROOT_PASSWORD=R9ujPAQBk4X2fdkv
+    expose:
+      - "27017"
+    networks:
+      - course-mongodb
+
+  course-redisdb:
+    image: redis
+    expose:
+      - "6379"
+    networks:
+      - course-redisdb
+
+  course-distribute-server:
+    build:
+      context: .
+      dockerfile: ./prod-support/distribute-server/Dockerfile
+    expose:
+      - "8001"
+    networks:
+      - course-distribute-server
+
+networks:
+  course-frontend:
+    external:
+      name: eeinfo 
+  course-backend:
+    external:
+      name: eeinfo
+  course-distribute-server:
+    external:
+      name: eeinfo
+  course-mongodb:
+    external:
+      name: eeinfo
+  course-redisdb:
+    external:
+      name: eeinfo

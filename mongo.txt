@@ -1,0 +1,18 @@
+nfo -p R9ujPAQBk4X2fdkv --authenticationDatabase admin
+use ntuee-course
+db.createUser(
+    {
+        user: "eeinfo",
+        pwd: "brmEu8EkRwaudH4J",
+        roles:[
+            {
+                role: "dbOwner",
+                db: "ntuee-course"
+            }
+        ]
+    }
+)
+
+
+db.grantRolesToUser("eeinfo", "dbOwner")
+

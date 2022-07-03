@@ -1,0 +1,46 @@
+# This file is used for development, not for production!
+
+version: "3.4"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: ./dev-support/frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_HOST=backend
+    volumes:
+      - .:/app
+      - /app/node_modules
+    links:
+      - "backend"
+  backend:
+    build:
+      context: .
+      dockerfile: ./dev-support/backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DISTRIBUTE_SERVER_HOST=distribute-server
+      - DISTRIBUTE_SERVER_PORT=8001
+    links:
+      - "distribute-server"
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  redisdb:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  distribute-server:
+    build:
+      context: .
+      dockerfile: ./dev-support/distribute-server/Dockerfile
+    ports:
+      - "8001:8001"

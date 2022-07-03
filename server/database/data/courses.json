@@ -1,0 +1,236 @@
+[
+  {
+    "id": "Ten-Select-Two",
+    "name": "十選二實驗",
+    "type": "Ten-Select-Two",
+    "description": "<p>(1) 請詳閱 <a href=\"https://bit.ly/3o0MrAb\" target=\"_blank\" style=\"color: #45bbff;\">實驗規定</a>，攸關各位的權利。</p><p>(2)特別轉載半導體實驗規定： ★★大學畢業後欲投入半導體領域者，可保留名額  ★★實驗期間需全程戴口罩、穿實驗衣含無塵衣,且著裝後需能自由移動。  ★★需遵守政府、臺大及實驗室之公共安全規定。  ★★環安衛法律條文規定沒有英文部份,若有外藉生不懂中文,將請助教以英文口譯告知。  ★★Electrical Engineering Lab (semiconductor) safety rules: ★In the labs,  students are required to wear  masks and lab  coats /cleanroom suits, and can be able to move freely with the  coats/suits.  ★★All persons in labs must follow the related safety regulations required by the labs, NTU, and the government.  ★★Enrolled international students  will be informed by teaching assistants orally in case that the English regulations/statutes of occupational health and safety, and environmental protection are not officially available.</p><p>(3) 數電請進入 <a href=\"https://forms.gle/kJowuD9SynDYQpjB6\" target=\"_blank\" style=\"color: #45bbff;\">此表單</a> 報名。</p>",
+    "students": [],
+    "number": 2,
+    "options": [
+      {
+        "name": "電力電子",
+        "limit": 24,
+        "priority_type": "none",
+        "priority_value": 0
+      },
+      {
+        "name": "自動控制",
+        "limit": 20,
+        "priority_type": "higher-grade-first",
+        "priority_value": 0
+      },
+      {
+        "name": "數電實驗",
+        "limit": 24,
+        "priority_type": "none",
+        "priority_value": 0
+      },
+      {
+        "name": "嵌入式系統",
+        "limit": 24,
+        "priority_type": "none",
+        "priority_value": 0
+      },
+      {
+        "name": "電磁波",
+        "limit": 24,
+        "priority_type": "guarantee-third-grade",
+        "priority_value": 12
+      },
+      {
+        "name": "半導體",
+        "limit": 12,
+        "priority_type": "grades",
+        "priority_value": [3, 4]
+      },
+      {
+        "name": "通信專題",
+        "limit": 30,
+        "priority_type": "none",
+        "priority_value": 0
+      },
+      {
+        "name": "網路與多媒體",
+        "limit": 24,
+        "priority_type": "none",
+        "priority_value": 0
+      },
+      {
+        "name": "生醫工程",
+        "limit": 30,
+        "priority_type": "none",
+        "priority_value": 0
+      },
+      {
+        "name": "光電",
+        "limit": 30,
+        "priority_type": "guarantee-fourth-grade",
+        "priority_value": 21
+      }
+    ]
+  },
+  {
+    "id": "Electronics-one",
+    "name": "電子學（一）",
+    "type": "2",
+    "description": "",
+    "students": [],
+    "number": 1,
+    "options": [
+      {
+        "name": "吳肇欣",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "林宗賢",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "呂良鴻",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "林致廷",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      }
+    ]
+  },
+  {
+    "id": "Electormagnetics-one",
+    "name": "電磁學一",
+    "type": "2",
+    "description": "",
+    "students": [],
+    "number": 1,
+    "options": [
+      {
+        "name": "周錫增",
+        "limit": 50,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "林晃巖",
+        "limit": 50,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "鄭宇翔",
+        "limit": 50,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "林怡成",
+        "limit": 50,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "李俊興",
+        "limit": 50,
+        "priority_type": "",
+        "priority_value": 0
+      }
+    ]
+  },
+  {
+    "id": "Linear-Algebra",
+    "name": "工程數學-線性代數",
+    "type": "2",
+    "description": "",
+    "students": [],
+    "number": 1,
+    "options": [
+      {
+        "name": "林茂昭",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "蘇柏青",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "李宏毅",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "楊東霖",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      }
+    ]
+  },
+  {
+    "id": "Differential-Equation",
+    "name": "工程數學-微分方程",
+    "type": "2",
+    "description": "",
+    "number": 1,
+    "students": ["B00000001"],
+    "options": [
+      {
+        "name": "林清富",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "黃天偉",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "黃定洧",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "丁建均",
+        "limit": 55,
+        "priority_type": "",
+        "priority_value": 0
+      }
+    ]
+  },
+  {
+    "id": "Algorithm",
+    "name": "演算法",
+    "type": "3",
+    "description": "",
+    "number": 1,
+    "students": ["B00000000"],
+    "options": [
+      {
+        "name": "張耀文",
+        "limit": 80,
+        "priority_type": "",
+        "priority_value": 0
+      },
+      {
+        "name": "李建模",
+        "limit": 80,
+        "priority_type": "",
+        "priority_value": 0
+      }
+    ]
+  }
+]

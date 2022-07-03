@@ -1,0 +1,72 @@
+[
+  {
+    "userID": "b00000000",
+    "grade": 2,
+    "password": "1111",
+    "name": "A",
+    "authority": 2
+  },
+  {
+    "userID": "b11111111",
+    "grade": 3,
+    "password": "1111",
+    "name": "B",
+    "authority": 1
+  },
+  {
+    "userID": "b22222222",
+    "grade": 1,
+    "password": "1111",
+    "name": "C",
+    "authority": 1
+  },
+  {
+    "userID": "b33333333",
+    "grade": 1,
+    "password": "1111",
+    "name": "E",
+    "authority": 0
+  },
+  {
+    "userID": "b44444444",
+    "grade": 4,
+    "password": "1111",
+    "name": "F",
+    "authority": 0
+  },
+  {
+    "userID": "b55555555",
+    "grade": 2,
+    "password": "1111",
+    "name": "G",
+    "authority": 0
+  },
+  {
+    "userID": "b66666666",
+    "grade": 5,
+    "password": "1111",
+    "name": "H",
+    "authority": 0
+  },
+  {
+    "userID": "b77777777",
+    "grade": 2,
+    "password": "1111",
+    "name": "I",
+    "authority": 0
+  },
+  {
+    "userID": "b88888888",
+    "grade": 4,
+    "password": "1111",
+    "name": "J",
+    "authority": 0
+  },
+  {
+    "userID": "b99999999",
+    "grade": 1,
+    "password": "1111",
+    "name": "K",
+    "authority": 0
+  }
+]
