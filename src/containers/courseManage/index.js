@@ -670,14 +670,14 @@ export default function CourseManage() {
   }
 
   const handleImportCourses = async() => {
-    console.log(importCoursesData[0]);
     const res = await CourseAPI.importCourses(importCoursesData);
-    console.log(res);
-    setAlert({
-      open: true,
-      severity: "warning",
-      msg: `Courses id ${res.data} have existed, which will be ignored.`
-    });
+    if(res.data.length !== 0){
+      setAlert({
+        open: true,
+        severity: "warning",
+        msg: `Courses id ${res.data} have existed, which will be ignored.`
+      });
+    }
     await handleCoursesReload();
     setImportCoursesOpen(false);
     setImportCoursesData([]);
