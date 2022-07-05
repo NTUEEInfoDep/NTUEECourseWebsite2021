@@ -931,7 +931,7 @@ router.get(
   "/exportCourses.json",
   permissionRequired(constants.AUTHORITY_MAINTAINER),
   asyncHandler(async (req, res, next) => {
-    const courses = await model.Course.find({}, {id: 1, name: 1, type: 1, description: 1, number: 1, options: 1, students: 1, _id: 0}).exec();
+    const courses = await model.Course.find({}, {id: 1, name: 1, type: 1, description: 1, number: 1, options: 1, _id: 0}).exec();
     res.send(courses);
   })
 );
@@ -956,7 +956,6 @@ router.post(
         typeof data.type === "string" &&
         typeof data.description === "string" &&
         typeof data.options === "object" &&
-        typeof data.students === "object" &&
         typeof data.number === "number" &&
         constants.COURSE_TYPE.includes(data.type)
       ) {
@@ -980,12 +979,10 @@ router.post(
     });
     const exist = await Promise.all(
       new_courses.map(async (data) => {
-        const { id, name, type, description, options, number, students } =
+        const { id, name, type, description, options, number } =
           data;
         const course = await model.Course.findOne({ id }).exec();
-        const newStudents = students.map((student) => {
-          return student.toUpperCase();
-        });
+        
         if (!course) {
           const courseDocument = new model.Course({
             id,
@@ -994,7 +991,7 @@ router.post(
             description,
             options,
             number,
-            students: newStudents,
+            students: [],
           });
           await courseDocument.save();
         }else{
