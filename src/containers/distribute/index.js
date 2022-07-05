@@ -12,9 +12,11 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   Fade,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -63,6 +65,11 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     marginRight: theme.spacing(1),
+  },
+  resetButton: {
+    marginRight: theme.spacing(1),
+    backgroundColor: "rgba(255, 0, 0, .7)",
+    color: "white"
   },
   input: {
     display: "none",
@@ -114,6 +121,8 @@ export default function Distribute() {
   const [lastDristributeTime, setLastDistributeTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({});
+  const [resetSelectionOpened, setResetSelectionOpened] = useState(false);
+  const [resetSelectionInput, setResetSelectionInput] = useState("");
 
   const handleGetDistribution = () => {
     DistributeAPI.getResult()
@@ -334,6 +343,31 @@ export default function Distribute() {
       });
     }
   };
+  const handleResetSelectionClose = () => {
+    setResetSelectionOpened(false);
+    setResetSelectionInput("");
+  };
+  const handleReset = () => {
+    setLoading(true);
+    DistributeAPI.resetSelection()
+      .then(() => {
+        setAlert({
+          open: true,
+          severity: "success",
+          msg: "User selection data reset!",
+        });
+        setResetSelectionInput("");
+        setResetSelectionOpened(false);
+      })
+      .catch(() =>
+        setAlert({
+          open: true,
+          severity: "error",
+          msg: "Fail to reset user selection data!",
+        })
+      )
+      .finally(() => setLoading(false));
+  };
   useEffect(() => {
     handleCoursesReload();
     handleStudentDataReload();
@@ -343,9 +377,23 @@ export default function Distribute() {
       <Container component="main" maxWidth="md">
         <CssBaseline />
         <div className={classes.paper}>
-          <Typography component="h1" variant="h4">
-            <div>Distribute</div>
-          </Typography>
+          <Grid container justifyContent="center">
+            <Grid item xs={0} sm={3}></Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography component="h1" variant="h4" align="center">
+                <div>Distribute</div>
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={3} align="center">
+              <Button
+                variant="contained"
+                className={classes.resetButton}
+                onClick={()=>setResetSelectionOpened(true)}
+              >
+                Reset Selection
+              </Button>
+            </Grid>
+          </Grid>
           <Stepper
             className={classes.root}
             nonLinear
@@ -610,6 +658,33 @@ export default function Distribute() {
             onClick={handleAddSpecifyStudents}
           >
             Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={resetSelectionOpened} onClose={handleResetSelectionClose} >
+        <DialogTitle id="form-dialog-title">{"[WARNING] Reset Selection"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            This operation will delete some sensitive data, including users' selection and distributed results. 
+            To execute the operation, please type <b>Reset Selection</b> below.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="resetSelectionInput"
+            label="Reset Selection"
+            type="text"
+            fullWidth
+            value={resetSelectionInput}
+            onChange={(e) => setResetSelectionInput(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleResetSelectionClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleReset} disabled={resetSelectionInput !== "Reset Selection"} color="primary">
+            Reset
           </Button>
         </DialogActions>
       </Dialog>

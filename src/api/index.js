@@ -36,6 +36,10 @@ export const CourseAPI = {
       .catch((error) => errorHandling(error)),
   putCourse: (course) =>
     axios.put(`/api/course`, [course]).catch((error) => errorHandling(error)),
+  exportCourses: () =>
+    axios.get('/api/exportCourses.json').catch((error) => errorHandling(error)),
+  importCourses: (courses)=>
+    axios.post(`/api/importCourses`, courses).catch((error) => errorHandling(error)),
 };
 
 export const StudentDataAPI = {
@@ -84,6 +88,7 @@ export const DistributeAPI = {
     axios.put(`/api/preselect`, ids).catch((error) => errorHandling(error)),
   getResult: () => axios.get(`/api/result.csv`),
   getStatistics: () => axios.get(`/api/statistics.csv`),
+  resetSelection: () => axios.delete('/api/reset_selection'),
 };
 
 export const OpentimeAPI = {

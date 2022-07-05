@@ -136,6 +136,10 @@ export default function CourseManage() {
   const [addStudentsData, setAddStudentsData] = useState([]);
   const [studentsLoaded, setStudentsLoaded] = useState(false);
 
+  const [importCoursesOpen, setImportCoursesOpen] = useState(false);
+  const [importCoursesData, setImportCoursesData] = useState([]);
+  const [importCoursesFile, setImportCoursesFile] = useState("");
+
   const handleOpen = () => {
     setDialogOpen(true);
   };
@@ -626,6 +630,60 @@ export default function CourseManage() {
     }
   };
 
+  const downloadJson = (filename, jsonObject) => {
+    const element = document.createElement("a");
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonObject));
+    element.setAttribute("href", dataStr);
+    element.setAttribute("download", filename);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  };
+
+  const handleUploadJson = async(e) => {
+    const fileReader = new FileReader();
+    fileReader.readAsText(e.target.files[0], "UTF-8");
+    fileReader.onload = e => {
+      setImportCoursesData(JSON.parse(e.target.result));
+    };
+    setImportCoursesFile(e.target.files[0].name);
+  }
+
+  const exportCourses = async () => {
+    const courses = await CourseAPI.exportCourses();
+    console.log(courses.data)
+    downloadJson("courses.json", courses.data);
+  };
+
+  const importCourses = () => {
+    setImportCoursesOpen(true);
+  };
+
+  const handleCloseImportCourses = () => {
+    setImportCoursesOpen(false);
+    setImportCoursesData([]);
+    setImportCoursesFile("");
+  }
+
+  const handleImportCourses = async() => {
+    console.log(importCoursesData[0]);
+    const res = await CourseAPI.importCourses(importCoursesData);
+    console.log(res);
+    setAlert({
+      open: true,
+      severity: "warning",
+      msg: `Courses id ${res.data} have existed, which will be ignored.`
+    });
+    await handleCoursesReload();
+    setImportCoursesOpen(false);
+    setImportCoursesData([]);
+    setImportCoursesFile("");
+  }
+
   useEffect(() => {
     setCourse({ ...course, description: mdescription });
   }, [mdescription]);
@@ -649,8 +707,14 @@ export default function CourseManage() {
     <div>
       <Grid container spacing={3} direction="row">
         <Grid item sm={12}>
-          <Button onClick={addCourse} variant="outlined" color="primary">
+          <Button onClick={addCourse} variant="contained" color="primary">
             Add Course
+          </Button>
+          <Button onClick={importCourses} variant="outlined" color="primary" style={{ marginLeft: "10px" }}>
+            Import Courses
+          </Button>
+          <Button onClick={exportCourses} variant="outlined" color="primary" style={{ marginLeft: "10px" }}>
+            Export Courses
           </Button>
 
           {/* <Button
@@ -1074,6 +1138,42 @@ export default function CourseManage() {
           )}
         </DialogActions>
       </Dialog>
+
+      <Dialog
+        aria-labelledby="simple-dialog-title"
+        disableBackdropClick
+        open={importCoursesOpen}
+        onClose={handleCloseImportCourses}
+      >
+        <DialogTitle id="simple-dialog-title">Import Courses from JSON File</DialogTitle>
+        <DialogContent>
+          <label htmlFor="contained-button-file">
+            <input
+              accept=".json"
+              id="contained-button-file"
+              type="file"
+              onChange={(e) => handleUploadJson(e)}
+              style={{"display": "none"}}
+              />
+            <Button variant="outlined" color="primary" component="span">
+              Select json file
+            </Button>
+          </label>
+          <Typography>Current File: <b>{importCoursesFile ? importCoursesFile : "none"}</b></Typography>
+        </DialogContent>
+        <DialogActions>
+            <Button
+              onClick={handleImportCourses}
+              variant="contained"
+              color="primary"
+              disabled={importCoursesFile === ""}
+            >
+              Import
+            </Button>
+            <Button onClick={handleCloseImportCourses}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={alert?.open}

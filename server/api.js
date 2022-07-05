@@ -916,4 +916,97 @@ router.get(
   })
 );
 
+router.delete(
+  "/reset_selection",
+  permissionRequired(constants.AUTHORITY_ADMIN),
+  asyncHandler(async (req, res, next) => {
+    await model.Selection.deleteMany();
+    await model.Preselect.deleteMany();
+    await model.Result.deleteMany();
+    res.status(204).end();
+  })
+);
+
+router.get(
+  "/exportCourses.json",
+  permissionRequired(constants.AUTHORITY_MAINTAINER),
+  asyncHandler(async (req, res, next) => {
+    const courses = await model.Course.find({}, {id: 1, name: 1, type: 1, description: 1, number: 1, options: 1, students: 1, _id: 0}).exec();
+    res.send(courses);
+  })
+);
+
+router.post(
+  "/importCourses",
+  express.json({ strict: false }),
+  permissionRequired(constants.AUTHORITY_MAINTAINER),
+  asyncHandler(async (req, res, next) => {
+    const courses = req.body;
+    const new_courses = [];
+    let pass;
+    if (!courses || !Array.isArray(courses)) {
+      res.status(400).end();
+      return;
+    }
+
+    courses.forEach((data) => {
+      if (
+        typeof data.id === "string" &&
+        typeof data.name === "string" &&
+        typeof data.type === "string" &&
+        typeof data.description === "string" &&
+        typeof data.options === "object" &&
+        typeof data.students === "object" &&
+        typeof data.number === "number" &&
+        constants.COURSE_TYPE.includes(data.type)
+      ) {
+        pass = true;
+        data.options.forEach((option) => {
+          if (
+            typeof option.name !== "string" ||
+            typeof option.limit !== "number" ||
+            typeof option.priority_type !== "string" ||
+            (typeof option.priority_value !== "number" &&
+              typeof option.priority_value !== "object") ||
+            !constants.PRIORITY_TYPE.includes(option.priority_type)
+          ) {
+            pass = false;
+          }
+        });
+        if (pass) {
+          new_courses.push(data);
+        }
+      }
+    });
+    const exist = await Promise.all(
+      new_courses.map(async (data) => {
+        const { id, name, type, description, options, number, students } =
+          data;
+        const course = await model.Course.findOne({ id }).exec();
+        const newStudents = students.map((student) => {
+          return student.toUpperCase();
+        });
+        if (!course) {
+          const courseDocument = new model.Course({
+            id,
+            name,
+            type,
+            description,
+            options,
+            number,
+            students: newStudents,
+          });
+          await courseDocument.save();
+        }else{
+          return id;
+        }
+      })
+    );
+    const duplicate = exist.filter((value, index, arr)=>{
+      return value;
+    })
+    res.status(200).send(duplicate);
+  })
+);
+
 module.exports = router;

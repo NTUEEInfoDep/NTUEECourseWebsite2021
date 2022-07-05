@@ -1360,6 +1360,226 @@
                     }
                 }
             }
+        },
+        "/reset_selection": {
+            "delete": {
+                "tags": ["Management"],
+                "summary": "delete selection related data",
+                "description": "delete SELECTION, PRESELECT, RESULT data in mongo. Need Authority: Admin",
+                "responses": {
+                    "204": {
+                        "description": "Success"
+                    },
+                    "403": {
+                        "description": "Fail"
+                    }
+                }
+            }
+        },
+        "/exportCourses.json": {
+            "get": {
+                "tags": ["Course"],
+                "summary": "get a list of courses with selected attributes",
+                "description": "Get a list of all courses with selected attributes. <br/>Use query parameters to specify the attributes you want (id is default. Name, type, description and options are optional). <br/>For example, if you wanna get id, name and type, the request will be like \"http://localhost:8000/api/courses?name=1&type=1. Need Authority: Maintainer",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "number": {
+                                                "type": "number"
+                                            },
+                                            "students": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "options": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "limit": {
+                                                            "type": "number"
+                                                        },
+                                                        "priority (有些可能沒有這項）": {
+                                                            "type": "number"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": [{
+                                        "id": "course1"
+                                    },
+                                    {
+                                        "id": "course2"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/importCourses": {
+            "post": {
+                "tags": ["Course"],
+                "summary": "import courses",
+                "description": "Import new course. Need Authority: Maintainer",
+                "requestBody": {
+                    "description": "<h2>type</h2> <b>\"1,2,3,4\":</b> 必修<br><b>\"Ten-Select-Two\":</b> 十選二實驗 <br><b>\"EE-Lab\":</b> 電電實驗<br><h2>number</h2>可以選上的數量<br><h2>limit</h2>人數上限<br><h2>priority_type</h2><b>\"higher-grade-first\":</b> 高年級優先<br><b>\"grades\":</b> 某些年同等優先(若array裡只有一項，及該年級優先)，其餘平等<br><b>\"guarantee-third-grade\":</b> 大三保障名額<br><b>\"guarantee-fourth-grade\":</b> 保障大四名額<br><b>\"preselect\":</b>可以寫已經選上的人<br><b>\"none\",\"\":</b> 無年級優先<br><h2>以下為兩個課程範例, priority_type, priority_value 只有 customized 會用到, 其他type無需.description 目前為必要",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "students": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "number": {
+                                            "type": "number"
+                                        },
+                                        "options": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "limit": {
+                                                        "type": "number"
+                                                    },
+                                                    "priority_type": {
+                                                        "type": "string"
+                                                    },
+                                                    "priority_value": {
+                                                        "type": "number"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "example": [{
+                                    "id": "Electronic-Circuit test",
+                                    "name": "電路學test",
+                                    "type": "1",
+                                    "description": "test",
+                                    "number": 2,
+                                    "students": ["B11111111"],
+                                    "options": [{
+                                            "name": "Teacher A",
+                                            "limit": 1,
+                                            "priority_type": "",
+                                            "priority_value": 0
+                                        },
+                                        {
+                                            "name": "Teacher B",
+                                            "limit": 1,
+                                            "priority_type": "",
+                                            "priority_value": 0
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "Ten-Select-Two test",
+                                    "name": "十選二實驗 test",
+                                    "type": "Ten-Select-Two",
+                                    "description": "<p>(1) 請詳閱 <a href=\"https://bit.ly/3o0MrAb\" target=\"_blank\" style=\"color: #45bbff;\">實驗規定</a>，攸關各位的權利。</p><p>(2)特別轉載半導體實驗規定： ★★大學畢業後欲投入半導體領域者，可保留名額  ★★實驗期間需全程戴口罩、穿實驗衣含無塵衣,且著裝後需能自由移動。  ★★需遵守政府、臺大及實驗室之公共安全規定。  ★★環安衛法律條文規定沒有英文部份,若有外藉生不懂中文,將請助教以英文口譯告知。  ★★Electrical Engineering Lab (semiconductor) safety rules: ★In the labs,  students are required</p>",
+                                    "number": 2,
+                                    "students": [],
+                                    "options": [{
+                                            "name": "電力電子",
+                                            "limit": 1,
+
+                                            "priority_type": "",
+                                            "priority_value": 0
+                                        },
+                                        {
+                                            "name": "光電",
+                                            "limit": 1,
+                                            "priority_type": "",
+                                            "priority_value": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "example": ["course1", "course2"]
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The course has already existed, no input, format error"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/503"
+                    }
+                }
+            }
         }
     },
     "components": {
