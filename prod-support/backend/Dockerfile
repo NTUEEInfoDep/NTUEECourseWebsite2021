@@ -18,4 +18,4 @@ EXPOSE 8000
 # ENV REDIS_HOST course-redisdb
 
 # startup command
-CMD ["npm", "run", "dev-server"]
+CMD ["npm", "run", "server"]
