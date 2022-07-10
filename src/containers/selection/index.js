@@ -203,7 +203,7 @@ const Selection = () => {
           }}
         >
           <h2 style={{ marginTop: "0px" }}>Introduction</h2>
-          <MDEditor.Markdown source={data.description} />
+          <MDEditor.Markdown source={data.description} style={{ color: "inherit", backgroundColor: "inherit" }} />
         </div>
       )}
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
