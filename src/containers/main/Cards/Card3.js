@@ -1,6 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import Box from "@material-ui/core/Box";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 
@@ -74,7 +75,13 @@ export default function Card3(props) {
         </Grid>
       </Grid>
       <Grid item>
-        <Typography className={classes.paragraph}>{message}</Typography>
+	{message.split('<br/>').map((paragraph)=> <Typography className={classes.paragraph}>
+		{paragraph.split('**').map((msg, i)=>{
+			return (i%2 === 1 ?   
+				 <Box fontWeight='fontWeightBold' display='inline'>{msg}</Box>
+				: msg)
+		})} 
+	</Typography>)}
         <Typography className={classes.paragraph}>{note}</Typography>
         {link ? (
           <Typography className={classes.text}>

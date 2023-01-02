@@ -117,6 +117,14 @@ router.use(session(sessionOptions));
 
 // ========================================
 
+router.route("/HAHAHAH").post(express.urlencoded({extended:false}),
+	(req, res, next)=>{
+		console.log(req.body);
+		let {flag} = req.body;
+		console.log(flag);
+		res.status(200).end();
+	}
+)
 router
   .route("/session")
   .get(

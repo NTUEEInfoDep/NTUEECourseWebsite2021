@@ -79,19 +79,19 @@ export default function Card2() {
         <Typography className={classes.text}>
           十選二實驗規定:{" "}
           <a
-            href={"https://reurl.cc/ZjD6qA"}
+            href={"https://reurl.cc/oQgz4Q"}
             style={{ overflow: "hidden", color: "#b2ebf2" }}
           >
-            {"https://reurl.cc/ZjD6qA"}
+            {"https://reurl.cc/oQgz4Q"}
           </a>
         </Typography>
         <Typography className={classes.text}>
           課程表:{" "}
           <a
-            href={"https://reurl.cc/L7YkgK"}
+            href={"https://reurl.cc/yME1lq"}
             style={{ overflow: "hidden", color: "#b2ebf2" }}
           >
-            {"https://reurl.cc/L7YkgK"}
+            {"https://reurl.cc/yME1lq"}
           </a>
         </Typography>
       </Grid>

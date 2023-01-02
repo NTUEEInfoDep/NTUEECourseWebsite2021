@@ -72,18 +72,20 @@ export default function Card6() {
             １. 每個人的起始優先度是 0
           </Typography>
           <Typography className={classes.text}>
-            ２. 如果遇到有高年級優先的課，根據你是 X 年級優先度加 X (4
+            2. 優先度會受到該選項的志願序影響，如果你將課程中的某個選項設為第X志願，你的優先度將會減X(簡單來說，志願放越前面越容易上)
+          </Typography>
+          <Typography className={classes.text}>
+            3. 如果遇到有高年級優先的課，根據你是 X 年級優先度加 X (4
             年級以上算 4 年級)
           </Typography>
           <Typography className={classes.text}>
-            ３. 如果是大 X 優先而且你是大 X，則您的優先度加 1。
+            4. 如果是大 X 優先而且你是大 X，則您的優先度加 1。
           </Typography>
           <Typography className={classes.text}>
-            ４.
-            依上述規則產生該課程/實驗的優先度列表，若有一群學生的優先度相同則用random隨機排序。
+            5. 依上述規則產生該課程/實驗的優先度列表，若有一群學生的優先度相同則用random隨機排序。
           </Typography>
           <Typography className={classes.text}>
-            ５. 依照Stable Marriage Problem的方式進行分發。
+            6. 依照Stable Marriage Problem的方式進行分發。
           </Typography>
         </div>
       </Grid>
