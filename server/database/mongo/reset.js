@@ -18,12 +18,14 @@ module.exports = () => {
   }
 
   const SALT_ROUNDS = 10;
-  const { MONGO_HOST, MONGO_DBNAME, MONGO_USERNAME, MONGO_PASSWORD} = process.env;
-
-  mongoose.connect(`mongodb://${MONGO_USERNAME}:${ MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DBNAME}`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  const { MONGO_HOST, MONGO_DBNAME, MONGO_USERNAME, MONGO_PASSWORD, MONGO_PORT } = process.env;
+  mongoose.connect(
+    `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DBNAME}?authSource=admin`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  );
 
   const db = mongoose.connection;
   db.on("error", console.error.bind(console, "connection error:"));

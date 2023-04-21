@@ -13,7 +13,9 @@
 前端：[朱哲廣](https://github.com/Kenchu123),
 email: `b07901016@ntu.edu.tw`
 
-後端：[劉奇聖](https://github.com/MortalHappiness), email: `b07901069@ntu.edu.tw`
+後端：
+- [劉奇聖](https://github.com/MortalHappiness), email: `b07901069@ntu.edu.tw`
+- [賴群貿](https://github.com/Mecoli1219), email: `b09901186@ntu.edu.tw`
 
 ## Quick Start (Development mode)
 
@@ -22,10 +24,12 @@ After cloning this repo, put `students.json` into `./server/database/private-dat
 For the format and generation of `students.json`, see [password generation](#gen_password).
 
 ```shell
-$ npm install
-$ docker-compose up -d         # This will watch backend code changes
-$ npm run dev-server           # This will run a develop server
-$ npm start
+$ cp .env.defaults .env                                  # Run one time
+$ pnmp database reset                                    # Database reset, run one time
+$ pnpm install
+$ docker-compose -f docker-compose_dev.yml up -d         # This will watch backend code changes
+$ pnpm dev-server           # This will run a develop server
+$ pnpm start
 ```
 
 Goto `http://localhost:3000` to see the website.

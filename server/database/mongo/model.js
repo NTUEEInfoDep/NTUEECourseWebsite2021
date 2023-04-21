@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 // const { conn, conn_atlas } = require("./connection");
 require("dotenv").config();
 
-const { MONGO_HOST, MONGO_DBNAME, MONGO_USERNAME, MONGO_PASSWORD } = process.env;
+const { MONGO_HOST, MONGO_DBNAME, MONGO_USERNAME, MONGO_PASSWORD, MONGO_PORT } = process.env;
 const conn = mongoose.createConnection(
-  `mongodb://${MONGO_USERNAME}:${ MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DBNAME}`,
+  `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DBNAME}?authSource=admin`,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
