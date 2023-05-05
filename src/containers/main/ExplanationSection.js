@@ -10,7 +10,12 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import BatteryAlertIcon from "@material-ui/icons/BatteryAlert";
 import BatteryCharging20Icon from "@material-ui/icons/BatteryCharging20";
+import BatteryCharging30Icon from "@material-ui/icons/BatteryCharging30";
+import BatteryCharging50Icon from "@material-ui/icons/BatteryCharging50";
 import BatteryCharging60Icon from "@material-ui/icons/BatteryCharging60";
+import BatteryCharging80Icon from "@material-ui/icons/BatteryCharging80";
+import BatteryChargingFullIcon from "@material-ui/icons/BatteryChargingFull";
+import AssistantPhotoIcon from "@material-ui/icons/AssistantPhoto";
 
 import Card from "./Cards/Card";
 import Card2 from "./Cards/Card2";
@@ -18,6 +23,7 @@ import Card3 from "./Cards/Card3";
 import Card4 from "./Cards/Card4";
 import Card5 from "./Cards/Card5";
 import Card6 from "./Cards/Card6";
+import CardMarkdown from "./Cards/CardMarkdown";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -83,10 +89,44 @@ const StyledDotGroup = styled(DotGroup)`
     margin-bottom: 3%;
   }
 `;
-const message = `選擇課程後，對所有教授設置志願序。全部為高年級優先，後續事宜交由加簽處理。 `;
-const message2 = `對所有時段設置志願序。無特定年級優先，後續事宜交由開學後的實驗meeting處理。 `;
-const message4 = `通常是全部選上，若遇到需要抽籤情況，抽籤方式為 "隨機+人工篩選" 。人工篩選：若學術部判定隨機抽籤的結果會引起爭議時，我們會考慮年級、十選二修課紀錄等等情節，手動調整並將修課機會合理地讓給未來較無機會再修習的人。`;
-const message5 = `演算法會進行兩次分發，會先以每人選只能選上一門課為前提先做第一次分發，分發完再利用剩下的空位再分發一次。<br/>第一次分發會先把上限設為保障名額數，以該年級為優先進行分發；第二次分發再開放剩餘名額，並調整為無特定年級優先，即可保障該年級人數能盡可能到達保障人數。（但如果選該課的保障年級學生人數很少，可能就不會到達保障名額人數）選中數電實驗的人算選中一個選項，因此抽籤時不會參加到十選二的第一次分發。<br/>本學期**網路與多媒體**設有**特定年級優先**；**電磁波**設置年級保障名額。電力電子預選只會開放18個名額；剩下的名額由加簽或教授決定。`;
+
+const message2 = `- 請對所有時段設置志願序(每個時段的上限人數為 50人)，無特定年級優先。
+- 在預選後，如您欲更換時段，請您找好能與您更換時段的同學。請直接來信與實驗課林冠中助教聯繫 ([calculus365@yahoo.com.tw](mailto:calculus365@yahoo.com.tw)) 並副本 (CC) 給另一位同學，這樣助教才會處理，謝謝。
+- 若未參加預選的同學，屆時將由助教們統一安排時段。
+- 參加系上實驗課預選，並不代表電子學實驗(二)、電路學實驗這門課會出現在您的課表上，請務必進入學校選課系統點選電子學實驗(二)、電路學實驗這門課，這樣才算數，期末才會有成績。
+- 電子學實驗(二)與電路學實驗之第一次上課時間與地點將會在開學前另行公告。`;
+
+const message3 = `選擇有興趣的實驗並設置志願序。
+
+- 請先詳細閱讀**十選二實驗規定**。部分課程有相關先修規定。
+- **[注意]** 今年電磁波實驗會針對兩個時段 (周二早上、周三早上) 各設置一個志願，請同學考量自身時間狀況進行志願的排序，系統會自行判斷不會同時選上兩個時段之電磁波實驗。
+- 可設置0~10個志願序 (不含數電實驗、有兩個電磁波實驗)，所有志願序都有可能選上。
+數電實驗另開Google表單，3人組隊報名。表單開放時間與預選系統相同。
+- 所有學生至多選上2門實驗，包含數電實驗。
+- 抽籤作業流程：(A)數電實驗抽籤 → (B)志願序抽籤
+
+十選二實驗規定：[https://reurl.cc/VRx3Gy](https://reurl.cc/VRx3Gy)
+
+課程表：[https://reurl.cc/pZN52e](https://reurl.cc/pZN52e)`
+
+const message4 = `通常是全部選上，若遇到需要抽籤情況，抽籤方式為**隨機**。
+
+數電實驗表單：[https://forms.gle/nHBXNxA4RP1Ajvts6](https://forms.gle/nHBXNxA4RP1Ajvts6)`;
+
+const message5 = `- 演算法會進行兩次分發，會先以每人選只能選上一門課為前提先做第一次分發，分發完再利用剩下的空位再分發一次。
+- 第一次分發會先把上限設為保障名額數，以該年級為優先進行分發；第二次分發再開放剩餘名額，並調整為無特定年級優先，即可保障該年級人數能盡可能到達保障人數。（但如果選該課的保障年級學生人數很少，可能就不會到達保障名額人數）
+- 選中數電實驗的人算選中一個選項，因此抽籤時不會參加到十選二的第一次分發。
+- 本學期**自動控制、半導體**設有**特定年級優先**；**光電**設置**年級保障名額**。
+- 本學期電力電子預選只會開放18個名額；剩下的名額由加簽或教授決定。`
+
+const message6 = `1. 每個人的起始優先度是 0
+2. 優先度會受到該選項的志願序影響，如果你將課程中的某個選項設為第X志願，你的優先度將會減X(簡單來說，志願放越前面越容易上)
+3. 如果遇到有高年級優先的課，根據你是 X 年級優先度加 X*20 (4 年級以上算 4 年級)
+4. 如果是大 X 優先而且你是大 X，則你的優先度加 20。
+5. 在產生課程選項志願的時候，會從優先度高的人開始抽。若有一群學生優先度相同則random排序進行分。
+
+演算法詳細說明: [Github](https://github.com/NTUEEInfoDep/NTUEECourseWebsite2021/blob/2022-fall/distribute-server/README.md)`
+
 export default function Explanation() {
   const classes = useStyles();
   const isMobile = useMediaQuery({ query: "(max-width: 480px,)" }); //只是控制頁數和上面的選擇器無關
@@ -120,20 +160,10 @@ export default function Explanation() {
           // dragEnabled={false}
         >
           <Slider>
-            {/* <StyledSlide index={0}>
-              <Scrollbars>
-                <Card
-                  message={message}
-                  title="系必修課程"
-                  icon={BatteryAlertIcon}
-                />
-              </Scrollbars>
-            </StyledSlide> */}
-
             <StyledSlide index={0}>
               <Scrollbars>
-                <Card
-                  message={message2}
+                <CardMarkdown
+	  	  description={message2}
                   title="電電實驗"
                   icon={BatteryCharging20Icon}
                 />
@@ -141,50 +171,39 @@ export default function Explanation() {
             </StyledSlide>
             <StyledSlide index={1}>
               <Scrollbars>
-                <Card2 />
+                <CardMarkdown
+	  	  description={message3}
+                  title="十選二實驗"
+                  icon={BatteryCharging50Icon}
+                />
               </Scrollbars>
             </StyledSlide>
 
             <StyledSlide index={2}>
               <Scrollbars>
-                <Card3
-                  message={message4}
+                <CardMarkdown
+                  description={message4}
                   title={"數電實驗抽籤"}
-                  icon={BatteryCharging60Icon}
-                  note={
-                    "NOTE：人工篩選會完全透明公開，非黑箱作業。黑箱作業對學術部沒有任何好處，請知悉。"
-                  }
-                  link={"https://forms.gle/dS3PGqC4KHhaJac78"}
-                  step={"STEP1"}
+                  icon={BatteryCharging80Icon}
                 />
               </Scrollbars>
             </StyledSlide>
             <StyledSlide index={3}>
               <Scrollbars>
-                <Card3
-                  message={message5}
+                <CardMarkdown
+                  description={message5}
                   title={"九實驗志願抽籤"}
-                  icon={BatteryCharging60Icon}
-                  note={
-                    "NOTE：請注意，第一 / 第二次分發表示演算法內部運作過程，與第一 / 第二階段選課不同。"
-                  }
-                  step={"STEP2"}
+                  icon={BatteryChargingFullIcon}
                 />
               </Scrollbars>
             </StyledSlide>
-            {/* <StyledSlide index={4}>
-              <Scrollbars>
-                <Card4 />
-              </Scrollbars>
-            </StyledSlide> */}
-	  {/*<StyledSlide index={4}>
-              <Scrollbars>
-                <Card5 />
-              </Scrollbars>
-            </StyledSlide>*/}
             <StyledSlide index={4}>
               <Scrollbars>
-                <Card6 />
+                <CardMarkdown
+                  description={message6}
+                  title={"補充"}
+                  icon={AssistantPhotoIcon}
+                />
               </Scrollbars>
             </StyledSlide>
           </Slider>

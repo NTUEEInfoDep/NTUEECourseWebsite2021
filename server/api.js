@@ -117,14 +117,6 @@ router.use(session(sessionOptions));
 
 // ========================================
 
-router.route("/HAHAHAH").post(express.urlencoded({extended:false}),
-	(req, res, next)=>{
-		console.log(req.body);
-		let {flag} = req.body;
-		console.log(flag);
-		res.status(200).end();
-	}
-)
 router
   .route("/session")
   .get(
@@ -941,6 +933,15 @@ router.get(
   asyncHandler(async (req, res, next) => {
     const courses = await model.Course.find({}, {id: 1, name: 1, type: 1, description: 1, number: 1, options: 1, _id: 0}).exec();
     res.send(courses);
+  })
+);
+
+router.get(
+  "/selections.json",
+  permissionRequired(constants.AUTHORITY_MAINTAINER),
+  asyncHandler(async (req, res, next) => {
+    const selections = await model.Selection.find({}, {courseID: 1, userID: 1, name: 1, ranking: 1, _id: 0}).exec();
+    res.send(selections);
   })
 );
 
