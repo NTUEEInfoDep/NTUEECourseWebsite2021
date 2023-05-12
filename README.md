@@ -19,48 +19,33 @@ email: `b07901016@ntu.edu.tw`
 
 ## Quick Start (Development mode)
 
-After cloning this repo, put `students.json` into `./server/database/private-data/`, and then execute the following commands.
+### Start dataset
+```shell
+$ docker-compose -f docker-compose_dev.yml up -d
+```
+Check whether ```mongodb``` and ```redisdb``` are running
+```shell
+$ docker ps
+```
 
-For the format and generation of `students.json`, see [password generation](#gen_password).
-
+### Base setup
 ```shell
 $ cp .env.defaults .env                                  # Run one time
-$ pnmp database reset                                    # Database reset, run one time
+$ pnpm database reset                                    # Database reset, run whenever you want
 $ pnpm install
-$ docker-compose -f docker-compose_dev.yml up -d         # This will watch backend code changes
+```
+
+### Start distribute server (OPTIONAL: If you want to test distribute)
+Checkout ```distribute-server/README.md```
+
+### Start backend first
+```shell
 $ pnpm dev-server           # This will run a develop server
+```
+Goto `http://localhost:8000` to see the swagger.
+
+### Start frontend first
+```bash
 $ pnpm start
 ```
-
 Goto `http://localhost:3000` to see the website.
-
-## Frontend Develop (With Docker)
-
-```bash
-# start frontend, backend, database
-$ docker-compose up -d
-```
-
-To see frontend logs
-
-```
-$ docker logs -f ntueecoursewebsite2021_frontend_1
-```
-
-To reset database
-
-```bash
-$ docker exec -it ntueecoursewebsite2021_backend_1 npm run database reset
-```
-
-## Frontend Develop (Without Docker)
-
-```bash
-$ npm install
-$ npm start
-# in another terminal
-cd server
-docker-compose up -d
-cd ..
-npm run database reset
-npm run dev-server
