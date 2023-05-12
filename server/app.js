@@ -27,43 +27,43 @@ db.once("open", () => {
   console.log("Successfully connect to MongoDB!");
   console.log(`dbName = "${process.env.MONGO_DBNAME}"`);
 
-  cron.schedule("59 */1 * * *", async () => {
-    try {
-      const startTime = await model.OpenTime.findOne({
-        type: constants.START_TIME_KEY,
-      }).exec();
-      const endTime = await model.OpenTime.findOne({
-        type: constants.END_TIME_KEY,
-      }).exec();
-      const now = Math.floor(new Date() / 1000);
-      if (now >= startTime.time && now <= endTime.time) {
-        console.log("Executing backup...");
-	const mongo_url = process.env.MONGO_URL + now + "?retryWrites=true&w=majority";
-	const conn_atlas = mongoose.createConnection(mongo_url, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        });
-        constants.MODEL.map(async (modelData) => {
-	  const schema = model[modelData[1]];
-	  const atlas = conn_atlas.model(modelData[0], schema);
-          const allData = await model[modelData[0]].find({});
-          await Promise.all(
-            allData.map(async (RawData) => {
-              const data = {};
-              await modelData[2].map((key) => {
-                data[key] = RawData[key];
-              });
-              const document = atlas(data);
-              await document.save();
-            })
-          );
-          console.log(`All data in ${modelData[0]} is backuped.`);
-        });
-      }
-    } catch (e) {
-      console.log("Back up failed");
-    }
-  });
+  // cron.schedule("59 */1 * * *", async () => {
+  //   try {
+  //     const startTime = await model.OpenTime.findOne({
+  //       type: constants.START_TIME_KEY,
+  //     }).exec();
+  //     const endTime = await model.OpenTime.findOne({
+  //       type: constants.END_TIME_KEY,
+  //     }).exec();
+  //     const now = Math.floor(new Date() / 1000);
+  //     if (now >= startTime.time && now <= endTime.time) {
+  //       console.log("Executing backup...");
+  // const mongo_url = process.env.MONGO_URL + now + "?retryWrites=true&w=majority";
+  // const conn_atlas = mongoose.createConnection(mongo_url, {
+  //         useNewUrlParser: true,
+  //         useUnifiedTopology: true,
+  //       });
+  //       constants.MODEL.map(async (modelData) => {
+  //   const schema = model[modelData[1]];
+  //   const atlas = conn_atlas.model(modelData[0], schema);
+  //         const allData = await model[modelData[0]].find({});
+  //         await Promise.all(
+  //           allData.map(async (RawData) => {
+  //             const data = {};
+  //             await modelData[2].map((key) => {
+  //               data[key] = RawData[key];
+  //             });
+  //             const document = atlas(data);
+  //             await document.save();
+  //           })
+  //         );
+  //         console.log(`All data in ${modelData[0]} is backuped.`);
+  //       });
+  //     }
+  //   } catch (e) {
+  //     console.log("Back up failed");
+  //   }
+  // });
 
   const app = express();
 
